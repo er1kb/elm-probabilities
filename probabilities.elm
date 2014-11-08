@@ -1,4 +1,4 @@
-module Probabilities (combinations, permutations, pdfbinom, pdfhyper, pdfpoission, cdfbinom, cdfhyper, cdfpoisson) where
+module Probabilities (combinations, permutations, pdfbinom, pdfhyper, pdfpoisson, cdfbinom, cdfhyper, cdfpoisson) where
 
 {-| Functions for calculating values of common discrete probability distributions. 
 
@@ -15,7 +15,6 @@ module Probabilities (combinations, permutations, pdfbinom, pdfhyper, pdfpoissio
 
 import Debug
 import List
-import Maybe
 
 {-| The number of ways to combine k out of n items. Order is irrelevant, so each unique set of items appears only once. Assuming two items a and b, (a,b) and (b,a) are one and the same combination. 
 
@@ -78,7 +77,7 @@ cdfhyper : number -> number -> number -> [number]
 cdfhyper pN pS n = tail <| scanl (+) 0 <| map (pdfhyper pN pS n) [0..n]
 
 
-{-| Poission probability distribution function, for anticipating unlikely events. Given a known average of mu, what is the likelihood of x? For example, if a certain workplace has 2 hard drive failures a week on average, compute the probability of getting 3 failures on a given week. 
+{-| Poission probability distribution function, for anticipating unlikely events. Given a known average of mu, what is the likelihood of x? For example, if a certain workplace has 2 hard drive failures a week on average, compute the probability of getting 3 failures in a given week. 
 
     pdfpoisson 2 3 == 0.18
     map (pdfpoisson 2) [0..5] == [0.135, 0.271, 0.271, 0.18, 0.09, 0.036]
@@ -94,11 +93,11 @@ cdfpoisson mu x = tail <| scanl (+) 0 <| map (pdfpoisson mu) [0..x]
 
 
 {- Utility functions -}
-
+{-| Factorial for a number n is the product of [1..n]. It can be used to calculate combinations and permutations. It is implemented backwards and recursively, starting with n * (n-1), then (n * (n-1)) * (n-2), and so on. -}
 factorial : number -> number
 factorial n = if n < 1 then 1 else n * factorial (n-1)
 
--- Round a number n to m number of decimals
+{-| Rounds a number n to m number of decimals -}
 dec : number -> number -> number
 dec m n = (toFloat << round <| n * 10^m) / (10^m)
 
