@@ -1,20 +1,74 @@
---module Probabilities (pdfuniform, pdfnormal, pdfstandardnormal, pdfexponential, cdfuniform, cdfnormal, cdfstandardnormal, cdfexponential) where
+module Probabilities (uniform, normal, standardnormal, exponential, pdfuniform, pdfnormal, pdfstandardnormal, pdfexponential, cdfuniform, cdfnormal, cdfstandardnormal, cdfexponential) where
 
 {-| Functions for calculating values of common continuous probability distributions. 
 
+# Distribution constructors
+@docs uniform, normal, standardnormal, exponential
+
 # Probability density functions
-@docs pdfuniform, pdfnormal, pdfexponential
+@docs pdfuniform, pdfnormal, pdfstandardnormal, pdfexponential
 
 # Cumulative density functions 
-@docs cdfuniform, cdfnormal, cdfexponential
+@docs cdfuniform, cdfnormal, cdfstandardnormal, cdfexponential
 
 -}
 
 import Debug
 import List
 
+
+type Uniform d = { d | name:String, mu:Float, sigma:Float, f:(Float -> Float), interval:(Float,Float) }
+
+{-| Constructs a new uniform distribution with the given interval. -}
+uniform : (number,number) -> Uniform {}
+uniform (from,to) = { name="uniform",  
+                      mu=(to-from)/2, 
+                      sigma=sqrt ((to - from)^2 / 12),
+                      f=pdfuniform (from,to),
+                      interval=(from,to) }
+
+
+type Normal d = { d | name:String, mu:Float, sigma:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
+
+{-| Constructs a new normal distribution with the given mean (mu) and standard deviation (sigma). -}
+normal : number -> number -> Normal {}
+normal mu sigma = { name="normal",  
+                      mu=mu, 
+                      sigma=sigma,
+                      f=pdfnormal mu sigma,
+                      p=cdfnormal mu sigma 100
+                   }
+
+
+type Standardnormal d = { d | name:String, mu:Float, sigma:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
+
+{-| Constructs a new standard normal distribution with mean (mu) 0 and standard deviation (sigma) 1. -}
+standardnormal : Standardnormal {}
+standardnormal = { name="standard normal",  
+                   mu=0, 
+                   sigma=1,
+                   f=pdfstandardnormal,
+                   p=cdfstandardnormal 100
+                   }
+
+
+type Exponential d = { d | name:String, lambda:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
+
+{-| Constructs a new exponential distribution with the lambda parameter. -}
+exponential : number -> Exponential {}
+exponential lambda = { name="exponential",  
+                       lambda=lambda,
+                       f=pdfexponential lambda,
+                       p=cdfexponential lambda 100
+                       }
+
+
+
+
+
+
 {-| Probability density function for a normal distribution with mean mu and standard deviation sigma. This function computes the height of the curve at a given x. -}
---pdfuniform : number -> number -> number -> number
+pdfuniform : (number,number) -> number -> number
 pdfuniform (from,to) x = 
    let 
       a = from
@@ -22,6 +76,7 @@ pdfuniform (from,to) x =
       domain = b - a
    in
       if x >= 0 && a <= x && x <= b then (1 / domain) else 0
+
 
 
 {-| Probability density function for a normal distribution with mean mu and standard deviation sigma. This function computes the height of the curve at a given x. -}
@@ -32,9 +87,12 @@ pdfnormal mu sigma x =
       in
           top * e^exponent
 
+
 {-| Probability density function for a standardized normal distribution, with mean 0 and standard deviation 1. -}
 pdfstandardnormal : number -> number
 pdfstandardnormal x = pdfnormal 0 1 x
+
+
 
 {-| Probability density function for an exponential distribution. -}
 pdfexponential : number -> number -> number
@@ -121,9 +179,6 @@ tangent dx x f =
        { slope = m, intercept = b, x = x, dx = dx }
 
 
-
-
-
 {- Utility functions -}
 {-| Factorial for a number n is the product of [1..n]. It can be used to calculate combinations and permutations. It is implemented backwards and recursively, starting with n * (n-1), then (n * (n-1)) * (n-2), and so on. -}
 factorial : number -> number
@@ -162,4 +217,10 @@ normalize (xmin,xmax) x = (x - xmin) / (xmax - xmin)
 --main = asText <| dec 3 <| integrate (1,pi) 100 (\x -> 1/x)
 --main = asText <| slope 0.01 2 (\x -> 1/x)
 --main = asText <| tangent 0.01 2 (\x -> 1/x)
-
+--meh = normal 100 10
+--main = asText <| (dec 3 << meh.p) (90,110)
+--main = asText <| meh.f 80
+--meh = standardnormal
+--main = asText <| (dec 3 << meh.p) (-1,1)
+--meh = exponential 0.5 
+--main = asText <| (dec 3 << meh.p) (0,3)

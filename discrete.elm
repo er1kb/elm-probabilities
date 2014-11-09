@@ -1,5 +1,5 @@
 module Discrete (combinations, permutations, binom, hyper, poisson, pdfbinom, pdfhyper, pdfpoisson, cdfbinom, cdfhyper, cdfpoisson) where
-
+--
 {-| Functions for calculating values of common discrete probability distributions. 
 
 # Combinations and permutations
