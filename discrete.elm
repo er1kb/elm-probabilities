@@ -1,9 +1,12 @@
-module Probabilities (combinations, permutations, pdfbinom, pdfhyper, pdfpoisson, cdfbinom, cdfhyper, cdfpoisson) where
+module Discrete (combinations, permutations, binom, hyper, poisson, pdfbinom, pdfhyper, pdfpoisson, cdfbinom, cdfhyper, cdfpoisson) where
 
 {-| Functions for calculating values of common discrete probability distributions. 
 
 # Combinations and permutations
 @docs combinations, permutations
+
+# Probability distributions
+@docs binom, hyper, poisson
 
 # Probability density functions
 @docs pdfbinom, pdfhyper, pdfpoisson
@@ -15,6 +18,8 @@ module Probabilities (combinations, permutations, pdfbinom, pdfhyper, pdfpoisson
 
 import Debug
 import List
+
+
 
 {-| The number of ways to combine k out of n items. Order is irrelevant, so each unique set of items appears only once. Assuming two items a and b, (a,b) and (b,a) are one and the same combination. 
 
@@ -35,6 +40,40 @@ combinations n k = if | k > n -> 0
 permutations : number -> number -> number
 permutations n k = if | k > n -> 0
                       | otherwise -> (factorial n) / factorial (n - k)
+
+type Binom d = { d | name:String, mu:Float, sigma:Float, f:(Float -> Float), p:[Float] }
+
+{-| Constructs a new binomial distribution with n tries and prob probability of "success" on each try. -}
+binom : number -> number -> Binom {}
+binom n prob = { name="binomial",  
+                      mu=n * prob, 
+                      sigma=sqrt <| (n * prob) * (1 - prob),
+                      f=pdfbinom n prob,
+                      p=cdfbinom n prob }
+
+
+type Hyper d = { d | name:String, mu:Float, sigma:Float, f:(Float -> Float), p:[Float] }
+
+{-| Constructs a new hypergeometric distribution with n tries and prob probability of "success" on each try. -}
+hyper : number -> number -> number -> Hyper {}
+hyper pN pS n = { name="hypergeometric",  
+                  mu=n * (pS / pN), 
+                  sigma=sqrt <| (n * (pS/pN)) * (1 - (pS/pN)) * ((pN-n)/(pN-1)),
+                  f=pdfhyper pN pS n,
+                  p=cdfhyper pN pS n }
+
+
+type Poisson d = { d | name:String, mu:Float, sigma:Float, f:(Float -> Float), p:(Float -> [Float]) }
+
+{-| Constructs a new Poisson distribution with mean mu. -}
+poisson : number -> Poisson {}
+poisson mu = { name="poisson",  
+               mu=mu, 
+               sigma=sqrt mu,
+               f=pdfpoisson mu,
+               p=cdfpoisson mu  
+             }
+
 
 {-| Binomial (Bernoulli) probability distribution function, for mutually independent events. 
 
@@ -77,7 +116,7 @@ cdfhyper : number -> number -> number -> [number]
 cdfhyper pN pS n = tail <| scanl (+) 0 <| map (pdfhyper pN pS n) [0..n]
 
 
-{-| Poission probability distribution function, for anticipating unlikely events. Given a known average of mu, what is the likelihood of x? For example, if a certain workplace has 2 hard drive failures a week on average, compute the probability of getting 3 failures in a given week. 
+{-| Poisson probability distribution function, for anticipating unlikely events. Given a known average of mu, what is the likelihood of x? For example, if a certain workplace has 2 hard drive failures a week on average, compute the probability of getting 3 failures in a given week. 
 
     pdfpoisson 2 3 == 0.18
     map (pdfpoisson 2) [0..5] == [0.135, 0.271, 0.271, 0.18, 0.09, 0.036]
