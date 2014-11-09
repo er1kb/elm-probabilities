@@ -1,4 +1,4 @@
-module Probabilities (uniform, normal, standardnormal, exponential, pdfuniform, pdfnormal, pdfstandardnormal, pdfexponential, cdfuniform, cdfnormal, cdfstandardnormal, cdfexponential) where
+module Continuous (uniform, normal, standardnormal, exponential, pdfuniform, pdfnormal, pdfstandardnormal, pdfexponential, cdfuniform, cdfnormal, cdfstandardnormal, cdfexponential) where
 
 {-| Functions for calculating values of common continuous probability distributions. 
 
@@ -138,7 +138,7 @@ cdfexponential lambda nsteps (from,to) =
 
 {-| Approximating an integral with a trapezium/trapezoid shape. -}
 trapezium : number -> (number,number) -> number
-trapezium dx (x1,x2) = dx * (x1 + x2) / 2
+trapezium dx (y1,y2) = dx * (y1 + y2) / 2
 
 {-| Splitting a list of x values into adjacent bins, as in a histogram. A list [a,b,c,d] becomes [(a,b),(b,c),(c,d)] -}
 bins : [number] -> [(number,number)]
