@@ -1,4 +1,4 @@
-module Continuous (uniform, normal, standardnormal, exponential, pdfuniform, pdfnormal, pdfstandardnormal, pdfexponential, cdfuniform, cdfnormal, cdfstandardnormal, cdfexponential) where
+module Continuous (uniform, normal, standardnormal, exponential, pdfuniform, pdfnormal, pdfstandardnormal, pdfexponential, cdfuniform, cdfnormal, cdfstandardnormal, cdfexponential, area, bins, interpolate, integrate, slope, tangent) where
 
 {-| Functions for calculating values of common continuous probability distributions. 
 
@@ -17,34 +17,37 @@ import Debug
 import List
 
 
-type Uniform d = { d | name:String, mu:Float, sigma:Float, f:(Float -> Float), interval:(Float,Float) }
+type Uniform d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), interval:(Float,Float) }
 
 {-| Constructs a new uniform distribution with the given interval. -}
 uniform : (number,number) -> Uniform {}
 uniform (from,to) = { name="uniform",  
+                      discrete=False,
                       mu=(to-from)/2, 
                       sigma=sqrt ((to - from)^2 / 12),
                       f=pdfuniform (from,to),
                       interval=(from,to) }
 
 
-type Normal d = { d | name:String, mu:Float, sigma:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
+type Normal d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
 
 {-| Constructs a new normal distribution with the given mean (mu) and standard deviation (sigma). -}
 normal : number -> number -> Normal {}
 normal mu sigma = { name="normal",  
-                      mu=mu, 
-                      sigma=sigma,
-                      f=pdfnormal mu sigma,
-                      p=cdfnormal mu sigma 100
+                    discrete=False,
+                    mu=mu, 
+                    sigma=sigma,
+                    f=pdfnormal mu sigma,
+                    p=cdfnormal mu sigma 100
                    }
 
 
-type Standardnormal d = { d | name:String, mu:Float, sigma:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
+type Standardnormal d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
 
 {-| Constructs a new standard normal distribution with mean (mu) 0 and standard deviation (sigma) 1. -}
 standardnormal : Standardnormal {}
 standardnormal = { name="standard normal",  
+                   discrete=False,
                    mu=0, 
                    sigma=1,
                    f=pdfstandardnormal,
@@ -52,19 +55,16 @@ standardnormal = { name="standard normal",
                    }
 
 
-type Exponential d = { d | name:String, lambda:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
+type Exponential d = { d | name:String, discrete:Bool, lambda:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
 
 {-| Constructs a new exponential distribution with the lambda parameter. -}
 exponential : number -> Exponential {}
 exponential lambda = { name="exponential",  
+                       discrete=False,
                        lambda=lambda,
                        f=pdfexponential lambda,
                        p=cdfexponential lambda 100
                        }
-
-
-
-
 
 
 {-| Probability density function for a normal distribution with mean mu and standard deviation sigma. This function computes the height of the curve at a given x. -}
@@ -113,6 +113,7 @@ pdfexponential lambda x =
 {-| Cumulative density function for a uniform distribution with mean mu and standard deviation sigma. This function computes the height of the curve at a given x. -}
 cdfuniform : number
 cdfuniform = 1
+--TODO
 
 
 cdfnormal : number -> number -> number -> (number,number) -> number
@@ -122,7 +123,7 @@ cdfnormal mu sigma nsteps (from,to) =
 
 {-| Cumulative density function for a standardized normal distribution.  
 
-   cdfznormal 10 (-1,1) == 0.683   -- ≈68 % within ±1 standard deviation around the mean
+   cdfstandardnormal 10 (-1,1) == 0.683   -- ≈68 % within ±1 standard deviation around the mean
 -}
 cdfstandardnormal :  number -> (number,number) -> number
 cdfstandardnormal nsteps (from,to) = integrate (from,to) nsteps (pdfnormal 0 1)
@@ -135,26 +136,37 @@ cdfexponential lambda nsteps (from,to) =
 
 
 
-
 {-| Approximating an integral with a trapezium/trapezoid shape. -}
-trapezium : number -> (number,number) -> number
-trapezium dx (y1,y2) = dx * (y1 + y2) / 2
+area : number -> (number,number) -> number
+area dx (y1,y2) = dx * (y1 + y2) / 2
 
 {-| Splitting a list of x values into adjacent bins, as in a histogram. A list [a,b,c,d] becomes [(a,b),(b,c),(c,d)] -}
 bins : [number] -> [(number,number)]
 bins ys = zip (take ((length ys)-1) ys) (tail ys)
 
+{-| Interpolate an interval for integration and plotting. -}
+interpolate (from,to) nsteps f = 
+   let
+       dxrange = (to - from) -- length of the interval
+       dx = dxrange / (nsteps) -- size of chunks (trapezia) to calculate individually
+       interpolator = map (\x -> (x / nsteps)) [0..nsteps]
+   in
+       (dx, map (\x -> from + x * dxrange) interpolator)
+
 {-| Integrating a function f over an interval in a given number of steps. -}
 integrate : (number,number) -> number -> (number -> number) -> number
 integrate (from,to) nsteps f =  
-   let dxrange = (to - from) -- length of the interval
-       dx = dxrange / (nsteps) -- size of chunks (trapezia) to calculate individually
-       interpolator = map (\x -> (x / nsteps)) [0..nsteps]
-       steps = map (\x -> from + x * dxrange) interpolator
+   let  
+       --dxrange = (to - from) -- length of the interval
+       --dx = dxrange / (nsteps) -- size of chunks (trapezia) to calculate individually
+       --interpolator = map (\x -> (x / nsteps)) [0..nsteps]
+       --steps = map (\x -> from + x * dxrange) interpolator
+       (dx, steps) = interpolate (from,to) nsteps f
        ys = map f steps
        trapezia = bins ys
    in
-       abs <| sum <| map (trapezium dx) trapezia
+       sum <| map (area dx) trapezia
+
 
 {-| Finding the approximate derivative of a function at a given point. -}
 slope : number -> number -> (number -> number) -> number
@@ -207,7 +219,7 @@ normalize (xmin,xmax) x = (x - xmin) / (xmax - xmin)
 --main = asText <| cdfnormal 0 1 10 (-1,1)
 --main = asText <| zip [1,2,3] <| map (dec 3 << cdfnormal 0 1 100) [(-1,1),(-2,2),(-3,3)]
 --main = asText <| cdfexponential 0.5 10 (0,2) 
---main = asText <| cdfznormal 100 (-1,1)
+--main = asText <| cdfstandardnormal 100 (-1,1)
 --main = asText <| cdfexponential (1/20) 100 (0,5)
 --main = asText <| 1 - cdfexponential (1/20) 100 (0,40)
 --main = asText <| integrate (25,30) 100 <| pdfuniform (0,30)
@@ -224,3 +236,8 @@ normalize (xmin,xmax) x = (x - xmin) / (xmax - xmin)
 --main = asText <| (dec 3 << meh.p) (-1,1)
 --meh = exponential 0.5 
 --main = asText <| (dec 3 << meh.p) (0,3)
+
+--integrating a volume of revolution around the x axis -->
+--main = asText <| dec 2 <| integrate (1,3) 100 (\x -> pi * (1 / sqrt x)^2)
+
+--main = asText <| dec 2 <| integrate (-pi, 0) 100 sin

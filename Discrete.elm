@@ -41,33 +41,36 @@ permutations : number -> number -> number
 permutations n k = if | k > n -> 0
                       | otherwise -> (factorial n) / factorial (n - k)
 
-type Binom d = { d | name:String, mu:Float, sigma:Float, f:(Float -> Float), p:[Float] }
+type Binom d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:[Float] }
 
 {-| Constructs a new binomial distribution with n tries and prob probability of "success" on each try. -}
 binom : number -> number -> Binom {}
 binom n prob = { name="binomial",  
-                      mu=n * prob, 
-                      sigma=sqrt <| (n * prob) * (1 - prob),
-                      f=pdfbinom n prob,
-                      p=cdfbinom n prob }
+                 discrete=True,
+                 mu=n * prob, 
+                 sigma=sqrt <| (n * prob) * (1 - prob),
+                 f=pdfbinom n prob,
+                 p=cdfbinom n prob }
 
 
-type Hyper d = { d | name:String, mu:Float, sigma:Float, f:(Float -> Float), p:[Float] }
+type Hyper d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:[Float] }
 
 {-| Constructs a new hypergeometric distribution with n tries and prob probability of "success" on each try. -}
 hyper : number -> number -> number -> Hyper {}
 hyper pN pS n = { name="hypergeometric",  
+                  discrete=True,
                   mu=n * (pS / pN), 
                   sigma=sqrt <| (n * (pS/pN)) * (1 - (pS/pN)) * ((pN-n)/(pN-1)),
                   f=pdfhyper pN pS n,
                   p=cdfhyper pN pS n }
 
 
-type Poisson d = { d | name:String, mu:Float, sigma:Float, f:(Float -> Float), p:(Float -> [Float]) }
+type Poisson d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:(Float -> [Float]) }
 
 {-| Constructs a new Poisson distribution with mean mu. -}
 poisson : number -> Poisson {}
 poisson mu = { name="poisson",  
+               discrete=True,
                mu=mu, 
                sigma=sqrt mu,
                f=pdfpoisson mu,
