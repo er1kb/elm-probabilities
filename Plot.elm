@@ -5,6 +5,7 @@ import Discrete as D
 import Continuous as C
 import Graphics.Collage
 import Window
+import Mouse
 
 plottype d = case d.discrete of
    True -> "plot discrete"
@@ -16,13 +17,13 @@ plottype d = case d.discrete of
 --data Distribution d = Discrete d | Continuous d
 
 {-| Calculating trapezium points for plotting them as polygons. -}
-trapezium m dx f (x1,x2) =  map (\(x,y) -> (m*x, m*y)) [(x1,0), (x2,0), (x2,f x2), (x1,f x1)]
+trapezoid m dx f (x1,x2) =  map (\(x,y) -> (m*x, m*y)) [(x1,0), (x2,0), (x2,f x2), (x1,f x1)]
 
 plotbins multiplier (from,to) nsteps f = 
    let
       (dx,steps) = C.interpolate (from,to) nsteps f
       xs = C.bins steps
-      points = map (trapezium multiplier dx f) xs 
+      points = map (trapezoid multiplier dx f) xs 
    in
       group <| map (\x -> outlined (solid blue) <| polygon x) points
 
@@ -35,9 +36,42 @@ plotcurve m (from,to) nsteps f =
       traced (solid red) <| path ys
 
 
-main = lift (plotc (300,64) (0,8*pi) (tan << cos << sin)) Window.dimensions 
---zdist = C.normal 3 1
---main = lift (plotc (300,40) (0,6) zdist.f) Window.dimensions 
+main = lift3 (plotc (800,800) (\x -> x^2) (0,4)) (constant (0,2)) Mouse.x Window.dimensions 
+
+plotc (iw,ih) f (fmin,fmax) (from,to) nbins (ow,oh) =  
+   let
+      xmargin = (toFloat iw)/20
+      ymargin = (toFloat ih)/20
+      xoffset = (toFloat iw)/2 - xmargin
+      yoffset = (toFloat ih)/2 - ymargin
+      xscale = (toFloat iw) - xoffset
+      yscale = fmax / ((toFloat ih) - yoffset)
+      interval = (to - from)
+      --multiplier = (toFloat iw) / (interval * 1.2)
+      nsteps = 300
+      multiplier = 200 
+      integral = C.integrate (from,to) (toFloat nbins) f
+   in 
+      collage iw ih  
+             [move (-xoffset, -yoffset) <| plotcurve multiplier (from,to) nsteps f, 
+              move (-xoffset, -yoffset) <| plotbins multiplier (from,to) (toFloat nbins) f,
+              toForm <| leftAligned <| toText <| "number of bins: " ++ (show nbins),
+              move (0,-30) <| toForm <| leftAligned <| toText <| "Approximate &#x222b;"  
+                     ++ " from " ++ (show <| C.dec 3 from)  
+                     ++ " to " ++ (show <| C.dec 3 to)  
+                     ++ " = " ++ (show <| integral)
+                     ++ " = " ++ (show <| C.dec 3 <| integral)]
+
+
+
+
+
+
+
+
+
+
+--main = lift3 (plotc zdist.f) (constant (0,6)) Mouse.x Window.dimensions 
 
 {- 
 TODO: 
@@ -45,16 +79,8 @@ make xscale and yscale functions
 implement grid + scales
 -}
 
-plotc (nsteps,nbins) (from,to) f (w,h) =  
-   let
-      xmargin = (toFloat w)/20
-      ymargin = (toFloat h)/20
-      xoffset = (toFloat w)/2 - xmargin
-      yoffset = (toFloat h)/2 - ymargin
-      interval = (to - from)
-      multiplier = (toFloat w) / (interval * 1.2)
-      --multiplier = 100 
-   in 
-      collage w h  
-             [move (-xoffset, 0) <| plotcurve multiplier (from,to) nsteps f, 
-              move (-xoffset, 0) <| plotbins multiplier (from,to) nbins f]
+--main = lift (plotc (300,64) (0,8*pi) (tan << cos << sin)) Window.dimensions 
+--zdist = C.normal 3 1
+--main = lift (plotc (300,40) (0,6) zdist.f) Window.dimensions 
+
+--main = lift3 (plotc (tan << cos << sin)) (constant (0,4*pi)) Mouse.x Window.dimensions 

@@ -1,4 +1,4 @@
-module Continuous (uniform, normal, standardnormal, exponential, pdfuniform, pdfnormal, pdfstandardnormal, pdfexponential, cdfuniform, cdfnormal, cdfstandardnormal, cdfexponential, area, bins, interpolate, integrate, slope, tangent) where
+module Continuous (uniform, normal, standardnormal, exponential, pdfuniform, pdfnormal, pdfstandardnormal, pdfexponential, cdfuniform, cdfnormal, cdfstandardnormal, cdfexponential, area, bins, interpolate, integrate, slope, tangent, normalize, dec) where
 
 {-| Functions for calculating values of common continuous probability distributions. 
 
