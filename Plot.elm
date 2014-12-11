@@ -3,9 +3,13 @@
 
 import Discrete as D
 import Continuous as C
-import Graphics.Collage
+import Graphics.Collage as GC
+import Signal
+import Color
+import Text
 import Window
 import Mouse
+import List
 
 plottype d = case d.discrete of
    True -> "plot discrete"
@@ -17,26 +21,26 @@ plottype d = case d.discrete of
 --data Distribution d = Discrete d | Continuous d
 
 {-| Calculating trapezium points for plotting them as polygons. -}
-trapezoid m dx f (x1,x2) =  map (\(x,y) -> (m*x, m*y)) [(x1,0), (x2,0), (x2,f x2), (x1,f x1)]
+trapezoid m dx f (x1,x2) =  List.map (\(x,y) -> (m*x, m*y)) [(x1,0), (x2,0), (x2,f x2), (x1,f x1)]
 
 plotbins multiplier (from,to) nsteps f = 
    let
       (dx,steps) = C.interpolate (from,to) nsteps f
       xs = C.bins steps
-      points = map (trapezoid multiplier dx f) xs 
+      points = List.map (trapezoid multiplier dx f) xs 
    in
-      group <| map (\x -> outlined (solid blue) <| polygon x) points
+      GC.group <| List.map (\x -> GC.outlined (GC.solid Color.blue) <| GC.polygon x) points
 
 plotcurve m (from,to) nsteps f = 
    let
       (dx,steps) = C.interpolate (from,to) nsteps f
-      ys = map (\(x,y) -> (m*x,m*y)) <| zip steps (map f steps)
+      ys = List.map (\(x,y) -> (m*x,m*y)) <| List.map2 (,) steps (List.map f steps)
    in
       --ys
-      traced (solid red) <| path ys
+      GC.traced (GC.solid Color.red) <| GC.path ys
 
 
-main = lift3 (plotc (800,800) (\x -> x^2) (0,4)) (constant (0,2)) Mouse.x Window.dimensions 
+main = Signal.map3 (plotc (800,800) (\x -> x^2) (0,4)) (Signal.constant (0,2)) Mouse.x Window.dimensions 
 
 plotc (iw,ih) f (fmin,fmax) (from,to) nbins (ow,oh) =  
    let
@@ -52,15 +56,15 @@ plotc (iw,ih) f (fmin,fmax) (from,to) nbins (ow,oh) =
       multiplier = 200 
       integral = C.integrate (from,to) (toFloat nbins) f
    in 
-      collage iw ih  
-             [move (-xoffset, -yoffset) <| plotcurve multiplier (from,to) nsteps f, 
-              move (-xoffset, -yoffset) <| plotbins multiplier (from,to) (toFloat nbins) f,
-              toForm <| leftAligned <| toText <| "number of bins: " ++ (show nbins),
-              move (0,-30) <| toForm <| leftAligned <| toText <| "Approximate &#x222b;"  
-                     ++ " from " ++ (show <| C.dec 3 from)  
-                     ++ " to " ++ (show <| C.dec 3 to)  
-                     ++ " = " ++ (show <| integral)
-                     ++ " = " ++ (show <| C.dec 3 <| integral)]
+      GC.collage iw ih  
+             [GC.move (-xoffset, -yoffset) <| plotcurve multiplier (from,to) nsteps f, 
+              GC.move (-xoffset, -yoffset) <| plotbins multiplier (from,to) (toFloat nbins) f]
+              --GC.toForm <| Text.leftAligned <| toText <| "number of bins: " ++ (show nbins),
+              --GC.move (0,-30) <| GC.toForm <| Text.leftAligned <| toText <| "Approximate &#x222b;"  
+              --       ++ " from " ++ (show <| C.dec 3 from)  
+              --       ++ " to " ++ (show <| C.dec 3 to)  
+              --       ++ " = " ++ (show <| integral)
+              --       ++ " = " ++ (show <| C.dec 3 <| integral)]
 
 
 

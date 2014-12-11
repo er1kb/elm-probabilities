@@ -17,10 +17,10 @@ import Debug
 import List
 
 
-type Uniform d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), interval:(Float,Float) }
+type alias Uniform = { name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), interval:(Float,Float) }
 
 {-| Constructs a new uniform distribution with the given interval. -}
-uniform : (number,number) -> Uniform {}
+uniform : (number,number) -> Uniform
 uniform (from,to) = { name="uniform",  
                       discrete=False,
                       mu=(to-from)/2, 
@@ -29,10 +29,10 @@ uniform (from,to) = { name="uniform",
                       interval=(from,to) }
 
 
-type Normal d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
+type alias Normal = { name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
 
 {-| Constructs a new normal distribution with the given mean (mu) and standard deviation (sigma). -}
-normal : number -> number -> Normal {}
+normal : number -> number -> Normal
 normal mu sigma = { name="normal",  
                     discrete=False,
                     mu=mu, 
@@ -42,10 +42,10 @@ normal mu sigma = { name="normal",
                    }
 
 
-type Standardnormal d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
+type alias Standardnormal = { name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
 
 {-| Constructs a new standard normal distribution with mean (mu) 0 and standard deviation (sigma) 1. -}
-standardnormal : Standardnormal {}
+standardnormal : Standardnormal
 standardnormal = { name="standard normal",  
                    discrete=False,
                    mu=0, 
@@ -55,10 +55,10 @@ standardnormal = { name="standard normal",
                    }
 
 
-type Exponential d = { d | name:String, discrete:Bool, lambda:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
+type alias Exponential = { name:String, discrete:Bool, lambda:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
 
 {-| Constructs a new exponential distribution with the lambda parameter. -}
-exponential : number -> Exponential {}
+exponential : number -> Exponential
 exponential lambda = { name="exponential",  
                        discrete=False,
                        lambda=lambda,
@@ -141,17 +141,17 @@ area : number -> (number,number) -> number
 area dx (y1,y2) = dx * (y1 + y2) / 2
 
 {-| Splitting a list of x values into adjacent bins, as in a histogram. A list [a,b,c,d] becomes [(a,b),(b,c),(c,d)] -}
-bins : [number] -> [(number,number)]
-bins ys = zip (take ((length ys)-1) ys) (tail ys)
+bins : List number -> List (number,number)
+bins ys = List.map2 (,) (List.take ((List.length ys)-1) ys) (List.tail ys)
 
 {-| Interpolate an interval for integration and plotting. -}
 interpolate (from,to) nsteps f = 
    let
        dxrange = (to - from) -- length of the interval
        dx = dxrange / (nsteps) -- size of chunks (trapezia) to calculate individually
-       interpolator = map (\x -> (x / nsteps)) [0..nsteps]
+       interpolator = List.map (\x -> (x / nsteps)) [0..nsteps]
    in
-       (dx, map (\x -> from + x * dxrange) interpolator)
+       (dx, List.map (\x -> from + x * dxrange) interpolator)
 
 {-| Integrating a function f over an interval in a given number of steps. -}
 integrate : (number,number) -> number -> (number -> number) -> number
@@ -162,10 +162,10 @@ integrate (from,to) nsteps f =
        --interpolator = map (\x -> (x / nsteps)) [0..nsteps]
        --steps = map (\x -> from + x * dxrange) interpolator
        (dx, steps) = interpolate (from,to) nsteps f
-       ys = map f steps
+       ys = List.map f steps
        trapezia = bins ys
    in
-       sum <| map (area dx) trapezia
+       List.sum <| List.map (area dx) trapezia
 
 
 {-| Finding the approximate derivative of a function at a given point. -}

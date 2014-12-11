@@ -41,10 +41,11 @@ permutations : number -> number -> number
 permutations n k = if | k > n -> 0
                       | otherwise -> (factorial n) / factorial (n - k)
 
-type Binom d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:[Float] }
+type alias Binom = { name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:List Float }
+--type Binom d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:[Float] }
 
 {-| Constructs a new binomial distribution with n tries and prob probability of "success" on each try. -}
-binom : number -> number -> Binom {}
+binom : number -> number -> Binom
 binom n prob = { name="binomial",  
                  discrete=True,
                  mu=n * prob, 
@@ -53,10 +54,11 @@ binom n prob = { name="binomial",
                  p=cdfbinom n prob }
 
 
-type Hyper d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:[Float] }
+type alias Hyper = { name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:List Float }
+--type Hyper d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:[Float] }
 
 {-| Constructs a new hypergeometric distribution with n tries and prob probability of "success" on each try. -}
-hyper : number -> number -> number -> Hyper {}
+hyper : number -> number -> number -> Hyper
 hyper pN pS n = { name="hypergeometric",  
                   discrete=True,
                   mu=n * (pS / pN), 
@@ -65,10 +67,11 @@ hyper pN pS n = { name="hypergeometric",
                   p=cdfhyper pN pS n }
 
 
-type Poisson d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:(Float -> [Float]) }
+type alias Poisson = { name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:(Float -> List Float) }
+--type Poisson d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:(Float -> [Float]) }
 
 {-| Constructs a new Poisson distribution with mean mu. -}
-poisson : number -> Poisson {}
+poisson : number -> Poisson
 poisson mu = { name="poisson",  
                discrete=True,
                mu=mu, 
@@ -94,8 +97,8 @@ pdfbinom n prob x =
 
     cdfbinom 4 0.5 == [0.0625, 0.3125, 0.6875, 0.9375, 1]
 -}
-cdfbinom : number -> number -> [number]
-cdfbinom n prob = tail <| scanl (+) 0 <| map (pdfbinom n prob) [0..n]
+cdfbinom : number -> number -> List number
+cdfbinom n prob = List.tail <| List.scanl (+) 0 <| List.map (pdfbinom n prob) [0..n]
 
 
 {-| Hypergeometric probability distribution function, for mutually dependent events. 
@@ -115,8 +118,8 @@ pdfhyper pN pS n x =
 
     cdfhyper 50 25 4 == [0.055, 0.305, 0.695, 0.945, 1] 
 -}
-cdfhyper : number -> number -> number -> [number]
-cdfhyper pN pS n = tail <| scanl (+) 0 <| map (pdfhyper pN pS n) [0..n]
+cdfhyper : number -> number -> number -> List number
+cdfhyper pN pS n = List.tail <| List.scanl (+) 0 <| List.map (pdfhyper pN pS n) [0..n]
 
 
 {-| Poisson probability distribution function, for anticipating unlikely events. Given a known average of mu, what is the likelihood of x? For example, if a certain workplace has 2 hard drive failures a week on average, compute the probability of getting 3 failures in a given week. 
@@ -130,8 +133,8 @@ pdfpoisson mu x = ((mu^x)*(e^(-mu))) / factorial x
 
     cdfpoisson 2 5 == [0.135, 0.406, 0.677, 0.857, 0.947, 0.983] 
 -}
-cdfpoisson : number -> number -> [number]
-cdfpoisson mu x = tail <| scanl (+) 0 <| map (pdfpoisson mu) [0..x]
+cdfpoisson : number -> number -> List number
+cdfpoisson mu x = List.tail <| List.scanl (+) 0 <| List.map (pdfpoisson mu) [0..x]
 
 
 {- Utility functions -}
