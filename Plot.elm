@@ -20,71 +20,86 @@ plottype d = case d.discrete of
 --data Continuous d = Uniform d | Normal d | Standardnormal d | Exponential d
 --data Distribution d = Discrete d | Continuous d
 
-{-| Calculating trapezium points for plotting them as polygons. -}
-trapezoid m dx f (x1,x2) =  List.map (\(x,y) -> (m*x, m*y)) [(x1,0), (x2,0), (x2,f x2), (x1,f x1)]
 
-plotbins multiplier (from,to) nsteps f = 
+--geom_rug direction multiplier scaleVar positions = 
+--   let
+--       rugs = List.map (\x -> GC.move (if direction == "x" then (x*multiplier,0) else (0,x*multiplier)) <| GC.filled Color.black <| GC.rect 2.0 2.0) positions
+--   in
+--       GC.group rugs
+
+
+
+{-| Calculating trapezium points for plotting them as polygons. -}
+trapezoid (xm,ym) (xscale, yscale) dx f (x1,x2) =  
+   List.map (\(x,y) -> (xm * (xscale x), ym * (yscale y))) 
+            [(x1,1), (x2,1), (x2,f x2), (x1,f x1)]
+
+plotbins (xm,ym) (dx, steps) f (xscale, yscale) = 
    let
-      (dx,steps) = C.interpolate (from,to) nsteps f
+      --(dx,steps) = C.interpolate (from,to) nsteps f
       xs = C.bins steps
-      points = List.map (trapezoid multiplier dx f) xs 
+      points = List.map (trapezoid (xm,ym) (xscale,yscale) dx f) xs 
    in
       GC.group <| List.map (\x -> GC.outlined (GC.solid Color.blue) <| GC.polygon x) points
 
-plotcurve m (from,to) nsteps f = 
+plotcurve (xm,ym) (from,to) nsteps f (xscale, yscale) = 
    let
       (dx,steps) = C.interpolate (from,to) nsteps f
-      ys = List.map (\(x,y) -> (m*x,m*y)) <| List.map2 (,) steps (List.map f steps)
+      ys = List.map (\(x,y) -> (xm * (xscale x),ym * (yscale y))) <| List.map2 (,) steps (List.map f steps)
    in
       --ys
       GC.traced (GC.solid Color.red) <| GC.path ys
 
 
-main = Signal.map3 (plotc (800,800) (\x -> x^2) (0,4)) (Signal.constant (0,2)) Mouse.x Window.dimensions 
+main = Signal.map3 (plotc (1400,400) (\x -> 2 + (cos x)) (-2*pi,2*pi)) (Signal.constant (-2*pi,2*pi)) Mouse.x Window.dimensions 
+--main = Signal.map Text.asText Window.dimensions
 
-plotc (iw,ih) f (fmin,fmax) (from,to) nbins (ow,oh) =  
+plotc (plotWidth,plotHeight) f (xmin,xmax) (from,to) nbins (windowWidth,windowHeight) =  
    let
-      xmargin = (toFloat iw)/20
-      ymargin = (toFloat ih)/20
-      xoffset = (toFloat iw)/2 - xmargin
-      yoffset = (toFloat ih)/2 - ymargin
-      xscale = (toFloat iw) - xoffset
-      yscale = fmax / ((toFloat ih) - yoffset)
+      xmargin = (toFloat plotWidth)/10
+      ymargin = (toFloat plotHeight)/10
+      xoffset = (toFloat plotWidth)/2 - xmargin
+      yoffset = (toFloat plotHeight)/2 - ymargin
+      xscale = C.normalize (xmin,xmax)
       interval = (to - from)
-      --multiplier = (toFloat iw) / (interval * 1.2)
+      interp = List.tail <| List.map (C.normalize (1,100)) [1..100] 
+      xs = List.map (\x -> from + interval * x) interp
+      ys = List.map f xs
+      yscale = C.normalize (List.minimum ys, List.maximum ys)
       nsteps = 300
-      multiplier = 200 
+      ymultiplier = (toFloat plotHeight) - (2 * ymargin)
+      xmultiplier = (toFloat plotWidth) - (2 * xmargin)
+      (dx,steps) = C.interpolate (from,to) (toFloat nbins) f
       integral = C.integrate (from,to) (toFloat nbins) f
+      plotFrame = GC.traced (GC.solid Color.black)  
+         <| GC.path [(0,0),(0,ymultiplier), (xmultiplier,ymultiplier),(xmultiplier,0),(0,0)]
+      zeroLine = GC.traced (GC.solid Color.black)  
+      <| GC.path [(0,ymultiplier * 0.5), (xmultiplier, ymultiplier * 0.5)] 
+      --yAxis = GC.traced (GC.solid Color.black) <| GC.path [(0,0),(0,ymultiplier)]
+      --xAxis = GC.traced (GC.solid Color.black) <| GC.path [(0,0),(xmultiplier,0)]
    in 
-      GC.collage iw ih  
-             [GC.move (-xoffset, -yoffset) <| plotcurve multiplier (from,to) nsteps f, 
-              GC.move (-xoffset, -yoffset) <| plotbins multiplier (from,to) (toFloat nbins) f]
-              --GC.toForm <| Text.leftAligned <| toText <| "number of bins: " ++ (show nbins),
-              --GC.move (0,-30) <| GC.toForm <| Text.leftAligned <| toText <| "Approximate &#x222b;"  
-              --       ++ " from " ++ (show <| C.dec 3 from)  
-              --       ++ " to " ++ (show <| C.dec 3 to)  
-              --       ++ " = " ++ (show <| integral)
-              --       ++ " = " ++ (show <| C.dec 3 <| integral)]
+      GC.collage plotWidth plotHeight  
+             [(GC.filled Color.grey (GC.ngon 8 ((toFloat plotHeight)/2))),
+                GC.move (-xoffset, -yoffset) <| plotcurve (xmultiplier,ymultiplier) (from,to) nsteps f (xscale,yscale), 
+              GC.move (-xoffset, -yoffset) <| plotbins (xmultiplier, ymultiplier) (dx,steps) f (xscale,yscale),
+              --GC.move (-xoffset, -yoffset) <| yAxis,
+              --GC.move (-xoffset, -yoffset) <| xAxis,
+              GC.move (-xoffset, -yoffset) <| zeroLine,
+              GC.move (-xoffset, -yoffset) <| plotFrame,
+              GC.toForm <| Text.leftAligned <| Text.fromString <| "number of bins: " ++ (toString nbins),
+              GC.move (0,-30) <| GC.toForm <| Text.leftAligned <| Text.fromString <| "Approximate &#x222b;"  
+                     ++ " from " ++ (toString <| C.dec 3 from)  
+                     ++ " to " ++ (toString <| C.dec 3 to)  
+                     ++ " = " ++ (toString <| integral)
+                     ++ " = " ++ (toString <| C.dec 3 <| integral)]
 
 
-
-
-
-
-
-
-
-
---main = lift3 (plotc zdist.f) (constant (0,6)) Mouse.x Window.dimensions 
+              --GC.move (-xoffset, -yoffset - 10.0) <| geom_rug "x" xmultiplier xscale steps,
+              --GC.move (-xoffset - 10, -yoffset) <| geom_rug "y" xmultiplier xscale steps]
 
 {- 
 TODO: 
-make xscale and yscale functions
+make everything scale properly
 implement grid + scales
 -}
 
---main = lift (plotc (300,64) (0,8*pi) (tan << cos << sin)) Window.dimensions 
---zdist = C.normal 3 1
---main = lift (plotc (300,40) (0,6) zdist.f) Window.dimensions 
-
---main = lift3 (plotc (tan << cos << sin)) (constant (0,4*pi)) Mouse.x Window.dimensions 
