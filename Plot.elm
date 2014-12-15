@@ -27,50 +27,91 @@ plottype d = case d.discrete of
 --   in
 --       GC.group rugs
 
+type alias PlotConfig = {
+         f: (Float -> Float),
+         xs: List Float,
+         ys: List Float, 
+         xDomain: (Float,Float), 
+         yDomain: (Float,Float),
+         xExtent: Float,
+         steps:Int,
+         dx:Float,
+         interpolator:List Float,
+         xScale:(Float -> Float),
+         yScale:(Float -> Float)
+      }
 
+plotConfig : (Float -> Float) -> (Float, Float) -> Int -> PlotConfig
+plotConfig f (from,to) steps = 
+   let
+       xDomain = (to, from)
+       yDomain = (-1,1)
+       xExtent = (to - from)
+       interpolator = List.tail <| List.map (C.normalize (1,toFloat steps)) [1..toFloat steps] 
+       xs = List.map (\x -> from + xExtent * x) interpolator
+       ys = List.map f xs
+       dx = xExtent / (toFloat steps)
+       xScale = C.normalize xDomain
+       yScale = C.normalize (List.minimum ys, List.maximum ys)
+   in
+                        {  
+                           f = f, 
+                           xs = xs,
+                           ys = ys,
+                           xDomain = xDomain, 
+                           yDomain = yDomain,
+                           xExtent = xExtent,
+                           steps = steps,
+                           dx = dx,
+                           interpolator = interpolator,
+                           xScale = xScale,
+                           yScale = yScale
+                        }
+
+
+pc = plotConfig (\x -> 0 + sin x) (-2*pi,2*pi) 100
+--pc = Signal.map (plotConfig sin (-2*pi,2*pi)) Mouse.x 
 
 {-| Calculating trapezium points for plotting them as polygons. -}
 trapezoid (xm,ym) (xscale, yscale) dx f (x1,x2) =  
    List.map (\(x,y) -> (xm * (xscale x), ym * (yscale y))) 
-            [(x1,1), (x2,1), (x2,f x2), (x1,f x1)]
+            [(x1,0), (x2,0), (x2,f x2), (x1,f x1)]
 
-plotbins (xm,ym) (dx, steps) f (xscale, yscale) = 
+geom_trapezoid cfg (xm,ym) (dx, steps) = 
    let
       --(dx,steps) = C.interpolate (from,to) nsteps f
+      xscale = cfg.xScale
+      yscale = cfg.yScale
       xs = C.bins steps
-      points = List.map (trapezoid (xm,ym) (xscale,yscale) dx f) xs 
+      points = List.map (trapezoid (xm,ym) (xscale,yscale) dx cfg.f) xs 
    in
       GC.group <| List.map (\x -> GC.outlined (GC.solid Color.blue) <| GC.polygon x) points
 
-plotcurve (xm,ym) (from,to) nsteps f (xscale, yscale) = 
+geom_curve cfg (xm,ym) nsteps = 
    let
-      (dx,steps) = C.interpolate (from,to) nsteps f
-      ys = List.map (\(x,y) -> (xm * (xscale x),ym * (yscale y))) <| List.map2 (,) steps (List.map f steps)
+      xscale = cfg.xScale
+      yscale = cfg.yScale
+      (dx,steps) = C.interpolate cfg.xDomain (toFloat nsteps) cfg.f
+      ys = List.map (\(x,y) -> (xm * (xscale x),ym * (yscale y))) <| List.map2 (,) steps (List.map cfg.f steps)
    in
-      --ys
       GC.traced (GC.solid Color.red) <| GC.path ys
 
+--main = Text.asText pc
 
-main = Signal.map3 (plotc (1400,400) (\x -> 2 + (cos x)) (-2*pi,2*pi)) (Signal.constant (-2*pi,2*pi)) Mouse.x Window.dimensions 
+main = Signal.map3 (plotc (1400,400) (\x -> 0 + sin x) (-2*pi,2*pi) pc) (Signal.constant (-2*pi,2*pi)) Mouse.x Window.dimensions 
 --main = Signal.map Text.asText Window.dimensions
 
-plotc (plotWidth,plotHeight) f (xmin,xmax) (from,to) nbins (windowWidth,windowHeight) =  
+plotc (plotWidth,plotHeight) f (xmin,xmax) cfg (from,to) nbins (windowWidth,windowHeight) =  
    let
-      xmargin = (toFloat plotWidth)/10
-      ymargin = (toFloat plotHeight)/10
+      xmargin = (toFloat plotWidth) * 0.1
+      ymargin = (toFloat plotHeight) * 0.1
       xoffset = (toFloat plotWidth)/2 - xmargin
       yoffset = (toFloat plotHeight)/2 - ymargin
-      xscale = C.normalize (xmin,xmax)
-      interval = (to - from)
-      interp = List.tail <| List.map (C.normalize (1,100)) [1..100] 
-      xs = List.map (\x -> from + interval * x) interp
-      ys = List.map f xs
-      yscale = C.normalize (List.minimum ys, List.maximum ys)
-      nsteps = 300
       ymultiplier = (toFloat plotHeight) - (2 * ymargin)
       xmultiplier = (toFloat plotWidth) - (2 * xmargin)
-      (dx,steps) = C.interpolate (from,to) (toFloat nbins) f
-      integral = C.integrate (from,to) (toFloat nbins) f
+      baseline = List.map (\x -> 0) [1..List.length cfg.xs]
+      (dx,steps) = C.interpolate cfg.xDomain (toFloat nbins) cfg.f
+      integral = C.integrate cfg.xDomain (toFloat nbins) cfg.f
       plotFrame = GC.traced (GC.solid Color.black)  
          <| GC.path [(0,0),(0,ymultiplier), (xmultiplier,ymultiplier),(xmultiplier,0),(0,0)]
       zeroLine = GC.traced (GC.solid Color.black)  
@@ -79,9 +120,10 @@ plotc (plotWidth,plotHeight) f (xmin,xmax) (from,to) nbins (windowWidth,windowHe
       --xAxis = GC.traced (GC.solid Color.black) <| GC.path [(0,0),(xmultiplier,0)]
    in 
       GC.collage plotWidth plotHeight  
-             [(GC.filled Color.grey (GC.ngon 8 ((toFloat plotHeight)/2))),
-                GC.move (-xoffset, -yoffset) <| plotcurve (xmultiplier,ymultiplier) (from,to) nsteps f (xscale,yscale), 
-              GC.move (-xoffset, -yoffset) <| plotbins (xmultiplier, ymultiplier) (dx,steps) f (xscale,yscale),
+             [
+                (GC.filled Color.grey (GC.ngon 8 ((toFloat plotHeight)/2))),
+                --GC.move (-xoffset, -yoffset) <| geom_curve cfg (xmultiplier,ymultiplier) cfg.steps, 
+              GC.move (-xoffset, -yoffset) <| geom_trapezoid cfg (xmultiplier, ymultiplier) (dx,steps),
               --GC.move (-xoffset, -yoffset) <| yAxis,
               --GC.move (-xoffset, -yoffset) <| xAxis,
               GC.move (-xoffset, -yoffset) <| zeroLine,
@@ -96,6 +138,17 @@ plotc (plotWidth,plotHeight) f (xmin,xmax) (from,to) nbins (windowWidth,windowHe
 
               --GC.move (-xoffset, -yoffset - 10.0) <| geom_rug "x" xmultiplier xscale steps,
               --GC.move (-xoffset - 10, -yoffset) <| geom_rug "y" xmultiplier xscale steps]
+
+
+      --xscale = C.normalize (xmin,xmax)
+      --nsteps = toFloat cfg.steps
+      --interval = (to - from)
+      --interp = List.tail <| List.map (C.normalize (1,100)) [1..100] 
+      --xs = List.map (\x -> from + interval * x) interp
+      --ys = List.map f xs
+      --yscale = C.normalize (List.minimum ys, List.maximum ys)
+
+
 
 {- 
 TODO: 
