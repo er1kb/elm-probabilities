@@ -38,14 +38,15 @@ type alias PlotConfig = {
          dx:Float,
          interpolator:List Float,
          xScale:(Float -> Float),
-         yScale:(Float -> Float)
+         yScale:(Float -> Float),
+         yExtent:Float 
       }
 
 plotConfig : (Float -> Float) -> (Float, Float) -> Int -> PlotConfig
 plotConfig f (from,to) steps = 
    let
        xDomain = (from, to)
-       yDomain = (-1,1)
+       --yDomain = (-1,1)
        xExtent = (to - from)
        interpolator = List.tail <| List.map (C.normalize (1,toFloat steps)) [1..toFloat steps] 
        xs = List.map (\x -> from + xExtent * x) interpolator
@@ -55,6 +56,10 @@ plotConfig f (from,to) steps =
        baselinePos = if (List.minimum ys < 0) then List.minimum ys else 0 
        baselineNeg = if (List.maximum ys > 0) then List.maximum ys else 0 
        yScale = C.normalize (baselinePos, baselineNeg)
+       ymin = List.minimum ys
+       ymax = List.maximum ys
+       yDomain = (ymin, ymax)
+       yExtent = ymax - ymin
    in
                         {  
                            f = f, 
@@ -67,11 +72,14 @@ plotConfig f (from,to) steps =
                            dx = dx,
                            interpolator = interpolator,
                            xScale = xScale,
-                           yScale = yScale
+                           yScale = yScale,
+                           yExtent = yExtent
                         }
 
 
-pc = plotConfig (\x -> logBase e x) (1,2*pi) 100
+--pc = plotConfig (\x -> logBase e x) (1,2*pi) 100
+--pc = plotConfig (\x -> 6 * sin x) (-2*pi,2*pi) 100
+pc = plotConfig (\x -> cos x) (-2*pi,2*pi) 100
 --pc = plotConfig (\x -> e^x) (-2*pi,2*pi) 100
 --pc = plotConfig (\x -> C.pdfstandardnormal x) (-2*pi,2*pi) 100
 --pc = Signal.map (plotConfig sin (-2*pi,2*pi)) Mouse.x 
@@ -129,7 +137,7 @@ geom_curve cfg (xm,ym) nsteps =
       (dx,steps) = C.interpolate cfg.xDomain (toFloat nsteps) cfg.f
       ys = List.map (\(x,y) -> (xm * (xscale x),ym * (yscale y))) <| List.map2 (,) steps (List.map cfg.f steps)
    in
-      GC.traced (GC.solid Color.red) <| GC.path ys
+      GC.traced (GC.solid Color.darkGrey) <| GC.path ys
 
 geom_hline cfg (xm, ym) y =
       GC.traced (GC.solid Color.black)  
@@ -140,20 +148,38 @@ geom_vline cfg (xm, ym) x =
       <| GC.path [(xm * (cfg.xScale x),0), (xm * (cfg.xScale x), ym)] 
 
 
-geom_abline cfg (xm,ym) x = 
+geom_abline cfg (xm,ym) x' = 
    let
+       xmin = fst cfg.xDomain
+       ymin = fst cfg.yDomain
+       ymax = snd cfg.yDomain
+       --ymin = cfg.yScale <| fst cfg.yDomain
+       dx = cfg.dx / 4
+       x = xmin + (cfg.xExtent * x')
        tangent = C.tangent cfg.dx x cfg.f
        m = tangent.slope
        b = tangent.intercept
        fun = (\x -> m * x + b)
-       x1 = x - 200
+       --y = ymin + (fun x)
+       --x1 = xmin + (cfg.xExtent * (x' - dx))
+       --y1 = ymin + (fun x1) - ((1 + cfg.yExtent) / 8)
+       --x2 = xmin + (cfg.xExtent * (x' + dx))
+       --y2 = ymin + (fun x2) - ((1 + cfg.yExtent) / 8)
+       y = (fun x)
+       x1 = xmin + (cfg.xExtent * (x' - dx))
        y1 = fun x1
-       x2 = x + 200
+       x2 = xmin + (cfg.xExtent * (x' + dx))
        y2 = fun x2
-       ys = [(200 * x, cfg.yScale y1),(250*x, cfg.yScale y2)]
+       ys = [(xm * (cfg.xScale x1), ym * (cfg.yScale y1) - 200),
+             (xm * (cfg.xScale x2), ym * (cfg.yScale y2) - 200)]
+       derivative = GC.move (80,50) <| GC.toForm <| Text.leftAligned <| Text.fromString  
+            <| "slope: " ++ (toString m) ++ "x\nintercept: " ++ (toString <| C.dec 3 b)
    in
-       GC.move (0,200) <| GC.traced (GC.solid Color.red) <| GC.path ys
-       --GC.move (xm * cfg.xScale x,ym * cfg.yScale (cfg.f x)) <| GC.filled Color.red <| GC.circle 2
+        --GC.move (80,300) <| GC.toForm <| Text.rightAligned <| Text.fromString <| toString <| List.map (\(a,b) -> (C.dec 2 a, C.dec 2 b)) ys
+        --GC.move (80,300) <| GC.toForm <| Text.rightAligned <| Text.fromString <| toString <| tangent
+        --GC.move (80,300) <| GC.toForm <| Text.rightAligned <| Text.fromString <| toString <| y
+        --GC.move (80,280) <| GC.toForm <| Text.rightAligned <| Text.fromString  <| (toString <| (C.dec 2 x1,C.dec 2 x,C.dec 2 x2, C.dec 2 (x2 - x1))) ++ "\n" ++ (toString <| (C.dec 2 y1,C.dec 2y,C.dec 2 y2, C.dec 2 (y2 - y1))) ++ "\n" ++ (toString (C.dec 2 ymin, C.dec 2 ymax))
+       GC.group [GC.move (0,200) <| GC.traced (GC.solid Color.red) <| GC.path ys, GC.move (xm * cfg.xScale x,ym * cfg.yScale (cfg.f x)) <| GC.filled Color.red <| GC.circle 2, derivative]
        
 
 --meh (mx,my) (ww,wh) = Text.asText <| (C.normalize (0,toFloat ww) (toFloat mx))
@@ -167,7 +193,9 @@ plotc (plotWidth,plotHeight) f (xmin,xmax) cfg (from,to) nbins' (windowWidth,win
       maxbins = 400
       windowScale = C.normalize (0,toFloat windowWidth)
       nbins = round <| (toFloat nbins') / 4
-      xpos = (fst cfg.xDomain) + cfg.xExtent * windowScale (toFloat nbins')
+      --xpos = (fst cfg.xDomain) + cfg.xExtent * windowScale (toFloat nbins')
+      wpos = windowScale (toFloat nbins')
+      xpos = (fst cfg.xDomain) + cfg.xExtent * wpos
       xmargin = (toFloat plotWidth) * 0.1
       ymargin = (toFloat plotHeight) * 0.1
       xoffset = (toFloat plotWidth)/2 - xmargin
@@ -185,7 +213,7 @@ plotc (plotWidth,plotHeight) f (xmin,xmax) cfg (from,to) nbins' (windowWidth,win
       zeroX = geom_hline cfg (xmultiplier,ymultiplier) 0
       zeroY = geom_vline cfg (xmultiplier,ymultiplier) 0
       xMarker = geom_vline cfg (xmultiplier,ymultiplier) xpos
-      tangent = geom_abline cfg (xmultiplier,ymultiplier) xpos
+      tangent = geom_abline cfg (xmultiplier,ymultiplier) wpos
       yAxis = GC.traced (GC.solid Color.black) <| GC.path [(0,0),(0,ymultiplier)]
       --xAxis = GC.traced (GC.solid Color.black) <| GC.path [(0,0),(xmultiplier,0)]
    in 
@@ -224,5 +252,8 @@ plotc (plotWidth,plotHeight) f (xmin,xmax) cfg (from,to) nbins' (windowWidth,win
 TODO: 
 implement grid + scales
 implement theme object to hold color, linestyle, etc.
+geom_bar: make half bars at each end
+implement variable placement of annotation 
+figure out what equals 200 and why translating the tangent by this amount is just right
 -}
 
