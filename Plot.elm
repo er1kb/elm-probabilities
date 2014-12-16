@@ -4,6 +4,7 @@
 import Discrete as D
 import Continuous as C
 import Graphics.Collage as GC
+import Graphics.Element (Element)
 import Signal
 import Color
 import Text
@@ -79,9 +80,9 @@ plotConfig f (from,to) steps =
 
 --pc = plotConfig (\x -> logBase e x) (1,2*pi) 100
 --pc = plotConfig (\x -> 6 * sin x) (-2*pi,2*pi) 100
-pc = plotConfig (\x -> 0.5 * (cos x)) (-2*pi,2*pi) 100
+pc = plotConfig (\x -> 0.2 * (cos x)) (-2*pi,2*pi) 100
 --pc = plotConfig (\x -> e^x) (-2*pi,2*pi) 100
---pc = plotConfig (\x -> C.pdfstandardnormal x) (-2*pi,2*pi) 100
+--pc = plotConfig (\x -> C.pdfstandardnormal x) (-4,4) 100
 --pc = Signal.map (plotConfig sin (-2*pi,2*pi)) Mouse.x 
 
 point (xm,ym) (xscale, yscale) f x y =  
@@ -222,10 +223,12 @@ axisY cfg (xm,ym) xmargin =
 --meh (mx,my) (ww,wh) = Text.asText <| (C.normalize (0,toFloat ww) (toFloat mx))
 --main = Signal.map2 meh Mouse.position Window.dimensions
 
-main = Signal.map3 (plotc (1400,400) (\x -> -3 + sin x) (-2*pi,2*pi) pc) (Signal.constant (-2*pi,2*pi)) Mouse.x Window.dimensions 
+main : Signal Element
+main = Signal.map2 (plotc (1400,400) pc) Mouse.x Window.dimensions 
 --main = Signal.map Text.asText Window.dimensions
 
-plotc (plotWidth,plotHeight) f (xmin,xmax) cfg (from,to) mouseX (windowWidth,windowHeight) =  
+plotc : (Int,Int) -> PlotConfig -> Int -> (Int,Int) -> Element
+plotc (plotWidth,plotHeight) cfg mouseX (windowWidth,windowHeight) =  
    let
       maxbins = 400
       windowScale = C.normalize (0,toFloat windowWidth)
@@ -265,8 +268,8 @@ plotc (plotWidth,plotHeight) f (xmin,xmax) cfg (from,to) mouseX (windowWidth,win
                   <| GC.rect xmultiplier ymultiplier,
                 --(GC.filled Color.grey (GC.ngon 8 ((toFloat plotHeight)/2))),
                 GC.move (-xoffset, -yoffset) <| geom_curve cfg (xmultiplier,ymultiplier) cfg.steps, 
-              --GC.move (-xoffset, -yoffset) <| geom_trapezoid cfg (xmultiplier, ymultiplier) (dx,steps),
-              GC.move (-xoffset, -yoffset) <| geom_bar cfg (xmultiplier, ymultiplier) (dx,steps),
+              GC.move (-xoffset, -yoffset) <| geom_trapezoid cfg (xmultiplier, ymultiplier) (dx,steps),
+              --GC.move (-xoffset, -yoffset) <| geom_bar cfg (xmultiplier, ymultiplier) (dx,steps),
               --GC.move (-xoffset, -yoffset) <| geom_point cfg (xmultiplier, ymultiplier) (dx,steps),
               GC.move (-xoffset, -yoffset) <| yAxis,
               GC.move (-xoffset, -yoffset) <| zeroX,
@@ -279,8 +282,8 @@ plotc (plotWidth,plotHeight) f (xmin,xmax) cfg (from,to) mouseX (windowWidth,win
               GC.move (-innerWidth/10,innerHeight/4) <| GC.toForm <| Text.rightAligned <| Text.fromString  
               <| "number of bins: " ++ (toString nbins) 
               ++ "\nApproximate &#x222b;"  
-                     ++ " from " ++ (toString <| C.dec 3 from)  
-                     ++ " to " ++ (toString <| C.dec 3 to)  
+                     ++ " from " ++ (toString <| C.dec 3 (fst cfg.xDomain))  
+                     ++ " to " ++ (toString <| C.dec 3 (snd cfg.xDomain))  
                      ++ "\n = " ++ (toString <| integral)
                      ++ " = " ++ (toString <| C.dec 3 <| integral)]
 
