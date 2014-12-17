@@ -41,7 +41,7 @@ permutations : number -> number -> number
 permutations n k = if | k > n -> 0
                       | otherwise -> (factorial n) / factorial (n - k)
 
-type alias Binom = { name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:List Float }
+type alias Binom = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:List Float }
 --type Binom d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:[Float] }
 
 {-| Constructs a new binomial distribution with n tries and prob probability of "success" on each try. -}
@@ -50,11 +50,11 @@ binom n prob = { name="binomial",
                  discrete=True,
                  mu=n * prob, 
                  sigma=sqrt <| (n * prob) * (1 - prob),
-                 f=pdfbinom n prob,
-                 p=cdfbinom n prob }
+                 pdf=pdfbinom n prob,
+                 cdf=cdfbinom n prob }
 
 
-type alias Hyper = { name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:List Float }
+type alias Hyper = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:List Float }
 --type Hyper d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:[Float] }
 
 {-| Constructs a new hypergeometric distribution with n tries and prob probability of "success" on each try. -}
@@ -63,11 +63,11 @@ hyper pN pS n = { name="hypergeometric",
                   discrete=True,
                   mu=n * (pS / pN), 
                   sigma=sqrt <| (n * (pS/pN)) * (1 - (pS/pN)) * ((pN-n)/(pN-1)),
-                  f=pdfhyper pN pS n,
-                  p=cdfhyper pN pS n }
+                  pdf=pdfhyper pN pS n,
+                  cdf=cdfhyper pN pS n }
 
 
-type alias Poisson = { name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:(Float -> List Float) }
+type alias Poisson = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:(Float -> List Float) }
 --type Poisson d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:(Float -> [Float]) }
 
 {-| Constructs a new Poisson distribution with mean mu. -}
@@ -76,8 +76,8 @@ poisson mu = { name="poisson",
                discrete=True,
                mu=mu, 
                sigma=sqrt mu,
-               f=pdfpoisson mu,
-               p=cdfpoisson mu  
+               pdf=pdfpoisson mu,
+               cdf=cdfpoisson mu  
              }
 
 

@@ -17,7 +17,7 @@ import Debug
 import List
 
 
-type alias Uniform = { name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), interval:(Float,Float) }
+type alias Uniform = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:(Float), interval:(Float,Float) }
 
 {-| Constructs a new uniform distribution with the given interval. -}
 uniform : (number,number) -> Uniform
@@ -25,11 +25,12 @@ uniform (from,to) = { name="uniform",
                       discrete=False,
                       mu=(to-from)/2, 
                       sigma=sqrt ((to - from)^2 / 12),
-                      f=pdfuniform (from,to),
+                      pdf=pdfuniform (from,to),
+                      cdf=cdfuniform,
                       interval=(from,to) }
 
 
-type alias Normal = { name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
+type alias Normal = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:((Float,Float) -> Float) }
 
 {-| Constructs a new normal distribution with the given mean (mu) and standard deviation (sigma). -}
 normal : number -> number -> Normal
@@ -37,12 +38,12 @@ normal mu sigma = { name="normal",
                     discrete=False,
                     mu=mu, 
                     sigma=sigma,
-                    f=pdfnormal mu sigma,
-                    p=cdfnormal mu sigma 100
+                    pdf=pdfnormal mu sigma,
+                    cdf=cdfnormal mu sigma 100
                    }
 
 
-type alias Standardnormal = { name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
+type alias Standardnormal = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:((Float,Float) -> Float) }
 
 {-| Constructs a new standard normal distribution with mean (mu) 0 and standard deviation (sigma) 1. -}
 standardnormal : Standardnormal
@@ -50,20 +51,20 @@ standardnormal = { name="standard normal",
                    discrete=False,
                    mu=0, 
                    sigma=1,
-                   f=pdfstandardnormal,
-                   p=cdfstandardnormal 100
+                   pdf=pdfstandardnormal,
+                   cdf=cdfstandardnormal 100
                    }
 
 
-type alias Exponential = { name:String, discrete:Bool, lambda:Float, f:(Float -> Float), p:((Float,Float) -> Float) }
+type alias Exponential = { name:String, discrete:Bool, lambda:Float, pdf:(Float -> Float), cdf:((Float,Float) -> Float) }
 
 {-| Constructs a new exponential distribution with the lambda parameter. -}
 exponential : number -> Exponential
 exponential lambda = { name="exponential",  
                        discrete=False,
                        lambda=lambda,
-                       f=pdfexponential lambda,
-                       p=cdfexponential lambda 100
+                       pdf=pdfexponential lambda,
+                       cdf=cdfexponential lambda 100
                        }
 
 
@@ -112,7 +113,7 @@ pdfexponential lambda x =
 
 {-| Cumulative density function for a uniform distribution with mean mu and standard deviation sigma. This function computes the height of the curve at a given x. -}
 cdfuniform : number
-cdfuniform = 1
+cdfuniform = 1.0
 --TODO
 
 
@@ -240,4 +241,4 @@ normalize (xmin,xmax) x = (x - xmin) / (xmax - xmin)
 --integrating a volume of revolution around the x axis -->
 --main = asText <| dec 2 <| integrate (1,3) 100 (\x -> pi * (1 / sqrt x)^2)
 
---main = asText <| dec 2 <| integrate (-pi, 0) 100 sin
+--main = asText <| dec 2 <| integrate (-1, 1) 100 pdfstandardnormal
