@@ -220,6 +220,23 @@ axisY cfg (xm,ym) xmargin =
       GC.move pos <| GC.group  
       [tickLabels, ticks, yBar]
 
+axisX cfg (xm,ym) ymargin = 
+   let
+       ymin = fst cfg.yDomain
+       xmin = fst cfg.xDomain
+       xmax = snd cfg.xDomain
+       pos = (0,ym * (cfg.yScale ymin) - (ymargin / 12))
+       tickPositions = [xmin, 0, xmax]
+       tickLabels = GC.group <| List.map (\x -> GC.move (xm * cfg.xScale x,-ymargin * 0.3)  
+         <| GC.toForm <| Text.centered <| Text.fromString <|  
+         toString <| C.dec 2 x) tickPositions
+       ticks = GC.group <| List.map (\x -> GC.move (xm * cfg.xScale x, -ymargin * 0.2)  
+         <| GC.traced (GC.solid Color.black) <| GC.path [(0,0),(0,12)]) tickPositions
+       xBar = GC.traced (GC.solid Color.black) <| GC.path [(0,-10),(xm,-10)]
+   in
+      GC.move pos <| GC.group  
+      [tickLabels, ticks, xBar]
+
 --meh (mx,my) (ww,wh) = Text.asText <| (C.normalize (0,toFloat ww) (toFloat mx))
 --main = Signal.map2 meh Mouse.position Window.dimensions
 
@@ -230,6 +247,9 @@ main = Signal.map2 (plotc (1400,400) pc) Mouse.x Window.dimensions
 plotc : (Int,Int) -> PlotConfig -> Int -> (Int,Int) -> Element
 plotc (plotWidth,plotHeight) cfg mouseX (windowWidth,windowHeight) =  
    let
+      -- make plot dimensions responsive --> 
+      --plotWidth = round ((toFloat windowWidth) * 0.8)
+      --plotHeight = round ((toFloat windowHeight) * 0.8)
       maxbins = 400
       windowScale = C.normalize (0,toFloat windowWidth)
       nbins = round <| (toFloat mouseX) / 4
@@ -238,7 +258,7 @@ plotc (plotWidth,plotHeight) cfg mouseX (windowWidth,windowHeight) =
       xpos = (fst cfg.xDomain) + cfg.xExtent * wpos
       ypos = cfg.f <| xpos
       xmargin = (toFloat plotWidth) * 0.1
-      ymargin = (toFloat plotHeight) * 0.1
+      ymargin = (toFloat plotHeight) * 0.2
       xoffset = (toFloat plotWidth)/2 - xmargin
       yoffset = (toFloat plotHeight)/2 - ymargin
       innerWidth = (toFloat plotWidth) - xmargin
@@ -258,6 +278,7 @@ plotc (plotWidth,plotHeight) cfg mouseX (windowWidth,windowHeight) =
       tangent = geom_abline cfg (xmultiplier,ymultiplier) wpos
       --yAxis = GC.traced (GC.solid Color.black) <| GC.path [(0,0),(0,ymultiplier)]
       yAxis = axisY cfg (xmultiplier,ymultiplier) xmargin
+      xAxis = axisX cfg (xmultiplier,ymultiplier) ymargin
       --xAxis = GC.traced (GC.solid Color.black) <| GC.path [(0,0),(xmultiplier,0)]
    in 
       GC.collage plotWidth plotHeight  
@@ -272,6 +293,7 @@ plotc (plotWidth,plotHeight) cfg mouseX (windowWidth,windowHeight) =
               --GC.move (-xoffset, -yoffset) <| geom_bar cfg (xmultiplier, ymultiplier) (dx,steps),
               --GC.move (-xoffset, -yoffset) <| geom_point cfg (xmultiplier, ymultiplier) (dx,steps),
               GC.move (-xoffset, -yoffset) <| yAxis,
+              GC.move (-xoffset, -yoffset) <| xAxis,
               GC.move (-xoffset, -yoffset) <| zeroX,
               GC.move (-xoffset, -yoffset) <| zeroY,
               GC.move (-xoffset, -yoffset) <| xMarker,
@@ -294,10 +316,11 @@ plotc (plotWidth,plotHeight) cfg mouseX (windowWidth,windowHeight) =
 
 {- 
 TODO: 
-implement grid + scales
-implement theme object to hold color, linestyle, etc.
-geom_bar: make half bars at each end
-implement variable placement of annotation 
-figure out what equals 200 and why translating the tangent by this amount is just right
+implement grid + axes
+implement theme/aes object to hold color, linestyle, etc.
+factor out annotation and simplify positioning
+geom_bar: make half bars at each end? The "number of bins" annotation does not match. 
+should be able to integrate smaller portions of the x domain (as in hypothesis testing etc.)
+should be able to specify the range of tangent lines, so as to show that smaller h lead to better approximations of the derivative
 -}
 
