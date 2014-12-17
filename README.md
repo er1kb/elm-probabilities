@@ -1,7 +1,10 @@
 elm-probabilities
 =================
 
-Probability distributions in Elm-lang. 
+Probability distributions and plotting in Elm-lang. 
+
+Layer based plotting of functions, integrals and derivatives
+(inspired by Hadley Wickham's ggplot2 but more narrow in scope)
 
 Discrete
 * Binomial
