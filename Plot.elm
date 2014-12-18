@@ -22,12 +22,6 @@ plottype d = case d.discrete of
 --data Distribution d = Discrete d | Continuous d
 
 
---geom_rug direction multiplier scaleVar positions = 
---   let
---       rugs = List.map (\x -> GC.move (if direction == "x" then (x*multiplier,0) else (0,x*multiplier)) <| GC.filled Color.black <| GC.rect 2.0 2.0) positions
---   in
---       GC.group rugs
-
 type alias PlotConfig = {
          f: (Float -> Float),
          xs: List Float,
@@ -80,7 +74,8 @@ plotConfig f (from,to) steps =
 
 --pc = plotConfig (\x -> logBase e x) (1,2*pi) 100
 --pc = plotConfig (\x -> 3 + 6 * sin x) (-2*pi,2*pi) 100
-pc = plotConfig (\x -> 0.2 * (cos x)) (-2*pi,2*pi) 100
+--pc = plotConfig (\x -> 0.2 * (cos x)) (-2*pi,2*pi) 100
+pc = plotConfig (\x -> x^5) (-2*pi,2*pi) 100
 --pc = plotConfig (\x -> e^x) (-2*pi,2*pi) 100
 --pc = plotConfig (\x -> C.pdfstandardnormal x) (-4,4) 100
 --pc = Signal.map (plotConfig sin (-2*pi,2*pi)) Mouse.x 
@@ -184,22 +179,21 @@ geom_vline aes defaults cfg dims x =
 
 geom_tangent aes defaults cfg dims x' = 
    let
-       --aes = { annotationPosition = (80,50), 
-       --        colour = red, 
-       --        dx = 0.033
-       --     }
        xm = dims.xm
        ym = dims.ym
        linetype = lookup .linetype aes defaults
        colour = lookup .colour aes defaults
        visibility = lookup .visibility aes defaults
+       pointsize = lookup .pointsize aes defaults
        annotationPosition = (80,50)
        dx = 0.033
+       --h = 0.0001 -- smaller dx for calculating a slightly more precise derivative
        xmin = fst cfg.xDomain
        ymin = fst cfg.yDomain
        ymax = snd cfg.yDomain
        x = xmin + (cfg.xExtent * x')
        tangent = C.tangent dx x cfg.f
+       --tangent = C.tangent h x cfg.f
        m = tangent.slope
        b = tangent.intercept
        fun = (\x -> m * x + b)
@@ -210,6 +204,9 @@ geom_tangent aes defaults cfg dims x' =
        y2 = fun x2
        ys = [(xm * (cfg.xScale x1), ym * (cfg.yScale y1)),
              (xm * (cfg.xScale x2), ym * (cfg.yScale y2))]
+       xdot = GC.move (xm * cfg.xScale x,ym * cfg.yScale (cfg.f x)) <| GC.filled colour <| GC.circle pointsize 
+       x1dot = GC.move (xm * cfg.xScale x1,ym * cfg.yScale (cfg.f x1)) <| GC.filled colour <| GC.circle pointsize 
+       x2dot = GC.move (xm * cfg.xScale x2,ym * cfg.yScale (cfg.f x2)) <| GC.filled colour <| GC.circle pointsize 
        annotation = GC.move annotationPosition <| GC.toForm <| Text.leftAligned <| Text.fromString  
             <| "slope: " ++ (toString m) ++ "x\nintercept: " ++ (toString <| C.dec 3 b)
    in
@@ -218,8 +215,9 @@ geom_tangent aes defaults cfg dims x' =
         --GC.move (80,300) <| GC.toForm <| Text.rightAligned <| Text.fromString <| toString <| y
         --GC.move (80,280) <| GC.toForm <| Text.rightAligned <| Text.fromString  <| (toString <| (C.dec 2 x1,C.dec 2 x,C.dec 2 x2, C.dec 2 (x2 - x1))) ++ "\n" ++ (toString <| (C.dec 2 y1,C.dec 2y,C.dec 2 y2, C.dec 2 (y2 - y1))) ++ "\n" ++ (toString (C.dec 2 ymin, C.dec 2 ymax))
        GC.alpha visibility <| GC.group [GC.traced (GC.solid red) <| GC.path ys,  
-       GC.move (xm * cfg.xScale x,ym * cfg.yScale (cfg.f x))  
-       <| GC.filled colour <| GC.circle 2,  
+       --x1dot,  
+       xdot,  
+       --x2dot,  
        annotation]
        
 -- customization object for axes?
@@ -262,7 +260,7 @@ axisX cfg (xm,ym) ymargin =
 --main = Signal.map2 meh Mouse.position Window.dimensions
 
 main : Signal Element
-main = Signal.map2 (plotc (1400,400) pc) Mouse.x Window.dimensions 
+main = Signal.map2 (plotc (1400,600) pc) Mouse.x Window.dimensions 
 --main = Signal.map Text.asText Window.dimensions
 
 plotc : (Int,Int) -> PlotConfig -> Int -> (Int,Int) -> Element
@@ -279,7 +277,7 @@ plotc (plotWidth,plotHeight) cfg mouseX (windowWidth,windowHeight) =
                           visibility <- Just 1
                        } 
       pointAes = { aes | pointsize <- Just 4, 
-                         colour <- Just orange  
+                         colour <- Just red  
                        }
       curveAes = { aes | colour <- Just darkGrey  
                        }
@@ -299,6 +297,7 @@ plotc (plotWidth,plotHeight) cfg mouseX (windowWidth,windowHeight) =
       ymultiplier = (toFloat plotHeight) - (2 * ymargin)
       xmultiplier = (toFloat plotWidth) - (2 * xmargin)
       zero = cfg.yScale 0
+      integral = C.integrate cfg.xDomain (toFloat nbins) cfg.f
 
       dims = {
          windowScale = windowScale,
@@ -314,19 +313,19 @@ plotc (plotWidth,plotHeight) cfg mouseX (windowWidth,windowHeight) =
          innerHeight = innerHeight,
          ym = ymultiplier,
          xm = xmultiplier,
-         zero = zero
+         zero = zero,
+         integral = integral
       }
 
       baseline = List.map (\x -> 0) [1..List.length cfg.xs]
       (dx,steps) = C.interpolate cfg.xDomain (toFloat nbins) cfg.f
-      integral = C.integrate cfg.xDomain (toFloat nbins) cfg.f
       plotFrame = GC.traced (GC.solid black)  
          <| GC.path [(0,0),(0,ymultiplier), (xmultiplier,ymultiplier),(xmultiplier,0),(0,0)]
       zeroX = geom_hline customAes defaults cfg dims 0
       zeroY = geom_vline customAes defaults cfg dims 0
       xMarker = geom_vline customAes defaults cfg dims xpos
       yMarker = geom_hline customAes defaults cfg dims ypos
-      tangent = geom_tangent customAes defaults cfg dims wpos
+      tangent = geom_tangent pointAes defaults cfg dims wpos
       --yAxis = GC.traced (GC.solid black) <| GC.path [(0,0),(0,ymultiplier)]
       yAxis = axisY cfg (xmultiplier,ymultiplier) xmargin
       xAxis = axisX cfg (xmultiplier,ymultiplier) ymargin
@@ -335,10 +334,10 @@ plotc (plotWidth,plotHeight) cfg mouseX (windowWidth,windowHeight) =
    in 
       GC.collage plotWidth plotHeight  
              [  
-                GC.filled grey  <| GC.rect innerWidth innerHeight,
-                GC.filled lightGrey <| GC.rect xmultiplier ymultiplier,
-                --(GC.filled grey (GC.ngon 8 ((toFloat plotHeight)/2))),
-                GC.move offsets <| geom_curve curveAes defaults cfg dims, 
+              GC.filled grey  <| GC.rect innerWidth innerHeight,
+              GC.filled lightGrey <| GC.rect xmultiplier ymultiplier,
+              --(GC.filled grey (GC.ngon 8 ((toFloat plotHeight)/2))),
+              GC.move offsets <| geom_curve curveAes defaults cfg dims, 
               GC.move offsets <| geom_trapezoid customAes defaults cfg dims (dx,steps),
               --GC.move offsets <| geom_bar customAes defaults cfg dims (dx,steps),
               GC.move offsets <| geom_point pointAes defaults cfg dims (dx,steps),
@@ -348,33 +347,38 @@ plotc (plotWidth,plotHeight) cfg mouseX (windowWidth,windowHeight) =
               GC.move offsets <| zeroY,
               GC.move offsets <| xMarker,
               GC.move offsets <| yMarker,
-              GC.move offsets <| tangent,
-              --GC.move (-xoffset, -yoffset) <| xAxis,
+              --GC.move offsets <| tangent,
               GC.move offsets <| plotFrame,
-              GC.move (-innerWidth/10,innerHeight/4) <| GC.toForm <| Text.rightAligned <| Text.fromString  
-              <| "number of bins: " ++ (toString nbins) 
+              GC.move (-innerWidth/10,innerHeight/4) <| annotate_integral aes defaults cfg dims 
+              ]
+
+
+annotate_integral aes defaults cfg dims = 
+              GC.toForm <| Text.rightAligned <| Text.fromString  
+              <| "number of bins: " ++ (toString dims.nbins) 
               ++ "\nApproximate &#x222b;"  
                      ++ " from " ++ (toString <| C.dec 3 (fst cfg.xDomain))  
                      ++ " to " ++ (toString <| C.dec 3 (snd cfg.xDomain))  
-                     --++ "\n = " ++ (toString <| integral)
-                     ++ " = " ++ (toString <| C.dec 3 <| integral)]
-
-
-              --GC.move (-xoffset, -yoffset - 10.0) <| geom_rug "x" xmultiplier xscale steps,
-              --GC.move (-xoffset - 10, -yoffset) <| geom_rug "y" xmultiplier xscale steps]
+                     --++ "\n = " ++ (toString <| dims.integral)
+                     ++ " = " ++ (toString <| C.dec 3 <| dims.integral)
 
 
 {- 
 TODO: 
-implement grid + axes
-implement theme/aes object to hold color, linestyle, etc.
+implement grid... plot title...
+find the formula for properly translating the x axis, regardless of y extent
 factor out annotation and simplify positioning
+annotation position should be given in the domains of x,y
 geom_bar: make half bars at each end? The "number of bins" annotation does not match. 
 should be able to integrate smaller portions of the x domain (as in hypothesis testing etc.)
 should be able to specify the range of tangent lines, so as to show that smaller h lead to better approximations of the derivative
-annotation position should be given in the domains of x,y
+separate derivative and integral calculations from their visual representations
+visualize the precision/convergence of integration at different number of partial integrals
 -}
 
+
+
+{- aesthetics -}
 
 lookup f child parent = let
                             childValue = f child
@@ -416,7 +420,3 @@ aes = { visibility = Nothing,
      }
 
 
---aesChild = { aes | linetype <- Just "dotted",
---                   pointsize <- Just 4 }
---
---aesParent = aesDefault
