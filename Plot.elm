@@ -34,7 +34,8 @@ type alias PlotConfig = {
          interpolator:List Float,
          xScale:(Float -> Float),
          yScale:(Float -> Float),
-         yExtent:Float 
+         yExtent:Float, 
+         plotLimits:(Float,Float)
       }
 
 plotConfig : (Float -> Float) -> (Float, Float) -> Int -> PlotConfig
@@ -43,16 +44,20 @@ plotConfig f (from,to) steps =
        xDomain = (from, to)
        --yDomain = (-1,1)
        xExtent = (to - from)
-       interpolator = List.tail <| List.map (C.normalize (1,toFloat steps)) [1..toFloat steps] 
+       --interpolator = List.tail <| List.map (C.normalize (1,toFloat steps)) [1..toFloat steps] 
+       interpolator = List.map (C.normalize (0,toFloat steps)) [0..toFloat steps] 
        xs = List.map (\x -> from + xExtent * x) interpolator
        ys = List.map f xs
        dx = xExtent / (toFloat steps)
        xScale = C.normalize xDomain
-       baselinePos = if (List.minimum ys < 0) then List.minimum ys else -0.5 
-       baselineNeg = if (List.maximum ys > 0) then List.maximum ys else 0.5 
-       yScale = C.normalize (baselinePos, baselineNeg)
        ymin = List.minimum ys
        ymax = List.maximum ys
+       --yminlog = logBase e (abs ymin)
+       --ymaxlog = logBase e (abs ymax)
+       baselinePos = if (ymin < 0) then List.minimum ys else -(ymax / 10)
+       baselineNeg = if (ymax > 0) then List.maximum ys else abs (ymin / 10) 
+       plotLimits = (baselinePos, baselineNeg)
+       yScale = C.normalize plotLimits
        yDomain = (ymin, ymax)
        yExtent = ymax - ymin
    in
@@ -68,16 +73,17 @@ plotConfig f (from,to) steps =
                            interpolator = interpolator,
                            xScale = xScale,
                            yScale = yScale,
-                           yExtent = yExtent
+                           yExtent = yExtent,
+                           plotLimits = plotLimits
                         }
 
 
 --pc = plotConfig (\x -> logBase e x) (1,2*pi) 100
---pc = plotConfig (\x -> 3 + 6 * sin x) (-2*pi,2*pi) 100
---pc = plotConfig (\x -> 0.2 * (cos x)) (-2*pi,2*pi) 100
-pc = plotConfig (\x -> x^5) (-2*pi,2*pi) 100
+--pc = plotConfig (\x -> -6 + 3 * sin x) (-1*pi,2*pi) 100
+pc = plotConfig (\x -> 0.2 * (cos x)) (-2*pi,2*pi) 100
+--pc = plotConfig (\x -> 0.1 * x^2) (-3*pi,2*pi) 100
 --pc = plotConfig (\x -> e^x) (-2*pi,2*pi) 100
---pc = plotConfig (\x -> C.pdfstandardnormal x) (-4,4) 100
+--pc = plotConfig (\x -> -10 + C.pdfstandardnormal x) (-1,1) 100
 --pc = Signal.map (plotConfig sin (-2*pi,2*pi)) Mouse.x 
 
 point (xm,ym) (xscale, yscale) f x y =  
@@ -224,8 +230,10 @@ geom_tangent aes defaults cfg dims x' =
 axisY cfg (xm,ym) xmargin = 
    let
        xmin = fst cfg.xDomain
-       ymin = fst cfg.yDomain
-       ymax = snd cfg.yDomain
+       --ymin = fst cfg.yDomain
+       ymin = fst cfg.plotLimits
+       --ymax = snd cfg.yDomain
+       ymax = snd cfg.plotLimits
        pos = (xm * (cfg.xScale xmin) - (xmargin / 4),0)
        tickPositions = [ymin, 0, ymax]
        tickLabels = GC.group <| List.map (\y -> GC.move (-xmargin / 8,ym * cfg.yScale y)  
@@ -241,7 +249,8 @@ axisY cfg (xm,ym) xmargin =
 -- customization object for axes?
 axisX cfg (xm,ym) ymargin = 
    let
-       ymin = fst cfg.yDomain
+       --ymin = fst cfg.yDomain
+       ymin = fst cfg.plotLimits
        xmin = fst cfg.xDomain
        xmax = snd cfg.xDomain
        pos = (0,ym * (cfg.yScale ymin) - (ymargin / 12))
@@ -251,10 +260,26 @@ axisX cfg (xm,ym) ymargin =
          toString <| C.dec 2 x) tickPositions
        ticks = GC.group <| List.map (\x -> GC.move (xm * cfg.xScale x, -ymargin * 0.2)  
          <| GC.traced (GC.solid black) <| GC.path [(0,0),(0,12)]) tickPositions
-       xBar = GC.traced (GC.solid black) <| GC.path [(0,-10),(xm,-10)] -- replace 10!!
+       xBar = GC.traced (GC.solid black) <| GC.path [(0,-11),(xm,-11)] -- replace 10!!
    in
       GC.move pos <| GC.group  
       [tickLabels, ticks, xBar]
+
+--
+title cfg dims = 
+   let
+       xm = dims.xm
+       ym = dims.ym
+       --ymax = snd cfg.yDomain
+       ymax = snd cfg.plotLimits
+       midx = ((fst cfg.xDomain) + (snd cfg.xDomain)) / 2
+       pos = (xm * (cfg.xScale midx),ym * (cfg.yScale ymax) + (dims.ymargin / 4))
+       --pos = (0,0)
+       txt = "y = 0.2cos(x) within x = &#177;2pi"
+       ttl = GC.toForm <| Text.centered <| Text.fromString <| txt
+   in
+      GC.move pos <| ttl
+
 
 --meh (mx,my) (ww,wh) = Text.asText <| (C.normalize (0,toFloat ww) (toFloat mx))
 --main = Signal.map2 meh Mouse.position Window.dimensions
@@ -281,6 +306,8 @@ plotc (plotWidth,plotHeight) cfg mouseX (windowWidth,windowHeight) =
                        }
       curveAes = { aes | colour <- Just darkGrey  
                        }
+      annotationAes = { aes | translate <- Just (-pi,0.1),
+                              decimals <- Just 5 }
       
       windowScale = C.normalize (0,toFloat windowWidth)
       nbins = round <| (toFloat mouseX) / 4
@@ -338,8 +365,8 @@ plotc (plotWidth,plotHeight) cfg mouseX (windowWidth,windowHeight) =
               GC.filled lightGrey <| GC.rect xmultiplier ymultiplier,
               --(GC.filled grey (GC.ngon 8 ((toFloat plotHeight)/2))),
               GC.move offsets <| geom_curve curveAes defaults cfg dims, 
-              GC.move offsets <| geom_trapezoid customAes defaults cfg dims (dx,steps),
-              --GC.move offsets <| geom_bar customAes defaults cfg dims (dx,steps),
+              --GC.move offsets <| geom_trapezoid customAes defaults cfg dims (dx,steps),
+              GC.move offsets <| geom_bar customAes defaults cfg dims (dx,steps),
               GC.move offsets <| geom_point pointAes defaults cfg dims (dx,steps),
               GC.move offsets <| yAxis,
               GC.move offsets <| xAxis,
@@ -349,18 +376,30 @@ plotc (plotWidth,plotHeight) cfg mouseX (windowWidth,windowHeight) =
               GC.move offsets <| yMarker,
               --GC.move offsets <| tangent,
               GC.move offsets <| plotFrame,
-              GC.move (-innerWidth/10,innerHeight/4) <| annotate_integral aes defaults cfg dims 
+              --GC.move (-innerWidth/10,innerHeight/4) <| annotate_integral aes defaults cfg dims 
+              --GC.move offsets <|  
+              GC.move offsets <| annotate_integral annotationAes defaults cfg dims,
+              GC.move offsets <| title cfg dims
               ]
 
 
 annotate_integral aes defaults cfg dims = 
-              GC.toForm <| Text.rightAligned <| Text.fromString  
+   let
+       decimals = lookup .decimals aes defaults
+       translate = lookup .translate aes defaults
+       xpos = fst translate
+       ypos = snd translate
+       xmin = fst cfg.xDomain
+       xmax = snd cfg.xDomain
+   in
+       GC.move (dims.xm * (cfg.xScale xpos), dims.ym * (cfg.yScale ypos))
+              <| GC.toForm <| Text.rightAligned <| Text.fromString  
               <| "number of bins: " ++ (toString dims.nbins) 
-              ++ "\nApproximate &#x222b;"  
-                     ++ " from " ++ (toString <| C.dec 3 (fst cfg.xDomain))  
-                     ++ " to " ++ (toString <| C.dec 3 (snd cfg.xDomain))  
+              ++ "\n&#x222b;"  
+                     ++ " from " ++ (toString <| C.dec decimals xmin)  
+                     ++ " to " ++ (toString <| C.dec decimals xmax)  
                      --++ "\n = " ++ (toString <| dims.integral)
-                     ++ " = " ++ (toString <| C.dec 3 <| dims.integral)
+                     ++ " &#8776; " ++ (toString <| C.dec decimals <| dims.integral)
 
 
 {- 
@@ -380,20 +419,22 @@ visualize the precision/convergence of integration at different number of partia
 
 {- aesthetics -}
 
-lookup f child parent = let
-                            childValue = f child
-                            parentValue = f parent
-                        in
+lookup key child parent = let
+                            childValue = key child
+                            parentValue = key parent
+                          in
                             case (childValue,parentValue) of
-                                (Just n,_) -> n
-                                (Nothing, Just n2) -> n2
+                                (Just c,_) -> c
+                                (Nothing, Just p) -> p
 
 
 type alias AESdefault = { visibility:Maybe Float, 
                           linetype:Maybe (Color -> GC.LineStyle),
                           linethickness:Maybe Float,
                           pointsize:Maybe Float, 
-                          colour:Maybe Color
+                          colour:Maybe Color,
+                          translate:Maybe (Float,Float),
+                          decimals:Maybe Float
                        }
 
 aesDefault : AESdefault
@@ -401,14 +442,18 @@ aesDefault = { visibility = Just 1,
                linetype = Just GC.solid,  
                linethickness = Just 1,  
                pointsize = Just 2,  
-               colour = Just black
+               colour = Just black,
+               translate = Just (0,0),
+               decimals = Just 2
             }
 
 type alias AES = { visibility:Maybe Float, 
                    linetype:Maybe (Color -> GC.LineStyle),
                    linethickness:Maybe Float,
                    pointsize:Maybe Float,
-                   colour:Maybe Color  
+                   colour:Maybe Color,  
+                   translate:Maybe (Float,Float),
+                   decimals: Maybe Float
                 }
 
 aes : AES
@@ -416,7 +461,9 @@ aes = { visibility = Nothing,
         linetype = Nothing,  
         linethickness = Nothing,  
         pointsize = Nothing,  
-        colour = Nothing
+        colour = Nothing,
+        translate = Nothing,
+        decimals = Nothing
      }
 
 
