@@ -146,7 +146,7 @@ bins : List number -> List (number,number)
 bins ys = List.map2 (,) (List.take ((List.length ys)-1) ys) (List.tail ys)
 
 {-| Interpolate an interval for integration and plotting. -}
-interpolate (from,to) nsteps f = 
+interpolate (from,to) nsteps = 
    let
        dxrange = (to - from) -- length of the interval
        dx = dxrange / (nsteps) -- size of chunks (trapezia) to calculate individually
@@ -162,7 +162,7 @@ integrate (from,to) nsteps f =
        --dx = dxrange / (nsteps) -- size of chunks (trapezia) to calculate individually
        --interpolator = map (\x -> (x / nsteps)) [0..nsteps]
        --steps = map (\x -> from + x * dxrange) interpolator
-       (dx, steps) = interpolate (from,to) nsteps f
+       (dx, steps) = interpolate (from,to) nsteps
        ys = List.map f steps
        trapezia = bins ys
    in
