@@ -4,7 +4,7 @@
 import Discrete as D
 import Continuous as C
 import Graphics.Collage as GC
-import Graphics.Element (Element, image)
+import Graphics.Element (Element, empty, image, flow, down, right, layers)
 import Signal
 import Color (..)
 import Text
@@ -81,6 +81,9 @@ plotConfig f (from,to) steps =
 --pc = plotConfig (\x -> logBase e x) (1,2*pi) 100
 --pc = plotConfig (\x -> -6 + 3 * sin x) (-1*pi,2*pi) 100
 pc = plotConfig (\x -> 0.2 * (cos x)) (-2*pi,2*pi) 100
+pc2 = plotConfig (\x -> -0.2 * (sin x)) (-2*pi,2*pi) 100
+pc3 = plotConfig (\x -> 0.2 * (sin x)) (-2*pi,2*pi) 100
+pc4 = plotConfig (\x -> -0.2 * (cos x)) (-2*pi,2*pi) 100
 --pc = plotConfig (\x -> 0.1 * x^2) (-3*pi,2*pi) 100
 --pc = plotConfig (\x -> e^x) (-2*pi,2*pi) 100
 --pc = plotConfig (\x -> C.pdfstandardnormal x) (-4,4) 100
@@ -165,7 +168,9 @@ geom_curve aes defaults cfg dims =
 
 geom_hline aes defaults cfg dims =
    let
-      y = dims.ypos
+      --y = dims.ypos
+      y = lookup .y aes defaults
+      --y = snd dims.pos
       xm = dims.xm
       ym = dims.ym
       linetype = lookup .linetype aes defaults
@@ -177,7 +182,9 @@ geom_hline aes defaults cfg dims =
 
 geom_vline aes defaults cfg dims =
    let
-      x = dims.xpos
+      --x = dims.xpos
+      x = lookup .x aes defaults
+      --x = fst dims.pos
       xm = dims.xm
       ym = dims.ym
       linetype = lookup .linetype aes defaults
@@ -193,13 +200,40 @@ geom_circle aes defaults cfg dims =
       ym = dims.ym
       linetype = lookup .linetype aes defaults
       colour = lookup .colour aes defaults
+      radius = lookup .radius aes defaults
       visibility = lookup .visibility aes defaults
-      radius = ym * 0.2
-      roundthing = GC.circle radius
-      pos = (xm * cfg.xScale 0, ym * cfg.yScale 0)
+      xpos = fst dims.pos
+      --radius = ym * 0.2
+      --radius = xm * xpos * 0.2
+      roundthing = GC.circle (xm * radius)
+      origin = (xm * cfg.xScale 0, ym * cfg.yScale 0)
    in
-      GC.move pos <| GC.alpha visibility <| GC.outlined (linetype colour) <| roundthing
+      GC.move origin <| GC.alpha visibility <| GC.outlined (linetype colour) <| roundthing
 
+
+geom_angle aes defaults cfg dims =
+   let
+       xm = dims.xm
+       ym = dims.ym
+       linetype = lookup .linetype aes defaults
+       colour = lookup .colour aes defaults
+       pointsize = lookup .pointsize aes defaults
+       radius = lookup .radius aes defaults
+       x = lookup .x aes defaults
+       annotate = lookup .annotate aes defaults
+       translate = lookup .translate aes defaults
+       coordinates = fromPolar (radius, x) 
+       --pos = (C.dec 3 (fst coordinates), C.dec 3 (snd coordinates))
+       pos = (xm * (fst coordinates), xm * (snd coordinates))
+       origin = (xm * cfg.xScale 0, ym * cfg.yScale 0)
+       annotationPosition = (xm * cfg.xScale (fst translate),  
+                             ym * cfg.yScale (snd translate))
+       point = GC.move pos  
+               <| GC.move origin  
+               <| GC.filled colour <| GC.circle pointsize
+       label = GC.move annotationPosition <| GC.toForm <| Text.rightAligned <| Text.fromString <| "&theta; &asymp; " ++ (toString <| C.dec 2 x)  
+   in
+      GC.group [point, label]
 
 
 
@@ -216,53 +250,78 @@ geom_tangent aes defaults cfg dims =
        visibility = lookup .visibility aes defaults
        pointsize = lookup .pointsize aes defaults
        translate = lookup .translate aes defaults
+       annotate = lookup .annotate aes defaults
+       decimals = lookup .decimals aes defaults
+       (w',h') = lookup .dims aes defaults
+       (w,h) = (toFloat w', toFloat h')
        annotationPosition = (xm * cfg.xScale (fst translate), ym * cfg.yScale (snd translate))
-       --dx = 0.033
-       --dx = 0.8 
-       dx = 0.3 * (1 - dims.wposy) * cfg.xExtent 
-       --h = 0.0001 -- smaller dx for calculating a slightly more precise derivative
+       --dx = 0.3 * (1 - (snd dims.wpos)) * cfg.xExtent 
+       --dx = 0.3 * (1 - (snd dims.wpos)) * cfg.xExtent 
+       delta = lookup .delta aes defaults
+       --dx = delta * (1 - (snd dims.wpos)) * cfg.xExtent
+       --dx = delta * (1 - (snd dims.wpos)) -- control dx with mouse y
+       dx = delta
        xmin = fst cfg.xDomain
        ymin = fst cfg.yDomain
        ymax = snd cfg.yDomain
-       x = dims.xpos
-       tangent = C.tangent (dx * 2) x cfg.f
+       --x = dims.xpos
+       x = fst dims.pos
+       tangent = C.tangent dx x cfg.f
        --tangent = C.tangent h x cfg.f
        m = tangent.slope
        b = tangent.intercept
        fun = (\x -> m * x + b)
-       y = (fun x)
+       --y = (fun x)
        --x1 = xmin + (cfg.xExtent * (x' - dx))
        --x1 = xmin + (cfg.xExtent * x') - dx
-       x1 = x - dx
+       x' = xm * cfg.xScale x
+       y' = xm * cfg.xScale (cfg.f x) 
+       x1 = x - (dx / 2)
+       x1' = xm * cfg.xScale x1
        y1 = fun x1
+       y1' = ym * cfg.yScale y1
        --x2 = xmin + (cfg.xExtent * (x' + dx))
        --x2 = xmin + (cfg.xExtent * x') + dx
-       x2 = x + dx
+       x2 = x + (dx / 2)
+       x2' = xm * cfg.xScale x2
        y2 = fun x2
-       ys = [(xm * cfg.xScale x1, ym * cfg.yScale y1),
-             (xm * cfg.xScale x2, ym * cfg.yScale y2)]
-       xpos = (xm * cfg.xScale x,ym * cfg.yScale (cfg.f x))
-       x1pos = (xm * cfg.xScale x1,ym * cfg.yScale (cfg.f x1))
-       x2pos = (xm * cfg.xScale x2,ym * cfg.yScale (cfg.f x2))
-       vline1 = GC.alpha visibility <| GC.traced (GC.dotted red) <| GC.path [List.head ys, x1pos]
-       vline2 = GC.alpha visibility <| GC.traced (GC.dotted red) <| GC.path [List.head <| List.tail ys, x2pos]
+       y2' = ym * cfg.yScale y2
+       --ys = [(xm * cfg.xScale x1, ym * cfg.yScale y1),
+       --      (xm * cfg.xScale x2, ym * cfg.yScale y2)]
+       ys = [(x1', y1'),
+             (x2', y2')]
+       --xpos = (xm * cfg.xScale x,ym * cfg.yScale (cfg.f x))
+       xpos = (x',ym * cfg.yScale (cfg.f x))
+       --x1pos = (xm * cfg.xScale x1,ym * cfg.yScale (cfg.f x1))
+       x1pos = (x1',ym * cfg.yScale (cfg.f x1))
+       --x2pos = (xm * cfg.xScale x2,ym * cfg.yScale (cfg.f x2))
+       x2pos = (x2',ym * cfg.yScale (cfg.f x2))
+       vline1 = GC.alpha visibility <| GC.traced (GC.dotted colour) <| GC.path [List.head ys, x1pos]
+       vline2 = GC.alpha visibility <| GC.traced (GC.dotted colour) <| GC.path [List.head <| List.tail ys, x2pos]
        xdot = GC.move xpos <| GC.filled colour <| GC.circle pointsize 
        x1dot = GC.move x1pos <| GC.filled colour <| GC.circle pointsize 
        x2dot = GC.move x2pos <| GC.filled colour <| GC.circle pointsize 
-       annotation = GC.move annotationPosition <| GC.toForm <| Text.leftAligned <| Text.fromString  
-            <| "slope: " ++ (toString m) ++ "x\nintercept: " ++ (toString <| C.dec 3 b)
+       --annotation = GC.move annotationPosition <| GC.toForm <| Text.leftAligned <| Text.fromString  
+            --<| "slope: " ++ (toString m) ++ "x\nintercept: " ++ (toString <| C.dec 3 b)
+       symbol = GC.filled colour <| GC.rect w h
+       label = GC.move (w * 1.6,0) <| GC.toForm <| Text.leftAligned <| Text.fromString  
+                  <| "&Delta;x = " ++ (toString <| C.dec decimals dx) 
+       annotation = if annotate then  
+                       GC.move annotationPosition <| GC.group [symbol,label] 
+                    else GC.toForm empty
    in
         --GC.move (80,300) <| GC.toForm <| Text.rightAligned <| Text.fromString <| toString <| List.map (\(a,b) -> (C.dec 2 a, C.dec 2 b)) ys
         --GC.move (80,300) <| GC.toForm <| Text.rightAligned <| Text.fromString <| toString <| tangent
         --GC.move (80,300) <| GC.toForm <| Text.rightAligned <| Text.fromString <| toString <| y
         --GC.move (80,280) <| GC.toForm <| Text.rightAligned <| Text.fromString  <| (toString <| (C.dec 2 x1,C.dec 2 x,C.dec 2 x2, C.dec 2 (x2 - x1))) ++ "\n" ++ (toString <| (C.dec 2 y1,C.dec 2y,C.dec 2 y2, C.dec 2 (y2 - y1))) ++ "\n" ++ (toString (C.dec 2 ymin, C.dec 2 ymax))
-       GC.alpha visibility <| GC.group [GC.traced (GC.solid red) <| GC.path ys,  
+       GC.alpha visibility <| GC.group [GC.traced (GC.solid colour) <| GC.path ys,  
        x1dot,  
        vline1,
        xdot,  
        x2dot,  
        vline2,
-       annotation]
+       annotation
+       ]
        
 -- customization object for axes?
 --axisY cfg (xm,ym) xmargin = 
@@ -270,7 +329,7 @@ yAxis aes defaults cfg dims =
    let
        xm = dims.xm
        ym = dims.ym
-       xmargin = dims.xmargin
+       xmargin = fst dims.margins
        xmin = fst cfg.xDomain
        --ymin = fst cfg.yDomain
        ymin = fst cfg.plotLimits
@@ -284,9 +343,11 @@ yAxis aes defaults cfg dims =
        ticks = GC.group <| List.map (\y -> GC.move (-xmargin * 0.02,ym * cfg.yScale y)  
          <| GC.traced (GC.solid black) <| GC.path [(0,0),(12,0)]) tickPositions
        yBar = GC.traced (GC.solid black) <| GC.path [(10,0),(10,ym)]
+       yLabel = GC.move (-xmargin * 0.35, ym * 0.5) <|  
+         GC.toForm <| Text.rightAligned <| Text.fromString "Y" 
    in
       GC.move pos <| GC.group  
-      [tickLabels, ticks, yBar]
+      [tickLabels, ticks, yBar, yLabel]
 
 -- customization object for axes?
 --axisX cfg (xm,ym) ymargin = 
@@ -294,7 +355,7 @@ xAxis aes defaults cfg dims =
    let
        xm = dims.xm
        ym = dims.ym
-       ymargin = dims.ymargin
+       ymargin = fst dims.margins
        --ymin = fst cfg.yDomain
        ymin = fst cfg.plotLimits
        xmin = fst cfg.xDomain
@@ -306,25 +367,47 @@ xAxis aes defaults cfg dims =
          toString <| C.dec 2 x) tickPositions
        ticks = GC.group <| List.map (\x -> GC.move (xm * cfg.xScale x, -ymargin * 0.2)  
          <| GC.traced (GC.solid black) <| GC.path [(0,0),(0,12)]) tickPositions
-       xBar = GC.traced (GC.solid black) <| GC.path [(0,-11),(xm,-11)] -- replace 10!!
+       xBar = GC.traced (GC.solid black) <| GC.path [(0,-11),(xm,-11)]
+       xLabel = GC.move (xm * 0.5,-ymargin * 0.55) <|  
+         GC.toForm <| Text.rightAligned <| Text.fromString "X" 
    in
       GC.move pos <| GC.group  
-      [tickLabels, ticks, xBar]
+      [tickLabels, ticks, xBar, xLabel]
 
 --
 title aes defaults cfg dims = 
    let
        txt = lookup .txt aes defaults
+       ymargin = fst dims.margins
        xm = dims.xm
        ym = dims.ym
        --ymax = snd cfg.yDomain
        ymax = snd cfg.plotLimits
        midx = ((fst cfg.xDomain) + (snd cfg.xDomain)) / 2
-       pos = (xm * (cfg.xScale midx),ym * (cfg.yScale ymax) + (dims.ymargin / 4))
+       pos = (xm * (cfg.xScale midx),ym * (cfg.yScale ymax) + (ymargin / 4))
        --pos = (0,0)
        ttl = GC.toForm <| Text.centered <| Text.fromString <| txt
    in
       GC.move pos <| ttl
+
+
+legend aes defaults cfg dims = 
+   let
+       xm = dims.xm
+       ym = dims.ym
+       (w',h') = lookup .dims aes defaults
+       (w,h) = (toFloat w', toFloat h')
+
+       txt = lookup .txt aes defaults
+       --txt = lookup .txt aes defaults
+       colour = lookup .colour aes defaults
+       translate = lookup .translate aes defaults
+       annotationPosition = (xm * cfg.xScale (fst translate),  
+                             ym * cfg.yScale (snd translate))
+       symbol = GC.filled colour <| GC.rect w h
+       label = GC.move (w * 1.5,0) <| GC.toForm <| Text.leftAligned <| Text.fromString txt
+   in
+       GC.move annotationPosition <| GC.group [symbol, label]
 
 
 geom_doge aes defaults cfg dims = 
@@ -334,16 +417,20 @@ geom_doge aes defaults cfg dims =
       dogeimg = image (fst wh) (snd wh) dogeurl
       xm = dims.xm
       ym = dims.ym
+      (xpos,ypos) = dims.pos
    in
-      GC.move (xm * cfg.xScale dims.xpos, ym * cfg.yScale dims.ypos) <| GC.toForm dogeimg
+      GC.move (xm * cfg.xScale xpos, ym * cfg.yScale ypos) <| GC.toForm dogeimg
 
 {-- CUSTOM AESTHETICS --}
 customAes = { aes | colour <- Just blue,
                      linetype <- Just GC.solid, 
-                     visibility <- Just 1
+                     visibility <- Just 1,
+                     radius <- Just 0.2,
+                     translate <- Just (-1, -0.05),
+                     pointsize <- Just 8
                   } 
 pointAes = { aes | pointsize <- Just 4, 
-                     colour <- Just red,  
+                     colour <- Just black,  
                      linethickness <- Just 5,
                      translate <- Just (-5.3,-0.14)
                   }
@@ -353,28 +440,49 @@ annotationAes = { aes | translate <- Just (-pi,0.1),
                         decimals <- Just 5,  
                         txt <- Just "y = 0.2cos(x) within -2pi &le; x &le; 2pi" }
 
-geoms = [layer_background { aes | colour <- Just grey }, 
+geoms = [layer_background { aes | colour <- Just white }, 
          xAxis aes,
          yAxis aes,
          geom_curve curveAes, 
          --geom_point pointAes,
          --geom_bar customAes,
          --geom_trapezoid customAes,
-         --geom_circle customAes,
-         --geom_hline aes, geom_vline aes,
-         geom_tangent pointAes,
-         title annotationAes,
-         geom_doge aes
+         geom_hline { aes | x <- Just 0, y <- Just 0 },  
+         geom_vline { aes | x <- Just 0, y <- Just 0 },
+         --geom_tangent pointAes,
+         geom_tangent { pointAes | delta <- Just (1.5 * pi), colour <- Just black, translate <- Just (-5,0.16) },
+         geom_tangent { pointAes | delta <- Just pi, colour <- Just darkBlue, translate <- Just (-5,0.12) },
+         geom_tangent { pointAes | delta <- Just (0.5 * pi), colour <- Just purple, translate <- Just (-5,0.08) },
+         --geom_tangent { pointAes | delta <- Just (0.2 * pi), colour <- Just red },
+         geom_tangent { pointAes | delta <- Just 0.25, colour <- Just darkOrange, translate <- Just (-5,0.04) },
+         --legend { aes | translate <- Just (3,0.1), colour <- Just black, txt <- Just "&Delta;x = " },
+         --title annotationAes
+         geom_circle customAes,
+         geom_angle customAes,
+         geom_doge { aes | dims <- Just (50,50) }
          --annotate_integral annotationAes 
          ]
 
---meh (mx,my) (ww,wh) = Text.asText <| (C.normalize (0,toFloat ww) (toFloat mx))
---main = Signal.map2 meh Mouse.position Window.dimensions
+
+--main : Signal Element
+--main = Signal.map2 (plotc (1400,800) pc geoms) Mouse.position Window.dimensions 
 
 main : Signal Element
-main = Signal.map2 (plotc (1400,600) pc geoms) Mouse.position Window.dimensions 
---main = Signal.map Text.asText Window.dimensions
-
+main = Signal.map2 plots Mouse.position Window.dimensions  
+plots mousepos windims = flow right <| List.map (flow down) [ 
+   [plotc (700,400) pc  
+      (geoms ++ [title { aes | txt <- Just "y = 0.2cos(x) within -2&pi; &le; x &le; 2&pi;" }])  
+      mousepos windims,
+   plotc (700,400) pc2  
+      (geoms ++ [title { aes | txt <- Just "y' = -0.2sin(x) within -2&pi; &le; x &le; 2&pi;" }])  
+      mousepos windims],
+   [plotc (700,400) pc3  
+      (geoms ++ [title { aes | txt <- Just "y = 0.2sin(x) within -2&pi; &le; x &le; 2&pi;" }])  
+      mousepos windims,
+   plotc (700,400) pc4  
+      (geoms ++ [title { aes | txt <- Just "y' = -0.2cos(x) within -2&pi; &le; x &le; 2&pi;" }])  
+      mousepos windims]
+   ]
 
 --plotc : (Int,Int) -> PlotConfig -> (Int,Int) -> (Int,Int) -> Element
 plotc (plotWidth,plotHeight) cfg geoms (mouseX,mouseY) (windowWidth,windowHeight) =  
@@ -384,16 +492,20 @@ plotc (plotWidth,plotHeight) cfg geoms (mouseX,mouseY) (windowWidth,windowHeight
       --plotHeight = round ((toFloat windowHeight) * 0.8)
 
       -- Pass two "aesthetics" to each geom, where a custom one can override defaults
-      defaults = aesDefault
+      defaults = { aesDefault | delta <- Just cfg.dx,  
+                                x <- Just xpos,  
+                                y <- Just ypos, 
+                                theta <- Just (pi / 4) 
+                             }
       
       windowScaleX = C.normalize (0,toFloat windowWidth)
       windowScaleY = C.normalize (0,toFloat windowHeight)
       nbins = round <| (toFloat mouseX) / 4
       --xpos = (fst cfg.xDomain) + cfg.xExtent * windowScale (toFloat mouseX)
-      wposx = windowScaleX (toFloat mouseX)
-      wposy = windowScaleY (toFloat mouseY)
-      xpos = (fst cfg.xDomain) + cfg.xExtent * wposx
+      wpos = (windowScaleX (toFloat mouseX), windowScaleY (toFloat mouseY))
+      xpos = (fst cfg.xDomain) + cfg.xExtent * (fst wpos)
       ypos = cfg.f xpos
+      radius = sqrt (xpos^2 + ypos^2)
       xmargin = (toFloat plotWidth) * 0.1
       ymargin = (toFloat plotHeight) * 0.2
       xoffset = (toFloat plotWidth)/2 - xmargin
@@ -402,31 +514,29 @@ plotc (plotWidth,plotHeight) cfg geoms (mouseX,mouseY) (windowWidth,windowHeight
       innerHeight = (toFloat plotHeight) - ymargin
       ymultiplier = (toFloat plotHeight) - (2 * ymargin)
       xmultiplier = (toFloat plotWidth) - (2 * xmargin)
-      zero = cfg.yScale 0
       --baseline = List.map (\x -> 0) [1..List.length cfg.xs]
 
       dims = {
          windowScaleX = windowScaleX,
          windowScaleY = windowScaleY,
          nbins = nbins,
-         wposx = wposx,
-         wposy = wposy,
-         xpos = xpos,
-         ypos = ypos,
+         wpos = wpos,
+         --xpos = xpos,
+         --ypos = ypos,
+         pos = (xpos,ypos),
          xmargin = xmargin,
          ymargin = ymargin,
-         xoffset = xoffset,
-         yoffset = yoffset,
+         margins = (xmargin,ymargin),
+         --xoffset = xoffset,
+         --yoffset = yoffset,
          innerWidth = innerWidth,
          innerHeight = innerHeight,
          ym = ymultiplier,
-         xm = xmultiplier,
-         zero = zero
+         xm = xmultiplier
       }
 
       --zeroX = geom_hline customAes defaults cfg dims 0
       --zeroY = geom_vline customAes defaults cfg dims 0
-      --tangent = geom_tangent pointAes defaults cfg dims wposx
       offsets = (-xoffset, -yoffset)
    in 
       GC.collage plotWidth plotHeight  
@@ -446,7 +556,8 @@ layer_background aes defaults cfg dims =
    in
       GC.group  
       [ 
-         GC.move (dims.xoffset, dims.yoffset) <| GC.group  
+         --GC.move (dims.xoffset, dims.yoffset) <| GC.group  
+         GC.move (xm * 0.5, ym * 0.5) <| GC.group  
          <| [GC.filled colour <| GC.rect dims.innerWidth dims.innerHeight,
             GC.filled lightGrey <| GC.rect xm ym],  
 
@@ -462,26 +573,23 @@ annotate_integral aes defaults cfg dims =
        xmin = fst cfg.xDomain
        xmax = snd cfg.xDomain
    in
-       GC.move (dims.xm * (cfg.xScale (fst translate)), dims.ym * (cfg.yScale (snd translate)))
+       GC.move (dims.xm * (cfg.xScale (fst translate)),  
+                dims.ym * (cfg.yScale (snd translate)))
               <| GC.toForm <| Text.rightAligned <| Text.fromString  
               <| "number of bins: " ++ (toString dims.nbins) 
               ++ "\n&#x222b;"  
                      ++ " from " ++ (toString <| C.dec decimals xmin)  
                      ++ " to " ++ (toString <| C.dec decimals xmax)  
-                     --++ "\n = " ++ (toString <| dims.integral)
                      ++ " &#8776; " ++ (toString <| C.dec decimals <| integral)
 
 
 {- 
 TODO: 
 make parent and child "configs" with maybe types, perhaps rename them into something more appropriate
-implement grid... 
-factor out annotation and simplify positioning
-geom_bar: make half bars at each end? The "number of bins" annotation does not match. 
 should be able to integrate smaller portions of the x domain (as in hypothesis testing etc.)
+implement grid... linestyles and textstyles! 
+geom_bar: make half bars at each end? The "number of bins" annotation does not match. 
 should be able to specify the range of tangent lines, so as to show that smaller h lead to better approximations of the derivative
-separate derivative and integral calculations from their visual representations?
-visualize the precision/convergence of integration at different number of partial integrals
 -}
 
 
@@ -506,7 +614,13 @@ type alias AES = { visibility:Maybe Float,
                    translate:Maybe (Float,Float),
                    decimals: Maybe Float,
                    dims: Maybe (Int,Int),
-                   txt: Maybe String
+                   txt: Maybe String,
+                   delta: Maybe Float,
+                   annotate: Maybe Bool,
+                   x: Maybe Float,
+                   y: Maybe Float,
+                   radius: Maybe Float,
+                   theta: Maybe Float
                 }
 
 aes : AES
@@ -518,7 +632,13 @@ aes = { visibility = Nothing,
         translate = Nothing,
         decimals = Nothing,
         dims = Nothing,
-        txt = Nothing
+        txt = Nothing,
+        delta = Nothing,
+        annotate = Nothing,
+        x = Nothing, 
+        y = Nothing,
+        radius = Nothing,
+        theta = Nothing
      }
 
 aesDefault : AES
@@ -529,7 +649,13 @@ aesDefault = { aes | visibility <- Just 1,
                      colour <- Just black,
                      translate <- Just (0,0),
                      decimals <- Just 2,
-                     dims <- Just (50,50),
-                     txt <- Just "Plot title"
+                     dims <- Just (30,3),
+                     txt <- Just "Plot title",
+                     delta <- Nothing,
+                     annotate <- Just True, 
+                     x <- Nothing,
+                     y <- Nothing,
+                     radius <- Just 1,
+                     theta <- Nothing
                }
 
