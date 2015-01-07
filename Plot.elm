@@ -84,7 +84,7 @@ plotConfig f (from,to) steps =
 --pc2 = plotConfig (\x -> -0.2 * (sin x)) (-2*pi,2*pi) 100
 --pc3 = plotConfig (\x -> 0.2 * (sin x)) (-2*pi,2*pi) 100
 --pc4 = plotConfig (\x -> -0.2 * (cos x)) (-2*pi,2*pi) 100
-pc5 = plotConfig (\x -> (cos (2*x))) (-pi,pi) 100
+pc5 = plotConfig (\x -> 3 * (cos (2*x))) (-pi,pi) 100
 --pc = plotConfig (\x -> 0.1 * x^2) (-3*pi,2*pi) 100
 --pc = plotConfig (\x -> e^x) (-2*pi,2*pi) 100
 --pc = plotConfig (\x -> C.pdfstandardnormal x) (-4,4) 100
@@ -199,15 +199,18 @@ geom_circle aes defaults cfg dims =
    let
       xm = dims.xm
       ym = dims.ym
-      xmin = fst cfg.xDomain
+      --xmin = fst cfg.xDomain
+      ymin = fst cfg.yDomain
       linetype = lookup .linetype aes defaults
       colour = lookup .colour aes defaults
-      radius = lookup .radius aes defaults
+      --radius = lookup .radius aes defaults
+      radius = cfg.yExtent / 2
       visibility = lookup .visibility aes defaults
       --xpos = fst dims.pos
       --radius = ym * 0.2
       --radius = xm * xpos * 0.2
-      roundthing = GC.circle (xm * (cfg.xScale (xmin + radius)))
+      --roundthing = GC.circle (xm * (cfg.xScale (xmin + radius)))
+      roundthing = GC.circle (ym * (cfg.yScale (ymin + radius)))
       origin = (xm * cfg.xScale 0, ym * cfg.yScale 0)
    in
       GC.move origin <| GC.alpha visibility <| GC.outlined (linetype colour) <| roundthing
@@ -217,24 +220,30 @@ geom_angle aes defaults cfg dims =
    let
        xm = dims.xm
        ym = dims.ym
-       xmin = fst cfg.xDomain
+       --xmin = fst cfg.xDomain
+       ymin = fst cfg.yDomain
        linetype = lookup .linetype aes defaults
        colour = lookup .colour aes defaults
        pointsize = lookup .pointsize aes defaults
-       radius = lookup .radius aes defaults
+       --radius = lookup .radius aes defaults
+       radius = cfg.yExtent / 2
        x = lookup .x aes defaults
        annotate = lookup .annotate aes defaults
        translate = lookup .translate aes defaults
-       coordinates = fromPolar (cfg.xScale (xmin + radius), x) 
+       --coordinates = fromPolar (cfg.xScale (xmin + radius), x) 
+       coordinates = fromPolar (cfg.yScale (ymin + radius), x) 
        --pos = (C.dec 3 (fst coordinates), C.dec 3 (snd coordinates))
-       pos = (xm * (fst coordinates), xm * (snd coordinates))
+       --pos = (xm * (fst coordinates), xm * (snd coordinates))
+       pos = (ym * (fst coordinates), ym * (snd coordinates))
        origin = (xm * cfg.xScale 0, ym * cfg.yScale 0)
        annotationPosition = (xm * cfg.xScale (fst translate),  
                              ym * cfg.yScale (snd translate))
        point = GC.move pos  
                <| GC.move origin  
                <| GC.filled colour <| GC.circle pointsize
-       label = GC.move annotationPosition <| GC.toForm <| Text.rightAligned <| Text.fromString <| "&theta; &asymp; " ++ (toString <| C.dec 2 x)  
+       label = GC.move annotationPosition <| GC.toForm <| Text.rightAligned  
+               <| Text.fromString <| "&theta; &asymp; " ++ (toString <| C.dec 2 x)  
+               ++ "\nr = " ++ (toString <| C.dec 2 (cfg.f x))
    in
       GC.group [point, label]
 
@@ -242,16 +251,20 @@ geom_curve_polar aes defaults cfg dims =
    let
        xm = dims.xm
        ym = dims.ym
-       xmin = fst cfg.xDomain
+       --xmin = fst cfg.xDomain
+       ymin = fst cfg.yDomain
+       ymax = snd cfg.yDomain
        linetype = lookup .linetype aes defaults
        colour = lookup .colour aes defaults
 
        origin = (xm * cfg.xScale 0, ym * cfg.yScale 0)
        visibility = lookup .visibility aes defaults
-       radius = lookup .radius aes defaults
-       rscale = cfg.xScale (xmin + radius)
+       --radius = lookup .radius aes defaults
+       radius = cfg.yExtent / 2
+       --rscale = cfg.xScale (xmin + radius)
+       rscale = cfg.yScale (ymin + radius)
        points = List.map2 (,) cfg.ys cfg.xs
-       ys = List.map (fromPolar << (\(r,t) -> (2 * rscale * xm * (cfg.yScale (r - 1)), t))) points
+       ys = List.map (fromPolar << (\(r,t) -> (2 * rscale * ym * (cfg.yScale (r - ymax)), t))) points
    in
       GC.move origin <| GC.alpha visibility <| GC.traced (linetype colour) <| GC.path ys
 
@@ -259,14 +272,18 @@ geom_position_polar aes defaults cfg dims =
    let
        xm = dims.xm
        ym = dims.ym
-       xmin = fst cfg.xDomain
+       --xmin = fst cfg.xDomain
+       ymin = fst cfg.yDomain
+       ymax = snd cfg.yDomain
        (xpos,ypos) = dims.pos 
        colour = lookup .colour aes defaults
        pointsize = lookup .pointsize aes defaults
-       radius = lookup .radius aes defaults
-       rscale = cfg.xScale (xmin + radius)
+       --radius = lookup .radius aes defaults
+       radius = cfg.yExtent / 2
+       --rscale = cfg.xScale (xmin + radius)
+       rscale = cfg.yScale (ymin + radius)
        origin = (xm * cfg.xScale 0, ym * cfg.yScale 0)
-       pos = fromPolar (2 * rscale * xm * (cfg.yScale (ypos - 1)), xpos)
+       pos = fromPolar (2 * rscale * ym * (cfg.yScale (ypos - ymax)), xpos)
 
        point = GC.move pos  
                <| GC.move origin  
@@ -557,7 +574,7 @@ plotc (plotWidth,plotHeight) cfg geoms (mouseX,mouseY) (windowWidth,windowHeight
       wpos = (windowScaleX (toFloat mouseX), windowScaleY (toFloat mouseY))
       xpos = (fst cfg.xDomain) + cfg.xExtent * (fst wpos)
       ypos = cfg.f xpos
-      radius = sqrt (xpos^2 + ypos^2)
+      --radius = sqrt (xpos^2 + ypos^2)
       xmargin = (toFloat plotWidth) * 0.1
       ymargin = (toFloat plotHeight) * 0.2
       xoffset = (toFloat plotWidth)/2 - xmargin
