@@ -80,10 +80,11 @@ plotConfig f (from,to) steps =
 
 --pc = plotConfig (\x -> logBase e x) (1,2*pi) 100
 --pc = plotConfig (\x -> -6 + 3 * sin x) (-1*pi,2*pi) 100
-pc = plotConfig (\x -> 0.2 * (cos x)) (-2*pi,2*pi) 100
-pc2 = plotConfig (\x -> -0.2 * (sin x)) (-2*pi,2*pi) 100
-pc3 = plotConfig (\x -> 0.2 * (sin x)) (-2*pi,2*pi) 100
-pc4 = plotConfig (\x -> -0.2 * (cos x)) (-2*pi,2*pi) 100
+--pc = plotConfig (\x -> 0.2 * (cos x)) (-2*pi,2*pi) 100
+--pc2 = plotConfig (\x -> -0.2 * (sin x)) (-2*pi,2*pi) 100
+--pc3 = plotConfig (\x -> 0.2 * (sin x)) (-2*pi,2*pi) 100
+--pc4 = plotConfig (\x -> -0.2 * (cos x)) (-2*pi,2*pi) 100
+pc5 = plotConfig (\x -> (cos (2*x))) (-pi,pi) 100
 --pc = plotConfig (\x -> 0.1 * x^2) (-3*pi,2*pi) 100
 --pc = plotConfig (\x -> e^x) (-2*pi,2*pi) 100
 --pc = plotConfig (\x -> C.pdfstandardnormal x) (-4,4) 100
@@ -198,14 +199,15 @@ geom_circle aes defaults cfg dims =
    let
       xm = dims.xm
       ym = dims.ym
+      xmin = fst cfg.xDomain
       linetype = lookup .linetype aes defaults
       colour = lookup .colour aes defaults
       radius = lookup .radius aes defaults
       visibility = lookup .visibility aes defaults
-      xpos = fst dims.pos
+      --xpos = fst dims.pos
       --radius = ym * 0.2
       --radius = xm * xpos * 0.2
-      roundthing = GC.circle (xm * radius)
+      roundthing = GC.circle (xm * (cfg.xScale (xmin + radius)))
       origin = (xm * cfg.xScale 0, ym * cfg.yScale 0)
    in
       GC.move origin <| GC.alpha visibility <| GC.outlined (linetype colour) <| roundthing
@@ -215,6 +217,7 @@ geom_angle aes defaults cfg dims =
    let
        xm = dims.xm
        ym = dims.ym
+       xmin = fst cfg.xDomain
        linetype = lookup .linetype aes defaults
        colour = lookup .colour aes defaults
        pointsize = lookup .pointsize aes defaults
@@ -222,7 +225,7 @@ geom_angle aes defaults cfg dims =
        x = lookup .x aes defaults
        annotate = lookup .annotate aes defaults
        translate = lookup .translate aes defaults
-       coordinates = fromPolar (radius, x) 
+       coordinates = fromPolar (cfg.xScale (xmin + radius), x) 
        --pos = (C.dec 3 (fst coordinates), C.dec 3 (snd coordinates))
        pos = (xm * (fst coordinates), xm * (snd coordinates))
        origin = (xm * cfg.xScale 0, ym * cfg.yScale 0)
@@ -234,6 +237,43 @@ geom_angle aes defaults cfg dims =
        label = GC.move annotationPosition <| GC.toForm <| Text.rightAligned <| Text.fromString <| "&theta; &asymp; " ++ (toString <| C.dec 2 x)  
    in
       GC.group [point, label]
+
+geom_curve_polar aes defaults cfg dims = 
+   let
+       xm = dims.xm
+       ym = dims.ym
+       xmin = fst cfg.xDomain
+       linetype = lookup .linetype aes defaults
+       colour = lookup .colour aes defaults
+
+       origin = (xm * cfg.xScale 0, ym * cfg.yScale 0)
+       visibility = lookup .visibility aes defaults
+       radius = lookup .radius aes defaults
+       rscale = cfg.xScale (xmin + radius)
+       points = List.map2 (,) cfg.ys cfg.xs
+       ys = List.map (fromPolar << (\(r,t) -> (2 * rscale * xm * (cfg.yScale (r - 1)), t))) points
+   in
+      GC.move origin <| GC.alpha visibility <| GC.traced (linetype colour) <| GC.path ys
+
+geom_position_polar aes defaults cfg dims = 
+   let
+       xm = dims.xm
+       ym = dims.ym
+       xmin = fst cfg.xDomain
+       (xpos,ypos) = dims.pos 
+       colour = lookup .colour aes defaults
+       pointsize = lookup .pointsize aes defaults
+       radius = lookup .radius aes defaults
+       rscale = cfg.xScale (xmin + radius)
+       origin = (xm * cfg.xScale 0, ym * cfg.yScale 0)
+       pos = fromPolar (2 * rscale * xm * (cfg.yScale (ypos - 1)), xpos)
+
+       point = GC.move pos  
+               <| GC.move origin  
+               <| GC.filled colour <| GC.circle pointsize
+   in
+      point
+
 
 
 
@@ -425,7 +465,7 @@ geom_doge aes defaults cfg dims =
 customAes = { aes | colour <- Just blue,
                      linetype <- Just GC.solid, 
                      visibility <- Just 1,
-                     radius <- Just 0.2,
+                     radius <- Just 1,
                      translate <- Just (-1, -0.05),
                      pointsize <- Just 8
                   } 
@@ -444,22 +484,28 @@ geoms = [layer_background { aes | colour <- Just white },
          xAxis aes,
          yAxis aes,
          geom_curve curveAes, 
+         geom_curve_polar { aes | colour <- Just red }, 
          --geom_point pointAes,
          --geom_bar customAes,
          --geom_trapezoid customAes,
          geom_hline { aes | x <- Just 0, y <- Just 0 },  
          geom_vline { aes | x <- Just 0, y <- Just 0 },
          --geom_tangent pointAes,
-         geom_tangent { pointAes | delta <- Just (1.5 * pi), colour <- Just black, translate <- Just (-5,0.16) },
-         geom_tangent { pointAes | delta <- Just pi, colour <- Just darkBlue, translate <- Just (-5,0.12) },
-         geom_tangent { pointAes | delta <- Just (0.5 * pi), colour <- Just purple, translate <- Just (-5,0.08) },
-         --geom_tangent { pointAes | delta <- Just (0.2 * pi), colour <- Just red },
-         geom_tangent { pointAes | delta <- Just 0.25, colour <- Just darkOrange, translate <- Just (-5,0.04) },
+         --geom_tangent { pointAes | delta <- Just (1.5 * pi), colour <- Just black, translate <- Just (-5,0.16) },
+         --geom_tangent { pointAes | delta <- Just pi, colour <- Just darkBlue, translate <- Just (-5,0.12) },
+         --geom_tangent { pointAes | delta <- Just (0.5 * pi), colour <- Just purple, translate <- Just (-5,0.08) },
+         ----geom_tangent { pointAes | delta <- Just (0.2 * pi), colour <- Just red },
+         --geom_tangent { pointAes | delta <- Just 0.25, colour <- Just darkOrange, translate <- Just (-5,0.04) },
          --legend { aes | translate <- Just (3,0.1), colour <- Just black, txt <- Just "&Delta;x = " },
          --title annotationAes
+         geom_hline { aes | x <- Just 1, y <- Just -1 },  
+         geom_hline { aes | x <- Just 1, y <- Just 1 },  
+         geom_vline { aes | x <- Just -1, y <- Just 1 },
+         geom_vline { aes | x <- Just 1, y <- Just 1 },
          geom_circle customAes,
          geom_angle customAes,
-         geom_doge { aes | dims <- Just (50,50) }
+         geom_position_polar customAes
+         --geom_doge { aes | dims <- Just (50,50) }
          --annotate_integral annotationAes 
          ]
 
@@ -469,20 +515,26 @@ geoms = [layer_background { aes | colour <- Just white },
 
 main : Signal Element
 main = Signal.map2 plots Mouse.position Window.dimensions  
-plots mousepos windims = flow right <| List.map (flow down) [ 
-   [plotc (700,400) pc  
-      (geoms ++ [title { aes | txt <- Just "y = 0.2cos(x) within -2&pi; &le; x &le; 2&pi;" }])  
-      mousepos windims,
-   plotc (700,400) pc2  
-      (geoms ++ [title { aes | txt <- Just "y' = -0.2sin(x) within -2&pi; &le; x &le; 2&pi;" }])  
-      mousepos windims],
-   [plotc (700,400) pc3  
-      (geoms ++ [title { aes | txt <- Just "y = 0.2sin(x) within -2&pi; &le; x &le; 2&pi;" }])  
-      mousepos windims,
-   plotc (700,400) pc4  
-      (geoms ++ [title { aes | txt <- Just "y' = -0.2cos(x) within -2&pi; &le; x &le; 2&pi;" }])  
-      mousepos windims]
-   ]
+plots mousepos windims = 
+   plotc (700,700) pc5  
+      (geoms ++ [title { aes | txt <- Just "y = 0.2cos(x) within -2&pi; &le; x &le; 2&pi;" }]) mousepos windims
+
+--main : Signal Element
+--main = Signal.map2 plots Mouse.position Window.dimensions  
+--plots mousepos windims = flow right <| List.map (flow down) [ 
+--   [plotc (700,400) pc  
+--      (geoms ++ [title { aes | txt <- Just "y = 0.2cos(x) within -2&pi; &le; x &le; 2&pi;" }])  
+--      mousepos windims,
+--   plotc (700,400) pc2  
+--      (geoms ++ [title { aes | txt <- Just "y' = -0.2sin(x) within -2&pi; &le; x &le; 2&pi;" }])  
+--      mousepos windims],
+--   [plotc (700,400) pc3  
+--      (geoms ++ [title { aes | txt <- Just "y = 0.2sin(x) within -2&pi; &le; x &le; 2&pi;" }])  
+--      mousepos windims,
+--   plotc (700,400) pc4  
+--      (geoms ++ [title { aes | txt <- Just "y' = -0.2cos(x) within -2&pi; &le; x &le; 2&pi;" }])  
+--      mousepos windims]
+--   ]
 
 --plotc : (Int,Int) -> PlotConfig -> (Int,Int) -> (Int,Int) -> Element
 plotc (plotWidth,plotHeight) cfg geoms (mouseX,mouseY) (windowWidth,windowHeight) =  
