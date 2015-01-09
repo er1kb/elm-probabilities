@@ -86,6 +86,7 @@ distribution f (from,to) steps =
 --pc4 = distribution (\x -> -0.2 * (cos x)) (-2*pi,2*pi) 100
 
 pc5 = distribution (\x -> 3 * (cos (2*x))) (-pi,pi) 100
+--pc5 = distribution (\x -> 3 * (sin (2*x))) (-pi,pi) 100
 
 --pc = distribution (\x -> 0.1 * x^2) (-3*pi,2*pi) 100
 --pc = distribution (\x -> e^x) (-2*pi,2*pi) 100
@@ -190,6 +191,27 @@ geom_trapezoid aes defaults d dims =
       points = List.map (trapezoid (xm,ym) (xscale,yscale) d.f) xs 
    in
       GC.alpha visibility <| GC.group <| List.map (\x -> GC.outlined (linetype colour) <| GC.polygon x) points
+
+
+geom_integral aes defaults d dims = 
+   let
+      linetype = lookup .linetype aes defaults
+      colour = lookup .colour aes defaults
+      visibility = lookup .visibility aes defaults
+      limits = lookup .limits aes defaults
+      (dx,steps) = C.interpolate limits (toFloat d.steps)
+      xm = dims.xm
+      ym = dims.ym
+      --xs = C.bins steps
+      xs = List.map (\x -> (x,0)) steps
+      rev_steps = List.reverse steps
+      ys = List.map d.f rev_steps
+      --area = xs
+      points = xs ++ (List.map2 (,) rev_steps ys)
+      area = List.map (\(x,y) -> (xm * (d.xScale x), ym * (d.yScale y))) points 
+      --area = List.map (\(x,y) -> (dims.xm * (d.xScale x), dims.ym * (d.yScale y))) <| List.map2 (,) steps (List.map d.f steps)
+   in
+      GC.alpha visibility <| GC.filled colour <| GC.polygon area
 
 geom_curve aes defaults d dims = 
    let
@@ -329,7 +351,34 @@ geom_position_polar aes defaults d dims =
       point
 
 
+geom_trace_polar aes defaults d dims = 
+   let
+       xm = dims.xm
+       ym = dims.ym
+       ymin = fst d.yDomain
+       ymax = snd d.yDomain
+       x = lookup .x aes defaults
+       linetype = lookup .linetype aes defaults
+       colour = lookup .colour aes defaults
+       visibility = lookup .visibility aes defaults
+       origin = (xm * d.xScale 0, ym * d.yScale 0)
+       (dx,steps) = C.interpolate (fst d.xDomain, x) (toFloat d.steps)
+       ys = List.map d.f steps
+       radius = d.yExtent / 2
+       rscale = d.yScale (ymin + radius)
+       points' = List.map2 (,) ys steps 
+       points = List.map (fromPolar << (\(r,t) -> (2 * rscale * ym * (d.yScale (r - ymax)), t))) points'
+   in
+      GC.move origin <| GC.alpha visibility <| GC.traced (linetype colour) <| GC.path points
 
+      --(dx,steps) = C.interpolate limits (toFloat d.steps)
+      --xm = dims.xm
+      --ym = dims.ym
+      --xs = List.map (\x -> (x,0)) steps
+      --rev_steps = List.reverse steps
+      --ys = List.map d.f rev_steps
+      --points = xs ++ (List.map2 (,) rev_steps ys)
+      --area = List.map (\(x,y) -> (xm * (d.xScale x), ym * (d.yScale y))) points 
 
 
 
@@ -518,7 +567,7 @@ geom_doge aes defaults d dims =
 {-- CUSTOM AESTHETICS --}
 customAes = { aes | colour <- Just blue,
                      linetype <- Just GC.solid, 
-                     visibility <- Just 1,
+                     visibility <- Just 0.2,
                      radius <- Just 1,
                      translate <- Just (-1.57, 0.5),
                      limits <- Just (-pi/2,pi/2),
@@ -541,9 +590,10 @@ geoms = [layer_background { aes | colour <- Just white },
          xAxis aes,
          yAxis aes,
          geom_curve curveAes, 
-         geom_curve_polar { aes | colour <- Just red }, 
-         geom_points pointAes,
-         --geom_point pointAes,
+         --geom_curve_polar { aes | colour <- Just red }, 
+         geom_trace_polar { aes | colour <- Just red }, 
+         --geom_points pointAes,
+         geom_point pointAes,
          geom_hline { aes | x <- Just 0, y <- Just 0 },  
          geom_vline { aes | x <- Just 0, y <- Just 0 },
          --geom_tangent pointAes,
@@ -558,8 +608,9 @@ geoms = [layer_background { aes | colour <- Just white },
          --geom_hline { aes | x <- Just 1, y <- Just 1 },  
          geom_vline { aes | x <- Just (-pi/2), y <- Just 1 },
          geom_vline { aes | x <- Just (pi/2), y <- Just 1 },
-         geom_bar customAes,
+         --geom_bar customAes,
          --geom_trapezoid customAes,
+         geom_integral customAes,
          geom_circle customAes,
          geom_angle customAes,
          geom_position_polar customAes,
@@ -705,6 +756,7 @@ annotate_integral aes defaults d dims =
 
 {- 
 TODO: 
+geom_trace, geom_integral_polar
 make parent and child "configs" with maybe types, perhaps rename them into something more appropriate
 should be able to integrate smaller portions of the x domain (as in hypothesis testing etc.)
 implement grid... linestyles and textstyles! 
