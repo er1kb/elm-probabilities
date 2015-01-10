@@ -81,10 +81,10 @@ const = 4
 nsteps = 400
 --pc = distribution (\x -> logBase e x) (1,2*pi) 100
 --pc = distribution (\x -> -6 + 3 * sin x) (-1*pi,2*pi) 100
-pc = distribution (\x -> 0.2 * (cos (const*x))) (0,2*pi) nsteps
-pc2 = distribution (\x -> -0.2 * (sin (const*x))) (0,2*pi) nsteps
-pc3 = distribution (\x -> 0.2 * (sin (const*x))) (0,2*pi) nsteps
-pc4 = distribution (\x -> -0.2 * (cos (const*x))) (0,2*pi) nsteps
+pc = distribution (\x -> 1 * (cos (const*x))) (0,2*pi) nsteps
+pc2 = distribution (\x -> -1 * (sin (const*x))) (0,2*pi) nsteps
+pc3 = distribution (\x -> 1 * (sin (const*x))) (0,2*pi) nsteps
+pc4 = distribution (\x -> -1 * (cos (const*x))) (0,2*pi) nsteps
 --pc5 = distribution (\x -> 3 * (cos (2*x))) (0,2*pi) 100
 
 --pc5 = distribution (\x -> 3 * (cos (2.01*x))) (-12*pi,12*pi) 100
@@ -589,7 +589,7 @@ title aes defaults d dims =
        midx = ((fst d.xDomain) + (snd d.xDomain)) / 2
        pos = (xm * (d.xScale midx),ym * (d.yScale ymax) + (ymargin / 4))
        --pos = (0,0)
-       ttl = GC.toForm <| Text.centered <| Text.fromString <| txt
+       ttl = GC.toForm <| Text.centered <| Text.height 22 <| Text.fromString <| txt
    in
       GC.move pos <| ttl
 
@@ -702,16 +702,16 @@ main = Signal.map plots input
 plots input =  
       flow right <| List.map (flow down) [ 
       [plotc (700,400) pc  
-         (geoms ++ [title { aes | txt <- Just "y = 0.2cos(x) within -2&pi; &le; x &le; 2&pi;" }])  
+         (geoms ++ [title { aes | txt <- Just "y = cos(x) within -2&pi; &le; x &le; 2&pi;" }])  
          input,
       plotc (700,400) pc2  
-         (geoms ++ [title { aes | txt <- Just "y' = -0.2sin(x) within -2&pi; &le; x &le; 2&pi;" }])  
+         (geoms ++ [title { aes | txt <- Just "y' = -sin(x) within -2&pi; &le; x &le; 2&pi;" }])  
          input],
       [plotc (700,400) pc3  
-         (geoms ++ [title { aes | txt <- Just "y = 0.2sin(x) within -2&pi; &le; x &le; 2&pi;" }])  
+         (geoms ++ [title { aes | txt <- Just "y = sin(x) within -2&pi; &le; x &le; 2&pi;" }])  
          input,
       plotc (700,400) pc4  
-         (geoms ++ [title { aes | txt <- Just "y' = -0.2cos(x) within -2&pi; &le; x &le; 2&pi;" }])  
+         (geoms ++ [title { aes | txt <- Just "y' = -cos(x) within -2&pi; &le; x &le; 2&pi;" }])  
          input]
       ]
 
@@ -783,13 +783,14 @@ layer_background aes defaults d dims =
        colour = lookup .colour aes defaults
        xm = dims.xm
        ym = dims.ym
+       colour2 = lightGrey
    in
       GC.group  
       [ 
          --GC.move (dims.xoffset, dims.yoffset) <| GC.group  
          GC.move (xm * 0.5, ym * 0.5) <| GC.group  
          <| [GC.filled colour <| GC.rect dims.innerWidth dims.innerHeight,
-            GC.filled lightGrey <| GC.rect xm ym],  
+            GC.filled colour2 <| GC.rect xm ym],  
 
          GC.traced (GC.solid black) <|  
             GC.path [(0,0),(0,ym), (xm,ym),(xm,0),(0,0)] 
@@ -819,9 +820,12 @@ annotate_integral aes defaults d dims =
 
 {-- 
 TODO: 
-implement grid... linestyles and textstyles! 
+geom_wheel, with rotation? 
+input time?
+implement grid...  
+linestyles and textstyles?! 
 improve axes 
--}
+--}
 
        --mouseX = .x <| lookup .input aes defaults
 
