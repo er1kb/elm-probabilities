@@ -1,6 +1,9 @@
 -- function graphs for plotting distributions
 -- a work in progress
 
+module Plot (Distribution, distribution, geom_point, geom_points, geom_bar, geom_trapezoid, geom_integral, geom_curve, geom_hline, geom_vline, geom_circle, geom_angle, geom_curve_polar, geom_integral_polar, geom_position_polar, geom_trace_polar, geom_trace, geom_tangent, yAxis, xAxis, title, legend, geom_doge, plot, background, annotate_integral, Aes, aes, aesDefault, point, bar, trapezoid, geom_none, lookup, Geom) where
+
+
 import Discrete as D
 import Continuous as C
 import Graphics.Collage as GC
@@ -11,16 +14,39 @@ import Text
 import Window
 import Mouse
 import List
+--import List (map, map2, head, tail, reverse, minimum, maximum, length)
 
---plottype d = case d.discrete of
---   True -> "plot discrete"
---   False -> "plot continuous"
+--main = Signal.map2 (plot (1200,600) (distribution sin (0,2*pi) 100) [background { aes | colour <- Just lightBlue }, geom_none aes, geom_circle aes, geom_trace aes, xAxis aes, yAxis aes, geom_integral { aes | visibility <- Just 0.3, colour <- Just blue }, geom_trapezoid aes]) Mouse.position Window.dimensions
+--
+
+type alias Geom = GC.Form
+
+geom_none : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_none aes' defaults d dims = 
+   let
+      meh = "meh"
+      --txt = lookup .txt aes' defaults
+      txt = lookup .txt aes' defaults
+      x = lookup .x aes' defaults
+      radius = lookup .radius aes' defaults
+      --txt = toString dims.ymargin
+      --txt = toString dims.ymargin
+      xm = dims.xm
+      ym = dims.xm
+      --zero = d.xScale 0
+      --aes' = aes
+   in
+      GC.toForm <| Text.plainText <| toString x
 
 
---data Discrete d = Binom d | Hyper d | Poisson d
---data Continuous d = Uniform d | Normal d | Standardnormal d | Exponential d
---data Distribution d = Discrete d | Continuous d
-
+--type alias Input = Signal { x : Int,
+--                            y : Int, 
+--                            width : Int, 
+--                            height : Int
+--                           }
+--input : Input
+----input m w = { x = fst m, y = snd m, width = fst w, height = snd w}
+--input = Signal.map2 (\(mx,my) (w,h) -> { x = mx, y = my, width = w, height = h}) Mouse.position Window.dimensions
 
 type alias Distribution = {
          f: (Float -> Float),
@@ -77,36 +103,23 @@ distribution f (from,to) steps =
                            plotLimits = plotLimits
                         }
 
-const = 4
-nsteps = 400
---pc = distribution (\x -> logBase e x) (1,2*pi) 100
---pc = distribution (\x -> -6 + 3 * sin x) (-1*pi,2*pi) 100
-pc = distribution (\x -> 1 * (cos (const*x))) (0,2*pi) nsteps
-pc2 = distribution (\x -> -1 * (sin (const*x))) (0,2*pi) nsteps
-pc3 = distribution (\x -> 1 * (sin (const*x))) (0,2*pi) nsteps
-pc4 = distribution (\x -> -1 * (cos (const*x))) (0,2*pi) nsteps
---pc5 = distribution (\x -> 3 * (cos (2*x))) (0,2*pi) 100
-
---pc5 = distribution (\x -> 3 * (cos (2.01*x))) (-12*pi,12*pi) 100
---pc5 = distribution (\x -> 3 * (cos (2*x))) (0,2*pi) 100
---pc5 = distribution (\x -> 3 * (cos (2*x))) (-pi,pi) 100
---pc5 = distribution (\x -> 3 * (sin (2*x))) (-pi,pi) 100
-
---pc = distribution (\x -> 0.1 * x^2) (-3*pi,2*pi) 100
---pc = distribution (\x -> e^x) (-2*pi,2*pi) 100
---pc = distribution (\x -> C.pdfstandardnormal x) (-4,4) 100
---pc = Signal.map (distribution sin (-2*pi,2*pi)) Mouse.x 
 
 
-geom_point aes defaults d dims = 
+
+geom_point : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_point aes' defaults d dims = 
    let
       --(dx,steps) = C.interpolate d.xDomain (toFloat dims.nbins)
       xm = dims.xm
       ym = dims.ym
-      colour = lookup .colour aes defaults
-      pointsize = lookup .pointsize aes defaults
-      visibility = lookup .visibility aes defaults
-      x = lookup .x aes defaults
+      colour = lookup .colour aes' defaults
+      pointsize = lookup .pointsize aes' defaults
+      visibility = lookup .visibility aes' defaults
+      --colour = lookup .colour aes aesDefault
+      --pointsize = lookup .pointsize aes aesDefault
+      --visibility = lookup .visibility aes aesDefault
+      x = lookup .x aes' defaults
+      --x = 1.57
       y = d.f x
       pos = point (xm,ym) (d.xScale, d.yScale) d.f x y
    in
@@ -117,14 +130,15 @@ geom_point aes defaults d dims =
 point (xm,ym) (xscale, yscale) f x y =  
       (xm * (xscale x), ym * (yscale <| f x)) 
 
-geom_points aes defaults d dims = 
+geom_points : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_points aes' defaults d dims = 
    let
       (dx,steps) = C.interpolate d.xDomain (toFloat dims.nbins)
       xm = dims.xm
       ym = dims.ym
-      colour = lookup .colour aes defaults
-      pointsize = lookup .pointsize aes defaults
-      visibility = lookup .visibility aes defaults
+      colour = lookup .colour aes' defaults
+      pointsize = lookup .pointsize aes' defaults
+      visibility = lookup .visibility aes' defaults
       xscale = d.xScale
       yscale = d.yScale
       --ys = List.map d.f steps -- SLOOOW, need to limit the number of points
@@ -150,15 +164,16 @@ bar (xm,ym) (xscale, yscale) limits f (x1',x2') =
       List.map (\(x,y) -> (xm * (xscale x), ym * (yscale y))) 
                [(x1,0), (x2,0), (x2,midpoint), (x1,midpoint)]
 
-geom_bar aes defaults d dims = 
+geom_bar : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_bar aes' defaults d dims = 
    let
       --(dx',steps) = C.interpolate d.xDomain (toFloat dims.nbins)
       xm = dims.xm
       ym = dims.ym
-      linetype = lookup .linetype aes defaults
-      colour = lookup .colour aes defaults
-      visibility = lookup .visibility aes defaults
-      limits = lookup .limits aes defaults
+      linetype = lookup .linetype aes' defaults
+      colour = lookup .colour aes' defaults
+      visibility = lookup .visibility aes' defaults
+      limits = lookup .limits aes' defaults
       (dx',steps) = C.interpolate limits (toFloat dims.nbins)
       xscale = d.xScale
       yscale = d.yScale
@@ -175,16 +190,19 @@ geom_bar aes defaults d dims =
 
 
 {-| Calculating trapezium points for plotting them as polygons. -}
-trapezoid (xm,ym) (xscale, yscale) f (x1,x2) =  
+trapezoid (xm,ym) (xscale, yscale) f baseline (x1,x2) =  
    List.map (\(x,y) -> (xm * (xscale x), ym * (yscale y))) 
-            [(x1,0), (x2,0), (x2,f x2), (x1,f x1)]
+            [(x1,baseline x1), (x2,baseline x2), (x2,f x2), (x1,f x1)]
+            --[(x1,0), (x2,0), (x2,f x2), (x1,f x1)]
 
-geom_trapezoid aes defaults d dims = 
+geom_trapezoid : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_trapezoid aes' defaults d dims = 
    let
-      linetype = lookup .linetype aes defaults
-      colour = lookup .colour aes defaults
-      visibility = lookup .visibility aes defaults
-      limits = lookup .limits aes defaults
+      linetype = lookup .linetype aes' defaults
+      colour = lookup .colour aes' defaults
+      visibility = lookup .visibility aes' defaults
+      baseline = lookup .baseline aes' defaults
+      limits = lookup .limits aes' defaults
       (dx,steps) = C.interpolate limits (toFloat dims.nbins)
       --(dx,steps) = C.interpolate d.xDomain (toFloat dims.nbins)
       xm = dims.xm
@@ -192,24 +210,31 @@ geom_trapezoid aes defaults d dims =
       xscale = d.xScale
       yscale = d.yScale
       xs = C.bins steps
-      points = List.map (trapezoid (xm,ym) (xscale,yscale) d.f) xs 
+      points = List.map (trapezoid (xm,ym) (xscale,yscale) d.f baseline) xs 
    in
       GC.alpha visibility <| GC.group <| List.map (\x -> GC.outlined (linetype colour) <| GC.polygon x) points
 
 
-geom_integral aes defaults d dims = 
+geom_integral : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_integral aes' defaults d dims = 
    let
-      linetype = lookup .linetype aes defaults
-      colour = lookup .colour aes defaults
-      visibility = lookup .visibility aes defaults
-      limits = lookup .limits aes defaults
-      (dx,steps) = C.interpolate limits (toFloat d.steps)
-      x = lookup .x aes defaults
+      linetype = lookup .linetype aes' defaults
+      colour = lookup .colour aes' defaults
+      visibility = lookup .visibility aes' defaults
+      baseline = lookup .baseline aes' defaults
+      dynamic = lookup .dynamic aes' defaults
+      negate = lookup .negate aes' defaults
+
+      limits = lookup .limits aes' defaults
+      x = lookup .x aes' defaults
+      limits' = if negate then (x, snd limits) else (fst limits, x)
+
+      (dx,steps) = C.interpolate (if dynamic then limits' else limits) (toFloat d.steps)
       --(dx,steps) = C.interpolate (snd limits,x) (toFloat d.steps)
       xm = dims.xm
       ym = dims.ym
       --xs = C.bins steps
-      xs = List.map (\x -> (x,0)) steps
+      xs = List.map (\x -> (x,baseline x)) steps
       rev_steps = List.reverse steps
       ys = List.map d.f rev_steps
       --area = xs
@@ -219,12 +244,13 @@ geom_integral aes defaults d dims =
    in
       GC.alpha visibility <| GC.filled colour <| GC.polygon area
 
-geom_curve aes defaults d dims = 
+geom_curve : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_curve aes' defaults d dims = 
    let
-      linetype = lookup .linetype aes defaults
-      colour = lookup .colour aes defaults
-      visibility = lookup .visibility aes defaults
-      linethickness = lookup .linethickness aes defaults -- not actually used yet
+      linetype = lookup .linetype aes' defaults
+      colour = lookup .colour aes' defaults
+      visibility = lookup .visibility aes' defaults
+      linethickness = lookup .linethickness aes' defaults -- not actually used yet
       xscale = d.xScale
       yscale = d.yScale
       (dx,steps) = C.interpolate d.xDomain (toFloat d.steps)
@@ -232,45 +258,48 @@ geom_curve aes defaults d dims =
    in
       GC.alpha visibility <| GC.traced (linetype colour) <| GC.path ys
 
-geom_hline aes defaults d dims =
+geom_hline : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_hline aes' defaults d dims =
    let
       --y = dims.ypos
-      y = lookup .y aes defaults
+      y = lookup .y aes' defaults
       --y = snd dims.pos
       xm = dims.xm
       ym = dims.ym
-      linetype = lookup .linetype aes defaults
-      colour = lookup .colour aes defaults
-      visibility = lookup .visibility aes defaults
+      linetype = lookup .linetype aes' defaults
+      colour = lookup .colour aes' defaults
+      visibility = lookup .visibility aes' defaults
    in
       GC.alpha visibility <| GC.traced (linetype colour)  
       <| GC.path [(0,ym * (d.yScale y)), (xm, ym * (d.yScale y))] 
 
-geom_vline aes defaults d dims =
+geom_vline : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_vline aes' defaults d dims =
    let
       --x = dims.xpos
-      x = lookup .x aes defaults
+      x = lookup .x aes' defaults
       --x = fst dims.pos
       xm = dims.xm
       ym = dims.ym
-      linetype = lookup .linetype aes defaults
-      colour = lookup .colour aes defaults
-      visibility = lookup .visibility aes defaults
+      linetype = lookup .linetype aes' defaults
+      colour = lookup .colour aes' defaults
+      visibility = lookup .visibility aes' defaults
    in
       GC.alpha visibility <| GC.traced (linetype colour)  
       <| GC.path [(xm * (d.xScale x),0), (xm * (d.xScale x), ym)] 
 
-geom_circle aes defaults d dims =
+geom_circle : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_circle aes' defaults d dims =
    let
       xm = dims.xm
       ym = dims.ym
       xmin = fst d.xDomain
       ymin = fst d.yDomain
-      linetype = lookup .linetype aes defaults
-      colour = lookup .colour aes defaults
-      --radius = lookup .radius aes defaults
+      linetype = lookup .linetype aes' defaults
+      colour = lookup .colour aes' defaults
+      --radius = lookup .radius aes' defaults
       radius = d.yExtent / 2
-      visibility = lookup .visibility aes defaults
+      visibility = lookup .visibility aes' defaults
       --xpos = fst dims.pos
       --radius = ym * 0.2
       --radius = xm * xpos * 0.2
@@ -284,20 +313,22 @@ geom_circle aes defaults d dims =
       GC.move origin <| GC.alpha visibility <| GC.outlined (linetype colour) <| roundthing
 
 
-geom_angle aes defaults d dims =
+
+geom_angle : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_angle aes' defaults d dims =
    let
        xm = dims.xm
        ym = dims.ym
        xmin = fst d.xDomain
        ymin = fst d.yDomain
-       linetype = lookup .linetype aes defaults
-       colour = lookup .colour aes defaults
-       pointsize = lookup .pointsize aes defaults
-       --radius = lookup .radius aes defaults
+       linetype = lookup .linetype aes' defaults
+       colour = lookup .colour aes' defaults
+       pointsize = lookup .pointsize aes' defaults
+       --radius = lookup .radius aes' defaults
        radius = d.yExtent / 2
-       x = lookup .x aes defaults
-       annotate = lookup .annotate aes defaults
-       translate = lookup .translate aes defaults
+       x = lookup .x aes' defaults
+       annotate = lookup .annotate aes' defaults
+       translate = lookup .translate aes' defaults
        --coordinates = fromPolar (d.xScale (xmin + radius), x) 
        coordinates = fromPolar (d.yScale (ymin + radius), x) 
        --pos = (C.dec 3 (fst coordinates), C.dec 3 (snd coordinates))
@@ -312,27 +343,30 @@ geom_angle aes defaults d dims =
        point = GC.move pos  
                <| GC.move origin  
                <| GC.filled colour <| GC.circle pointsize
-       label = GC.move annotationPosition <| GC.toForm <| Text.rightAligned  
+       label' = GC.move annotationPosition <| GC.toForm <| Text.rightAligned <| Text.color colour 
                <| Text.fromString <| "&theta; &asymp; " ++ (toString <| C.dec 2 x)  
                ++ "\nr = " ++ (toString <| C.dec 2 (d.f x))
+       label = if annotate then label' else (GC.toForm empty)
+
    in
       GC.group [point, label]
 
-geom_curve_polar aes defaults d dims = 
+geom_curve_polar : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_curve_polar aes' defaults d dims = 
    let
        xm = dims.xm
        ym = dims.ym
        xmin = fst d.xDomain
        ymin = fst d.yDomain
        ymax = snd d.yDomain
-       linetype = lookup .linetype aes defaults
-       colour = lookup .colour aes defaults
+       linetype = lookup .linetype aes' defaults
+       colour = lookup .colour aes' defaults
 
        --origin = (xm * d.xScale 0, ym * d.yScale 0)
        xmid = (d.xExtent / 2) + xmin
        ymid = (d.yExtent / 2) + ymin
        origin = (xm * d.xScale xmid, ym * d.yScale ymid)
-       visibility = lookup .visibility aes defaults
+       visibility = lookup .visibility aes' defaults
        radius = d.yExtent / 2
        rscale = d.yScale (ymin + radius)
        points = List.map2 (,) d.ys d.xs
@@ -341,21 +375,29 @@ geom_curve_polar aes defaults d dims =
       GC.move origin <| GC.alpha visibility <| GC.traced (linetype colour) <| GC.path ys
 
 
-geom_integral_polar aes defaults d dims = 
+geom_integral_polar : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_integral_polar aes' defaults d dims = 
    let
       xm = dims.xm
       ym = dims.ym
       xmin = fst d.xDomain
       ymin = fst d.yDomain
       ymax = snd d.yDomain
-      colour = lookup .colour aes defaults
-      visibility = lookup .visibility aes defaults
-      limits = lookup .limits aes defaults
+      colour = lookup .colour aes' defaults
+      visibility = lookup .visibility aes' defaults
+      limits = lookup .limits aes' defaults
+      baseline = lookup .baseline aes' defaults
 
-      x = lookup .x aes defaults
+      dynamic = lookup .dynamic aes' defaults
+      negate = lookup .negate aes' defaults
+
+      x = lookup .x aes' defaults
       x' = if x < (fst limits) then (fst limits) else x
       x'' = if x' > (snd limits) then (snd limits) else x'
-      (dx,steps) = C.interpolate (fst limits, x'') (toFloat d.steps)
+
+      limits' = if negate then (x'', snd limits) else (fst limits, x'')
+
+      (dx,steps) = C.interpolate (if dynamic then limits' else limits) (toFloat d.steps)
 
       radius = d.yExtent
       rscale = d.yScale (ymin + radius)
@@ -367,14 +409,20 @@ geom_integral_polar aes defaults d dims =
       points = [(2 * rscale * ym * (d.yScale (ymin)), xmin)]  
                ++ (List.map2 (,) ys' steps) 
 
+      baseline_ys = List.map baseline steps 
+      baseline_points = List.reverse <|  
+      [(2 * rscale * ym * (d.yScale (ymin)), xmin)]  
+                                 ++ (List.map2 (,) baseline_ys steps) 
+
       area = List.map (fromPolar << (\(r,t) ->  
-         (rscale * ym * (d.yScale (r - ymax)), t))) points
+         (rscale * ym * (d.yScale (r - ymax)), t))) (points ++ baseline_points)
    in
       GC.move origin <| GC.alpha visibility <| GC.filled colour <| GC.polygon area
 
 
 
-geom_position_polar aes defaults d dims = 
+geom_position_polar : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_position_polar aes' defaults d dims = 
    let
        xm = dims.xm
        ym = dims.ym
@@ -382,9 +430,10 @@ geom_position_polar aes defaults d dims =
        ymin = fst d.yDomain
        ymax = snd d.yDomain
        (xpos,ypos) = dims.pos 
-       colour = lookup .colour aes defaults
-       pointsize = lookup .pointsize aes defaults
-       --radius = lookup .radius aes defaults
+       colour = lookup .colour aes' defaults
+       visibility = lookup .visibility aes' defaults
+       pointsize = lookup .pointsize aes' defaults
+       --radius = lookup .radius aes' defaults
        radius = d.yExtent / 2
        --rscale = d.xScale (xmin + radius)
        rscale = d.yScale (ymin + radius)
@@ -395,23 +444,24 @@ geom_position_polar aes defaults d dims =
        pos = fromPolar (2 * rscale * ym * (d.yScale (ypos - ymax)), xpos)
 
        point = GC.move pos  
-               <| GC.move origin  
+               <| GC.move origin <| GC.alpha visibility 
                <| GC.filled colour <| GC.circle pointsize
    in
       point
 
 
-geom_trace_polar aes defaults d dims = 
+geom_trace_polar : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_trace_polar aes' defaults d dims = 
    let
        xm = dims.xm
        ym = dims.ym
        xmin = fst d.xDomain
        ymin = fst d.yDomain
        ymax = snd d.yDomain
-       x = lookup .x aes defaults
-       linetype = lookup .linetype aes defaults
-       colour = lookup .colour aes defaults
-       visibility = lookup .visibility aes defaults
+       x = lookup .x aes' defaults
+       linetype = lookup .linetype aes' defaults
+       colour = lookup .colour aes' defaults
+       visibility = lookup .visibility aes' defaults
        --origin = (xm * d.xScale 0, ym * d.yScale 0)
        xmid = (d.xExtent / 2) + xmin
        ymid = (d.yExtent / 2) + ymin
@@ -425,15 +475,16 @@ geom_trace_polar aes defaults d dims =
    in
       GC.move origin <| GC.alpha visibility <| GC.traced (linetype colour) <| GC.path points
 
-geom_trace aes defaults d dims = 
+geom_trace : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_trace aes' defaults d dims = 
    let
       xm = dims.xm
       ym = dims.ym
-      linetype = lookup .linetype aes defaults
-      colour = lookup .colour aes defaults
-      visibility = lookup .visibility aes defaults
-      linethickness = lookup .linethickness aes defaults -- not actually used yet
-      x = lookup .x aes defaults
+      linetype = lookup .linetype aes' defaults
+      colour = lookup .colour aes' defaults
+      visibility = lookup .visibility aes' defaults
+      linethickness = lookup .linethickness aes' defaults -- not actually used yet
+      x = lookup .x aes' defaults
       (dx,steps) = C.interpolate (fst d.xDomain,x) (toFloat d.steps)
       ys = List.map (\(x,y) -> (xm * (d.xScale x), ym * (d.yScale y)))  
                      <| List.map2 (,) steps (List.map d.f steps)
@@ -442,25 +493,25 @@ geom_trace aes defaults d dims =
 
 
 
-geom_tangent aes defaults d dims = 
+geom_tangent : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_tangent aes' defaults d dims = 
    let
-       --x' = .wposx dims
        xm = dims.xm
        ym = dims.ym
-       linetype = lookup .linetype aes defaults
-       linethickness = lookup .linethickness aes defaults
-       colour = lookup .colour aes defaults
-       visibility = lookup .visibility aes defaults
-       pointsize = lookup .pointsize aes defaults
-       translate = lookup .translate aes defaults
-       annotate = lookup .annotate aes defaults
-       decimals = lookup .decimals aes defaults
-       (w',h') = lookup .dims aes defaults
+       linetype = lookup .linetype aes' defaults
+       linethickness = lookup .linethickness aes' defaults
+       colour = lookup .colour aes' defaults
+       visibility = lookup .visibility aes' defaults
+       pointsize = lookup .pointsize aes' defaults
+       translate = lookup .translate aes' defaults
+       annotate = lookup .annotate aes' defaults
+       decimals = lookup .decimals aes' defaults
+       (w',h') = lookup .dims aes' defaults
        (w,h) = (toFloat w', toFloat h')
        annotationPosition = (xm * d.xScale (fst translate), ym * d.yScale (snd translate))
        --dx = 0.3 * (1 - (snd dims.wpos)) * d.xExtent 
        --dx = 0.3 * (1 - (snd dims.wpos)) * d.xExtent 
-       delta = lookup .delta aes defaults
+       delta = lookup .delta aes' defaults
        --dx = delta * (1 - (snd dims.wpos)) * d.xExtent
        --dx = delta * (1 - (snd dims.wpos)) -- control dx with mouse y
        dx = delta
@@ -526,12 +577,13 @@ geom_tangent aes defaults d dims =
        annotation
        ]
        
--- customization object for axes?
---axisY d (xm,ym) xmargin = 
-yAxis aes defaults d dims = 
+yAxis : Aes -> Aes -> Distribution -> Dimensions -> Geom
+yAxis aes' defaults d dims = 
    let
        xm = dims.xm
        ym = dims.ym
+       axis = lookup .axis aes' defaults
+       label = (snd << .labels) axis
        xmargin = fst dims.margins
        xmin = fst d.xDomain
        --ymin = fst d.yDomain
@@ -547,17 +599,18 @@ yAxis aes defaults d dims =
          <| GC.traced (GC.solid black) <| GC.path [(0,0),(12,0)]) tickPositions
        yBar = GC.traced (GC.solid black) <| GC.path [(10,0),(10,ym)]
        yLabel = GC.move (-xmargin * 0.35, ym * 0.5) <|  
-         GC.toForm <| Text.rightAligned <| Text.fromString "Y" 
+         GC.toForm <| Text.leftAligned <| Text.fromString label
    in
       GC.move pos <| GC.group  
       [tickLabels, ticks, yBar, yLabel]
 
--- customization object for axes?
---axisX d (xm,ym) ymargin = 
-xAxis aes defaults d dims = 
+xAxis : Aes -> Aes -> Distribution -> Dimensions -> Geom
+xAxis aes' defaults d dims = 
    let
        xm = dims.xm
        ym = dims.ym
+       axis = lookup .axis aes' defaults
+       label = (fst << .labels) axis
        ymargin = fst dims.margins
        --ymin = fst d.yDomain
        ymin = fst d.plotLimits
@@ -572,15 +625,16 @@ xAxis aes defaults d dims =
          <| GC.traced (GC.solid black) <| GC.path [(0,0),(0,12)]) tickPositions
        xBar = GC.traced (GC.solid black) <| GC.path [(0,-11),(xm,-11)]
        xLabel = GC.move (xm * 0.5,-ymargin * 0.55) <|  
-         GC.toForm <| Text.rightAligned <| Text.fromString "X" 
+         GC.toForm <| Text.centered <| Text.fromString label
    in
       GC.move pos <| GC.group  
       [tickLabels, ticks, xBar, xLabel]
 
 --
-title aes defaults d dims = 
+title : Aes -> Aes -> Distribution -> Dimensions -> Geom
+title aes' defaults d dims = 
    let
-       txt = lookup .txt aes defaults
+       txt = lookup .txt aes' defaults
        ymargin = fst dims.margins
        xm = dims.xm
        ym = dims.ym
@@ -594,28 +648,30 @@ title aes defaults d dims =
       GC.move pos <| ttl
 
 
-legend aes defaults d dims = 
+legend : Aes -> Aes -> Distribution -> Dimensions -> Geom
+legend aes' defaults d dims = 
    let
        xm = dims.xm
        ym = dims.ym
-       (w',h') = lookup .dims aes defaults
+       (w',h') = lookup .dims aes' defaults
        (w,h) = (toFloat w', toFloat h')
 
-       txt = lookup .txt aes defaults
-       --txt = lookup .txt aes defaults
-       colour = lookup .colour aes defaults
-       translate = lookup .translate aes defaults
+       txt = lookup .txt aes' defaults
+       --txt = lookup .txt aes' defaults
+       colour = lookup .colour aes' defaults
+       translate = lookup .translate aes' defaults
        annotationPosition = (xm * d.xScale (fst translate),  
                              ym * d.yScale (snd translate))
-       symbol = GC.filled colour <| GC.rect w h
-       label = GC.move (w * 1.5,0) <| GC.toForm <| Text.leftAligned <| Text.fromString txt
+       symbol = GC.move (w * -2,0) <| GC.filled colour <| GC.rect w h
+       label = GC.toForm <| Text.leftAligned <| Text.fromString txt
    in
        GC.move annotationPosition <| GC.group [symbol, label]
 
 
-geom_doge aes defaults d dims = 
+geom_doge : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_doge aes' defaults d dims = 
    let
-      wh = lookup .dims aes defaults
+      wh = lookup .dims aes' defaults
       dogeurl = "https://31.media.tumblr.com/b23ef59e7838d323c281de41a31d672a/tumblr_inline_n0rlcbgFBe1s0subn.gif"
       dogeimg = image (fst wh) (snd wh) dogeurl
       xm = dims.xm
@@ -624,118 +680,28 @@ geom_doge aes defaults d dims =
    in
       GC.move (xm * d.xScale xpos, ym * d.yScale ypos) <| GC.toForm dogeimg
 
-{-- CUSTOM AESTHETICS --}
-customAes = { aes | colour <- Just blue,
-                     linetype <- Just GC.solid, 
-                     visibility <- Just 0.2,
-                     radius <- Just 1,
-                     translate <- Just (-1.57, 0.5),
-                     --limits <- Just (pi/2,(3*pi)/2),
-                     pointsize <- Just 8
-                  } 
-pointAes = { aes | pointsize <- Just 6, 
-                     colour <- Just red,  
-                     linethickness <- Just 5,
-                     translate <- Just (-5.3,-0.14)
-                  }
-curveAes = { aes | colour <- Just darkGrey  
-                  }
-annotationAes = { aes | translate <- Just (-pi,0.1),
-                        decimals <- Just 5,  
-                        txt <- Just "y = 0.2cos(x) within -2pi &le; x &le; 2pi", 
-                        limits <- Just (-pi/2,pi/2)
-                     }
-
-geoms = [layer_background { aes | colour <- Just white }, 
-         xAxis aes,
-         yAxis aes,
-         --geom_curve curveAes, 
-         geom_trace curveAes, 
-         --geom_curve_polar { aes | colour <- Just red }, 
-         geom_trace_polar { aes | colour <- Just red }, 
-         --geom_points pointAes,
-         geom_point pointAes,
-         geom_hline { aes | x <- Just 0, y <- Just 0 },  
-         geom_vline { aes | x <- Just 0, y <- Just 0 },
-         --geom_tangent pointAes,
-         --geom_tangent { pointAes | delta <- Just (1.5 * pi), colour <- Just black, translate <- Just (-5,0.16) },
-         --geom_tangent { pointAes | delta <- Just pi, colour <- Just darkBlue, translate <- Just (-5,0.12) },
-         --geom_tangent { pointAes | delta <- Just (0.5 * pi), colour <- Just purple, translate <- Just (-5,0.08) },
-         ----geom_tangent { pointAes | delta <- Just (0.2 * pi), colour <- Just red },
-         --geom_tangent { pointAes | delta <- Just 0.25, colour <- Just darkOrange, translate <- Just (-5,0.04) },
-         --legend { aes | translate <- Just (3,0.1), colour <- Just black, txt <- Just "&Delta;x = " },
-         --title annotationAes
-         --geom_hline { aes | x <- Just 1, y <- Just -1 },  
-         --geom_hline { aes | x <- Just 1, y <- Just 1 },  
-         geom_vline { aes | x <- Just (-pi/2), y <- Just 1 },
-         geom_vline { aes | x <- Just (pi/2), y <- Just 1 },
-         --geom_bar customAes,
-         --geom_trapezoid customAes,
-         --geom_integral customAes,
-         geom_integral_polar customAes,
-         geom_circle customAes,
-         geom_angle customAes,
-         geom_position_polar customAes
-         --geom_doge { aes | dims <- Just (50,50) }
-         --annotate_integral annotationAes 
-         ]
-
-type alias Input = Signal { x : Int,
-                            y : Int, 
-                            width : Int, 
-                            height : Int
-                           }
-input : Input
-input = Signal.map2 (\(mx,my) (w,h) -> { x = mx, y = my, width = w, height = h}) Mouse.position Window.dimensions
-
---main : Signal Element
---main = Signal.map2 (plotc (1400,800) pc geoms) Mouse.position Window.dimensions 
-
---main : Signal Element
---main = Signal.map plots input
---plots input = 
---   plotc (1400,600) pc5  
---      (geoms ++ [title { aes | txt <- Just "y = 0.2cos(x) within -2&pi; &le; x &le; 2&pi;" }]) input
-
-main : Signal Element
-main = Signal.map plots input
-plots input =  
-      flow right <| List.map (flow down) [ 
-      [plotc (700,400) pc  
-         (geoms ++ [title { aes | txt <- Just "y = cos(x) within -2&pi; &le; x &le; 2&pi;" }])  
-         input,
-      plotc (700,400) pc2  
-         (geoms ++ [title { aes | txt <- Just "y' = -sin(x) within -2&pi; &le; x &le; 2&pi;" }])  
-         input],
-      [plotc (700,400) pc3  
-         (geoms ++ [title { aes | txt <- Just "y = sin(x) within -2&pi; &le; x &le; 2&pi;" }])  
-         input,
-      plotc (700,400) pc4  
-         (geoms ++ [title { aes | txt <- Just "y' = -cos(x) within -2&pi; &le; x &le; 2&pi;" }])  
-         input]
-      ]
 
 --plotc : (Int,Int) -> PlotConfig -> (Int,Int) -> (Int,Int) -> Element
 --plotc (plotWidth,plotHeight) d geoms (mouseX,mouseY) (windowWidth,windowHeight) =  
-plotc (plotWidth,plotHeight) d geoms input =  
+--plot : (Int,Int) -> Distribution -> List geom -> (Int,Int) -> (Int,Int) -> Element
+plot (plotWidth,plotHeight) d geoms m w =  
    let
+      input = { x = (fst m), y = (snd m), width = (fst w), height = (snd w) }
 
-      -- Pass two "aesthetics" to each geom, where a custom one can override defaults
+       --Pass two "aesthetics" to each geom, where a custom one can override defaults
       defaults = { aesDefault | delta <- Just d.dx,  
+                                limits <- Just d.xDomain,
                                 x <- Just xpos,  
                                 y <- Just ypos, 
-                                theta <- Just (pi / 4),
+                                theta <- Just (pi / 4)
                                 --input <- Just input,
-                                limits <- Just d.xDomain
                              }
-      
       windowScaleX = C.normalize (0,toFloat input.width)    --- 
       windowScaleY = C.normalize (0,toFloat input.height)   ---
       nbins = round <| (toFloat input.x) / 4   --- 
       wpos = (windowScaleX (toFloat input.x), windowScaleY (toFloat input.y))   --- 
       xpos = (fst d.xDomain) + d.xExtent * (fst wpos)
       ypos = d.f xpos
-      --radius = sqrt (xpos^2 + ypos^2)
       xmargin = (toFloat plotWidth) * 0.1
       ymargin = (toFloat plotHeight) * 0.2
       xoffset = (toFloat plotWidth)/2 - xmargin
@@ -744,21 +710,17 @@ plotc (plotWidth,plotHeight) d geoms input =
       innerHeight = (toFloat plotHeight) - ymargin
       ymultiplier = (toFloat plotHeight) - (2 * ymargin)
       xmultiplier = (toFloat plotWidth) - (2 * xmargin)
-      --baseline = List.map (\x -> 0) [1..List.length d.xs]
 
+      dims : Dimensions
       dims = {
          windowScaleX = windowScaleX,
          windowScaleY = windowScaleY,
          nbins = nbins,
          wpos = wpos,
-         --xpos = xpos,
-         --ypos = ypos,
          pos = (xpos,ypos),
          xmargin = xmargin,
          ymargin = ymargin,
          margins = (xmargin,ymargin),
-         --xoffset = xoffset,
-         --yoffset = yoffset,
          innerWidth = innerWidth,
          innerHeight = innerHeight,
          ym = ymultiplier,
@@ -771,16 +733,18 @@ plotc (plotWidth,plotHeight) d geoms input =
    in 
       GC.collage plotWidth plotHeight  
             [GC.move offsets <| GC.group <| List.map (\g -> g defaults d dims) geoms]
-             --[  
+            --[GC.move offsets <| GC.group <| List.map (\(g,a) -> g a defaults d dims) geoms]
+             -- [  
              -- --GC.move offsets <| xMarker,
              -- --GC.move offsets <| yMarker,
              -- GC.move offsets <| annotate_integral annotationAes defaults d dims,
              -- ]
 
 
-layer_background aes defaults d dims = 
+background : Aes -> Aes -> Distribution -> Dimensions -> Geom
+background aes' defaults d dims = 
    let
-       colour = lookup .colour aes defaults
+       colour = lookup .colour aes' defaults
        xm = dims.xm
        ym = dims.ym
        colour2 = lightGrey
@@ -796,11 +760,13 @@ layer_background aes defaults d dims =
             GC.path [(0,0),(0,ym), (xm,ym),(xm,0),(0,0)] 
       ]
 
-annotate_integral aes defaults d dims = 
+annotate_integral : Aes -> Aes -> Distribution -> Dimensions -> Geom
+annotate_integral aes' defaults d dims = 
    let
-       decimals = lookup .decimals aes defaults
-       translate = lookup .translate aes defaults
-       limits = lookup .limits aes defaults
+       decimals = lookup .decimals aes' defaults
+       translate = lookup .translate aes' defaults
+       limits = lookup .limits aes' defaults
+       --baseline = lookup .baseline aes' defaults -- !!
        xmin = fst limits
        xmax = snd limits
        integral = C.integrate limits (toFloat dims.nbins) d.f
@@ -820,14 +786,18 @@ annotate_integral aes defaults d dims =
 
 {-- 
 TODO: 
-geom_wheel, with rotation? 
-input time?
-implement grid...  
-linestyles and textstyles?! 
-improve axes 
+Polar plot of a standard normal distribution is messed up... 
+Set y plotting limits manually, for layering purposes.
+Colouring positive and negative integrals independently?
+Geom_wheel, with rotation? 
+Hline and vline etc in polar coordinates... implement "trace" within the curve function instead of having two separate functions --> Conditional interactivity and direction (moving upper or lower bound?)
+Input time?
+Implement grid...  
+Linestyles and textstyles?! 
+Improve axes: number of ticks etc. 
+Fix circle radius (e g sin over (0,pi)) 
 --}
 
-       --mouseX = .x <| lookup .input aes defaults
 
 
 {- aesthetics -}
@@ -840,9 +810,22 @@ lookup key child parent = let
                                 (Just c,_) -> c
                                 (Nothing, Just p) -> p
 
-
+type alias Dimensions = {
+         windowScaleX : (Float -> Float),
+         windowScaleY : (Float -> Float),
+         nbins : Int,
+         wpos : (Float,Float),
+         pos : (Float,Float),
+         xmargin : Float,
+         ymargin : Float,
+         margins : (Float,Float),
+         innerWidth : Float,
+         innerHeight : Float,
+         ym : Float,
+         xm : Float
+}
             
-type alias AES = { visibility:Maybe Float, 
+type alias Aes = { visibility:Maybe Float, 
                    linetype:Maybe (Color -> GC.LineStyle),
                    linethickness:Maybe Float,
                    pointsize:Maybe Float,
@@ -858,10 +841,14 @@ type alias AES = { visibility:Maybe Float,
                    y: Maybe Float,
                    radius: Maybe Float,
                    theta: Maybe Float,
-                   input: Maybe { height : Int, width : Int, x : Int, y : Int }
+                   baseline: Maybe (Float -> Float),
+                   dynamic: Maybe Bool,
+                   negate: Maybe Bool,
+                   axis: Maybe { labels : (String,String) }
+                   --input: Maybe { height : Int, width : Int, x : Int, y : Int }
                 }
 
-aes : AES
+aes : Aes
 aes = { visibility = Nothing, 
         linetype = Nothing,  
         linethickness = Nothing,  
@@ -878,26 +865,77 @@ aes = { visibility = Nothing,
         y = Nothing,
         radius = Nothing,
         theta = Nothing,
-        input = Nothing
+        baseline = Nothing,
+        dynamic = Nothing,
+        negate = Nothing,
+        axis = Nothing
+        --input = Nothing
      }
 
-aesDefault : AES
-aesDefault = { aes | visibility <- Just 1, 
-                     linetype <- Just GC.solid,  
-                     linethickness <- Just 1,  
-                     pointsize <- Just 2,  
-                     colour <- Just black,
-                     translate <- Just (0,0),
-                     decimals <- Just 2,
-                     dims <- Just (30,3),
-                     txt <- Just "Plot title",
-                     delta <- Nothing,
-                     limits <- Nothing,
-                     annotate <- Just True, 
-                     x <- Nothing,
-                     y <- Nothing,
-                     radius <- Just 1,
-                     theta <- Nothing,
-                     input <- Nothing
+--type alias AesDefault = Aes
+
+--aesDefault : Aes
+--aesDefault = { aes | visibility <- Just 1, 
+aesDefault : Aes
+aesDefault = { visibility = Just 1, 
+               linetype = Just GC.solid,  
+               linethickness = Just 1,  
+               pointsize = Just 4.0,  
+               colour = Just black,
+               translate = Just (0,0),
+               decimals = Just 2,
+               dims = Just (30,3),
+               txt = Just "Plot title",
+               delta = Just 0.1,
+               limits = Just (-1,1),
+               annotate = Just True, 
+               x = Just 0,
+               y = Just 0,
+               radius = Just 1,
+               theta = Just 0,
+               baseline = Just (\x -> 0),
+               dynamic = Just True,
+               negate = Just False,
+               axis = Just { labels = ("X", "Y") }
+               --input = Nothing
                }
+
+--aesDefault = { visibility <- Just 1, 
+--               linetype <- Just GC.solid,  
+--               linethickness <- Just 1,  
+--               pointsize <- Just 2.0,  
+--               colour <- Just black,
+--               translate <- Just (0,0),
+--               decimals <- Just 2,
+--               dims <- Just (30,3),
+--               txt <- Just "Plot title",
+--               delta <- Nothing,
+--               limits <- Nothing,
+--               annotate <- Just True, 
+--               x <- Nothing,
+--               y <- Nothing,
+--               radius <- Just 1,
+--               theta <- Nothing
+--               --input <- Nothing
+--               }
+
+--aesDefault : Aes
+--aesDefault = { aes | visibility <- Just 1, 
+--                     linetype <- Just GC.solid,  
+--                     linethickness <- Just 1,  
+--                     pointsize <- Just 2,  
+--                     colour <- Just black,
+--                     translate <- Just (0,0),
+--                     decimals <- Just 2,
+--                     dims <- Just (30,3),
+--                     txt <- Just "Plot title",
+--                     delta <- Nothing,
+--                     limits <- Nothing,
+--                     annotate <- Just True, 
+--                     x <- Nothing,
+--                     y <- Nothing,
+--                     radius <- Just 1,
+--                     theta <- Nothing
+--                     --input <- Nothing
+--               }
 
