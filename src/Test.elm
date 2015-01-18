@@ -50,31 +50,31 @@ customAes = { aes | radius <- Just 2, txt <- Just "grrRRr!", pointsize <- Just 9
 geoms1 = [ 
          --background { aes | colour <- Just lightGrey }, 
          --geom_integral { aes | baseline <- Just (\x -> 0.5), colour <- Just grey, dynamic <- Just True, negate <- Just False },
-         geom_integral { aes | colour <- Just darkGreen, visibility <- Just 0.4, dynamic <- Just True, negate <- Just False },
+         --geom_integral { aes | colour <- Just darkGreen, visibility <- Just 0.4, dynamic <- Just True, negate <- Just False },
          --geom_trapezoid { aes | baseline <- Just bl },
-         --geom_bar { aes | baseline <- Just (\x -> sin (4*x)), colour <- Just darkBlue },
+         geom_bar { aes | baseline <- Just (\x -> sin (4*x)), colour <- Just darkBlue },
          --geom_curve aes,
-         geom_point customAes,
+         --geom_point customAes,
          --geom_trace_polar customAes,
          geom_trace { aes | colour <- Just orange },
          geom_hline customAes,
          geom_vline customAes,
-         --geom_tangent { aes | colour <- Just red, delta <- Just 0.5, translate <- Just (-2.6,0.5) },
+         --geom_tangent { aes | colour <- Just red, delta <- Just 1.5, translate <- Just (-2.6,0.5) },
          --geom_hline { aes | y <- Just 0.5 },
          xAxis { aes | axis <- Just { labels = ("X", "_") } },  
          yAxis { aes | axis <- Just { labels = ("_", "Y") }},
          title { aes | txt <- Just "y = 2 + 4cosx" }
          ]
 --d1 = (distribution (\x -> 4 * (cos (0.5*x))) (0,2*pi) 200)
---d1 = (distribution (\x -> 2 + 4 * cos x) (-2*pi,2*pi) 200)
+d1 = (distribution (\x -> 2 + 4 * cos x) (-2*pi,2*pi) 200)
 --d1 = (distribution (\x -> cos (4*x)) (-pi,pi) 200)
-d1 = (distribution (\x -> sin (4*x)) (-pi,pi) 200)
+--d1 = (distribution (\x -> sin (4*x)) (-pi,pi) 200)
 --d1 = (distribution (\x -> C.pdfstandardnormal x) (-pi,pi) 200)
 --d1 = (distribution (C.pdfnormal 190 7) (170,210) 200)
 --d2 = (distribution (\x -> 2 + 4 * (cos (0.5*x))) (0,2*pi) 200)
---d2 = (distribution (\x -> 2 + 4 * cos x) (-2*pi,2*pi) 200)
+d2 = (distribution (\x -> 2 + 4 * cos x) (-2*pi,2*pi) 200)
 --d2 = (distribution (\x -> cos (4*x)) (-pi,pi) 200)
-d2 = (distribution (\x -> (sin (4*x))) (-pi,pi) 200)
+--d2 = (distribution (\x -> (sin (4*x))) (-pi,pi) 200)
 --d2 = (distribution (\x -> C.pdfstandardnormal x) (-pi,pi) 200)
 --d2 = (distribution (C.pdfnormal 190 7) (170,210) 200)
 

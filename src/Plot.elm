@@ -44,6 +44,7 @@ type alias Distribution = {
          xDomain: (Float,Float), 
          yDomain: (Float,Float),
          xExtent: Float,
+         rmax:Float,
          steps:Int,
          dx:Float,
          interpolator:List Float,
@@ -80,7 +81,7 @@ distribution f (from,to) steps =
        --xScale = C.normalize xLimits
        yDomain = (ymin, ymax)
        yExtent = ymax - ymin
-       xyRatio = ymax / (snd xDomain)
+       xyRatio = rmax / (snd xDomain)
        polar = List.map fromPolar <| List.map2 (,) ys xs
    in
                         {  
@@ -91,6 +92,7 @@ distribution f (from,to) steps =
                            xDomain = xDomain, 
                            yDomain = yDomain,
                            xExtent = xExtent,
+                           rmax = rmax,
                            steps = steps,
                            dx = dx,
                            interpolator = interpolator,
@@ -339,29 +341,16 @@ geom_circle aes' defaults d dims =
    let
       xm = dims.xm
       ym = dims.ym
-      xmin = fst d.xDomain
-      (ymin,ymax) = d.yDomain
       linetype = lookup .linetype aes' defaults
       colour = lookup .colour aes' defaults
-      --radius = lookup .radius aes' defaults
-      --radius = d.yExtent / 2
       visibility = lookup .visibility aes' defaults
       fit = lookup .fit aes' defaults
       xyRatio = if fit then d.xyRatio else 1
-      --xpos = fst dims.pos
-      --radius = ym * 0.2
-      --radius = xm * xpos * 0.2
-      --roundthing = GC.circle (xm * (d.xScale (xmin + radius)))
-      --roundthing = GC.circle (ym * (d.yScale (ymin + radius)))
       
       ys = List.map (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale (y)))
-            <| List.map (fromPolar << (\x -> (ymax,x))) d.xs
+            <| List.map (fromPolar << (\x -> (d.rmax,x))) d.xs
 
       thing = GC.path ys
-      --roundthing = GC.circle (ym * (d.yScale ymid))
-      --origin = (xm * d.xScale 0, ym * d.yScale 0)
-      --xmid = (d.xExtent / 2) + xmin
-      --ymid = (d.yExtent / 2) + ymin
       origin = (0,0)
    in
       GC.move origin <| GC.alpha visibility <| GC.outlined (linetype colour) <| thing
@@ -373,25 +362,17 @@ geom_angle aes' defaults d dims =
    let
        xm = dims.xm
        ym = dims.ym
-       xmin = fst d.xDomain
-       --ymin = fst d.yDomain
-       (ymin,ymax) = d.yDomain
        linetype = lookup .linetype aes' defaults
        colour = lookup .colour aes' defaults
        pointsize = lookup .pointsize aes' defaults
        fit = lookup .fit aes' defaults
        xyRatio = if fit then d.xyRatio else 1
-       --radius = lookup .radius aes' defaults
        radius = d.yExtent / 2
        x = lookup .x aes' defaults
        annotate = lookup .annotate aes' defaults
        translate = lookup .translate aes' defaults
-       --coordinates = fromPolar (d.yScale (ymin + radius), x) 
-       (x',y') = fromPolar (ymax, x) 
+       (x',y') = fromPolar (d.rmax, x) 
        pos = (xm * d.xScale (x' / xyRatio), ym * d.yScale y')
-       --xmid = (d.xExtent / 2) + xmin
-       --ymid = (d.yExtent / 2) + ymin
-       --origin = (xm * d.xScale xmid, ym * d.yScale ymid)
        origin = (0,0)
        annotationPosition = (xm * d.xScale (fst translate),  
                              ym * d.yScale (snd translate))
@@ -411,17 +392,12 @@ geom_curve_polar aes' defaults d dims =
    let
        xm = dims.xm
        ym = dims.ym
-       (xmin,xmax) = d.xDomain
-       (ymin,ymax) = d.yDomain
        linetype = lookup .linetype aes' defaults
        colour = lookup .colour aes' defaults
        visibility = lookup .visibility aes' defaults
        fit = lookup .fit aes' defaults
        xyRatio = if fit then d.xyRatio else 1
-       --origin = (\(x,y) -> (xm * d.xScale x, ym * d.yScale y))  
-       --                    <| lookup .translate aes' defaults
        origin = (0,0)
-       --points = List.map fromPolar <| List.map2 (,) d.ys d.xs
        ys = List.map (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale (y))) d.polar
    in
       GC.move origin <| GC.alpha visibility <| GC.traced (linetype colour) <| GC.path ys
@@ -432,8 +408,6 @@ geom_integral_polar aes' defaults d dims =
    let
       xm = dims.xm
       ym = dims.ym
-      xmin = fst d.xDomain
-      (ymin,ymax) = d.yDomain
       colour = lookup .colour aes' defaults
       visibility = lookup .visibility aes' defaults
       limits = lookup .limits aes' defaults
@@ -472,25 +446,13 @@ geom_position_polar aes' defaults d dims =
    let
        xm = dims.xm
        ym = dims.ym
-       xmin = fst d.xDomain
-       ymin = fst d.yDomain
-       ymax = snd d.yDomain
        (xpos,ypos) = dims.pos 
        colour = lookup .colour aes' defaults
        visibility = lookup .visibility aes' defaults
        pointsize = lookup .pointsize aes' defaults
        fit = lookup .fit aes' defaults
        xyRatio = if fit then d.xyRatio else 1
-       --radius = lookup .radius aes' defaults
-       --radius = d.yExtent / 2
-       --rscale = d.yScale (ymin + radius)
-       --rscale = d.yScale radius
-       --origin = (xm * d.xScale 0, ym * d.yScale 0)
-       --xmid = (d.xExtent / 2) + xmin
-       --ymid = (d.yExtent / 2) + ymin
-       --origin = (xm * d.xScale xmid, ym * d.yScale ymid)
        origin = (0,0)
-       --pos = fromPolar (rscale * ym * (d.yScale (ypos + ymin)), xpos)
        pos = (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale y)) <| fromPolar (ypos,xpos)
 
        point = GC.move pos  
@@ -505,32 +467,17 @@ geom_trace_polar aes' defaults d dims =
    let
        xm = dims.xm
        ym = dims.ym
-       xmin = fst d.xDomain
-       ymin = fst d.yDomain
-       ymax = snd d.yDomain
        x = lookup .x aes' defaults
        linetype = lookup .linetype aes' defaults
        colour = lookup .colour aes' defaults
        visibility = lookup .visibility aes' defaults
        fit = lookup .fit aes' defaults
        xyRatio = if fit then d.xyRatio else 1
-       --origin = (xm * d.xScale 0, ym * d.yScale 0)
-       xmid = (d.xExtent / 2) + xmin
-       ymid = (d.yExtent / 2) + ymin
-
-       --origin = (xm * d.xScale xmid, ym * d.yScale ymid)
        origin = (0,0)
        (dx,steps) = C.interpolate (fst d.xDomain, x) (toFloat d.steps)
        ys = List.map d.f steps
 
-       --ys = List.map (\(x,y) -> (xm * (d.xScale x), ym * (d.yScale (y)))) d.polar
-
-       --radius = d.yExtent / 2
-       --rscale = d.yScale (ymin + radius)
-       --rscale = d.yScale radius
        points = List.map (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale y)) <| List.map fromPolar <| List.map2 (,) ys steps 
-       --points = List.map (fromPolar << (\(r,t) -> (2 * rscale * ym * (d.yScale (r - ymax)), t))) points'
-       --points = List.map (fromPolar << (\(r,t) -> (rscale * ym * (d.yScale (r + ymin)), t))) points'
    in
       GC.move origin <| GC.alpha visibility <| GC.traced (linetype colour) <| GC.path points
 
@@ -567,32 +514,29 @@ geom_tangent aes' defaults d dims =
        decimals = lookup .decimals aes' defaults
        (w',h') = lookup .dims aes' defaults
        (w,h) = (toFloat w', toFloat h')
-       annotationPosition = (xm * d.xScale (fst translate), ym * d.yScale (snd translate))
        delta = lookup .delta aes' defaults
-       dx = delta
-       xmin = fst d.xDomain
-       ymin = fst d.yDomain
-       ymax = snd d.yDomain
-       x = fst dims.pos
-       tangent = C.tangent dx x d.f
-       m = tangent.slope
-       b = tangent.intercept
-       fun = (\x -> m * x + b)
-       x' = xm * d.xScale x
-       y' = xm * d.xScale (d.f x) 
-       x1 = x - (dx / 2)
+       x = lookup .x aes' defaults
+
+       tangent = C.tangent delta x d.f
+       fun = (\x -> tangent.slope * x + tangent.intercept) 
+       annotationPosition = (xm * d.xScale (fst translate),  
+                             ym * d.yScale (snd translate))
+
+       x1 = x - (delta / 2)
        x1' = xm * d.xScale x1
        y1 = fun x1
        y1' = ym * d.yScale y1
-       x2 = x + (dx / 2)
+       x2 = x + (delta / 2)
        x2' = xm * d.xScale x2
        y2 = fun x2
        y2' = ym * d.yScale y2
        ys = [(x1', y1'),
              (x2', y2')]
-       xpos = (x',ym * d.yScale (d.f x))
+       xpos = (xm * d.xScale x,ym * d.yScale (d.f x))
        x1pos = (x1',ym * d.yScale (d.f x1))
        x2pos = (x2',ym * d.yScale (d.f x2))
+
+
        vline1 = GC.alpha visibility <| GC.traced (GC.dotted colour) <| GC.path [List.head ys, x1pos]
        vline2 = GC.alpha visibility <| GC.traced (GC.dotted colour) <| GC.path [List.head <| List.tail ys, x2pos]
        xdot = GC.move xpos <| GC.filled colour <| GC.circle pointsize 
@@ -602,15 +546,11 @@ geom_tangent aes' defaults d dims =
             --<| "slope: " ++ (toString m) ++ "x\nintercept: " ++ (toString <| C.dec 3 b)
        symbol = GC.filled colour <| GC.rect w h
        label = GC.move (w * 1.6,0) <| GC.toForm <| Text.leftAligned <| Text.fromString  
-                  <| "&Delta;x = " ++ (toString <| C.dec decimals dx) 
+                  <| "&Delta;x = " ++ (toString <| C.dec decimals delta) 
        annotation = if annotate then  
                        GC.move annotationPosition <| GC.group [symbol,label] 
                     else GC.toForm empty
    in
-        --GC.move (80,300) <| GC.toForm <| Text.rightAligned <| Text.fromString <| toString <| List.map (\(a,b) -> (C.dec 2 a, C.dec 2 b)) ys
-        --GC.move (80,300) <| GC.toForm <| Text.rightAligned <| Text.fromString <| toString <| tangent
-        --GC.move (80,300) <| GC.toForm <| Text.rightAligned <| Text.fromString <| toString <| y
-        --GC.move (80,280) <| GC.toForm <| Text.rightAligned <| Text.fromString  <| (toString <| (C.dec 2 x1,C.dec 2 x,C.dec 2 x2, C.dec 2 (x2 - x1))) ++ "\n" ++ (toString <| (C.dec 2 y1,C.dec 2y,C.dec 2 y2, C.dec 2 (y2 - y1))) ++ "\n" ++ (toString (C.dec 2 ymin, C.dec 2 ymax))
        GC.alpha visibility <| GC.group [GC.traced (GC.solid colour) <| GC.path ys,  
        x1dot,  
        vline1,
@@ -620,6 +560,16 @@ geom_tangent aes' defaults d dims =
        annotation
        ]
        
+
+--makeTicks (from,to) =
+--   let
+--       below0 = [ceiling from..0]
+--       above0 = [0..floor to]
+--       positions = [ceiling from .. floor to]
+--   in
+--      []
+
+
 yAxis : Aes -> Aes -> Distribution -> Dimensions -> Geom
 yAxis aes' defaults d dims = 
    let
@@ -630,11 +580,13 @@ yAxis aes' defaults d dims =
        xmargin = fst dims.margins
        xmin = fst d.xDomain
        --ymin = fst d.yDomain
-       ymin = fst d.yLimits
+       (ymin,ymax) = d.yLimits
        --ymax = snd d.yDomain
-       ymax = snd d.yLimits
+       --ymax = snd d.yLimits
        pos = (xm * (d.xScale xmin) - (xmargin / 4),0)
-       tickPositions = [ymin, 0, ymax]
+       --tickPositions = [ymin, 0, ymax]
+       tickPositions = List.filter (\n -> (round n) % 3 == 0) 
+          <| List.map toFloat [ceiling ymin .. floor ymax]
        tickLabels = GC.group <| List.map (\y -> GC.move (-xmargin / 8,ym * d.yScale y)  
          <| GC.toForm <| Text.rightAligned <| Text.fromString <|  
          toString <| C.dec 2 y) tickPositions
@@ -655,12 +607,12 @@ xAxis aes' defaults d dims =
        axis = lookup .axis aes' defaults
        label = (fst << .labels) axis
        ymargin = fst dims.margins
-       --ymin = fst d.yDomain
        ymin = fst d.yLimits
-       xmin = fst d.xDomain
-       xmax = snd d.xDomain
+       (xmin,xmax) = d.xDomain
        pos = (0,ym * (d.yScale ymin) - (ymargin / 12))
-       tickPositions = [xmin, 0, xmax]
+       --tickPositions = [xmin, 0, xmax]
+       tickPositions = List.filter (\n -> (round n) % 3 == 0) 
+          <| List.map toFloat [ceiling xmin .. floor xmax]
        tickLabels = GC.group <| List.map (\x -> GC.move (xm * d.xScale x,-ymargin * 0.3)  
          <| GC.toForm <| Text.centered <| Text.fromString <|  
          toString <| C.dec 2 x) tickPositions
