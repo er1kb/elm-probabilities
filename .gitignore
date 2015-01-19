@@ -1,8 +1,7 @@
 /build
 /cache
 /elm-stuff
-.Continuous.elm.swp
-.Plot.elm.swp
-.Plot.elm.swo
+*.swp
+*.swo
 accident*
 elm.js
