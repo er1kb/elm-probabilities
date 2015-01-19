@@ -1,7 +1,7 @@
 -- function graphs for plotting distributions
 -- a work in progress
 
-module Plot (Distribution, distribution, geom_point, geom_points, geom_bar, geom_trapezoid, geom_integral, geom_curve, geom_hline, geom_vline, geom_hline_polar, geom_vline_polar, geom_circle, geom_angle, geom_curve_polar, geom_integral_polar, geom_position_polar, geom_trace_polar, geom_trace, geom_tangent, yAxis, xAxis, title, legend, geom_doge, plot, background, annotate_integral, Aes, aes, aesDefault, point, bar, trapezoid, geom_none, lookup, Geom) where
+module Plot (Distribution, distribution, discrete, geom_step, geom_point, geom_points, geom_bar, geom_trapezoid, geom_integral, geom_curve, geom_hline, geom_vline, geom_hline_polar, geom_vline_polar, geom_circle, geom_angle, geom_curve_polar, geom_integral_polar, geom_position_polar, geom_trace_polar, geom_trace, geom_tangent, yAxis, xAxis, title, legend, geom_doge, plot, background, annotate_integral, Aes, aes, aesDefault, point, bar, trapezoid, geom_none, lookup, Geom) where
 
 
 import Discrete as D
@@ -37,6 +37,7 @@ geom_none aes' defaults d dims =
 --input = Signal.map2 (\(mx,my) (w,h) -> { x = mx, y = my, width = w, height = h}) Mouse.position Window.dimensions
 
 type alias Distribution = {
+         discrete: Bool,
          f: (Float -> Float),
          xs: List Float,
          ys: List Float, 
@@ -47,7 +48,7 @@ type alias Distribution = {
          rmax:Float,
          steps:Int,
          dx:Float,
-         interpolator:List Float,
+         --interpolator:List Float,
          xScale:(Float -> Float),
          yScale:(Float -> Float),
          yExtent:Float, 
@@ -85,6 +86,7 @@ distribution f (from,to) steps =
        polar = List.map fromPolar <| List.map2 (,) ys xs
    in
                         {  
+                           discrete = False,
                            f = f, 
                            xs = xs,
                            ys = ys,
@@ -95,7 +97,7 @@ distribution f (from,to) steps =
                            rmax = rmax,
                            steps = steps,
                            dx = dx,
-                           interpolator = interpolator,
+                           --interpolator = interpolator,
                            xScale = xScale,
                            yScale = yScale,
                            yExtent = yExtent,
@@ -103,6 +105,72 @@ distribution f (from,to) steps =
                            yLimits = yLimits,
                            xyRatio = xyRatio
                         }
+
+
+discrete : (Float -> Float) -> (Float, Float) -> Distribution
+discrete f (from',to') = 
+   let
+       from = from' - 0.5
+       to = to' + 0.5
+       xDomain = (from, to)
+       xExtent = (to - from)
+       xs = [from' .. to']
+       ys = List.map f xs
+       steps = List.length xs
+       dx = 1
+       xScale = C.normalize xDomain
+       ymin = List.minimum ys
+       ymax = List.maximum ys
+       rmax = if (abs ymax) > (abs ymin) then (abs ymax) else (abs ymin)
+       yLimits = (-rmax, rmax)
+       xLimits = yLimits
+       yScale = C.normalize yLimits
+       yDomain = (ymin, ymax)
+       yExtent = ymax - ymin
+       xyRatio = rmax / (snd xDomain)
+       polar = List.map fromPolar <| List.map2 (,) ys xs
+   in
+                        {  
+                           discrete = True,
+                           f = f, 
+                           xs = xs,
+                           ys = ys,
+                           polar = polar,
+                           xDomain = xDomain, 
+                           yDomain = yDomain,
+                           xExtent = xExtent,
+                           rmax = rmax,
+                           steps = steps,
+                           dx = dx,
+                           --interpolator = interpolator,
+                           xScale = xScale,
+                           yScale = yScale,
+                           yExtent = yExtent,
+                           xLimits = xLimits,
+                           yLimits = yLimits,
+                           xyRatio = xyRatio
+                        }
+
+geom_step : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_step aes' defaults d dims = 
+   let
+      xm = dims.xm
+      ym = dims.ym
+      colour = lookup .colour aes' defaults
+      pointsize = lookup .pointsize aes' defaults
+      visibility = lookup .visibility aes' defaults
+      linetype = lookup .linetype aes' defaults
+      x = lookup .x aes' defaults
+      dynamic = lookup .dynamic aes' defaults
+      nsteps = if dynamic then (toFloat dims.nbins) else (toFloat d.steps) 
+      (dx,steps') = if d.discrete then (1,d.xs) else (C.interpolate d.xDomain nsteps)
+      lastx = List.head <| List.reverse steps'
+      points = List.concatMap (\x -> [(x, d.f x),(if (x < lastx) then x+dx else x, d.f x)]) steps'
+
+      ys = List.map (\(x,y) -> (xm * (d.xScale x), ym * (d.yScale y))) points 
+                                 -- <| List.map2 (,) steps' (List.map d.f steps)
+   in
+      GC.alpha visibility <| GC.traced (linetype colour) <| GC.path ys
 
 
 
@@ -134,12 +202,15 @@ point (xm,ym) (xscale, yscale) f x y =
 geom_points : Aes -> Aes -> Distribution -> Dimensions -> Geom
 geom_points aes' defaults d dims = 
    let
-      (dx,steps) = C.interpolate d.xDomain (toFloat dims.nbins)
       xm = dims.xm
       ym = dims.ym
       colour = lookup .colour aes' defaults
       pointsize = lookup .pointsize aes' defaults
       visibility = lookup .visibility aes' defaults
+      dynamic = lookup .dynamic aes' defaults
+      nsteps = if dynamic then (toFloat dims.nbins) else (toFloat d.steps) 
+      --(dx,steps) = C.interpolate d.xDomain nsteps
+      (dx,steps) = if d.discrete then (1,d.xs) else (C.interpolate d.xDomain nsteps)
       xscale = d.xScale
       yscale = d.yScale
       --ys = List.map d.f steps -- SLOOOW, need to limit the number of points
@@ -165,17 +236,21 @@ bar (xm,ym) (xscale, yscale) limits f (x1',x2') =
       List.map (\(x,y) -> (xm * (xscale x), ym * (yscale y))) 
                [(x1,0), (x2,0), (x2,midpoint), (x1,midpoint)]
 
+
+-- keep one separate "bar chart" for discrete distributions?!
 geom_bar : Aes -> Aes -> Distribution -> Dimensions -> Geom
 geom_bar aes' defaults d dims = 
    let
-      --(dx',steps) = C.interpolate d.xDomain (toFloat dims.nbins)
       xm = dims.xm
       ym = dims.ym
       linetype = lookup .linetype aes' defaults
       colour = lookup .colour aes' defaults
       visibility = lookup .visibility aes' defaults
-      limits = lookup .limits aes' defaults
-      (dx',steps) = C.interpolate limits (toFloat dims.nbins)
+      limits' = lookup .limits aes' defaults
+      limits = if d.discrete then d.xDomain else limits'
+      dynamic = lookup .dynamic aes' defaults
+      nsteps = if dynamic then (toFloat dims.nbins) else (toFloat d.steps) 
+      (dx',steps) = if d.discrete then (1,d.xs) else (C.interpolate d.xDomain nsteps)
       xscale = d.xScale
       yscale = d.yScale
       dx = dx' / 2
@@ -188,6 +263,33 @@ geom_bar aes' defaults d dims =
       points = List.map (bar (xm,ym) (xscale,yscale) limits d.f) xs 
    in
       GC.alpha visibility <| GC.group <| List.map (\x -> GC.outlined (linetype colour) <| GC.polygon x) points
+
+
+
+-- integral approximation by bars/rectangles
+--geom_bar : Aes -> Aes -> Distribution -> Dimensions -> Geom
+--geom_bar aes' defaults d dims = 
+--   let
+--      --(dx',steps) = C.interpolate d.xDomain (toFloat dims.nbins)
+--      xm = dims.xm
+--      ym = dims.ym
+--      linetype = lookup .linetype aes' defaults
+--      colour = lookup .colour aes' defaults
+--      visibility = lookup .visibility aes' defaults
+--      limits = lookup .limits aes' defaults
+--      (dx',steps) = C.interpolate limits (toFloat dims.nbins)
+--      xscale = d.xScale
+--      yscale = d.yScale
+--      dx = dx' / 2
+--      --xs = C.bins <| List.map (\x -> x - dx) steps
+--      lowerbar = [((fst limits) - dx')]
+--      upperbar = [((snd limits) + dx')]
+--      --xs = C.bins <| List.map (\x -> x - dx) (lowerbar ++ steps ++ upperbar)
+--      xs = C.bins <| List.map (\x -> x - dx) (steps ++ upperbar)
+--      --points = List.map (bar (xm,ym) (xscale,yscale) d.f) xs 
+--      points = List.map (bar (xm,ym) (xscale,yscale) limits d.f) xs 
+--   in
+--      GC.alpha visibility <| GC.group <| List.map (\x -> GC.outlined (linetype colour) <| GC.polygon x) points
 
 
 {-| Calculating trapezium points for plotting them as polygons. -}
@@ -254,7 +356,8 @@ geom_curve aes' defaults d dims =
       linethickness = lookup .linethickness aes' defaults -- not actually used yet
       xscale = d.xScale
       yscale = d.yScale
-      (dx,steps) = C.interpolate d.xDomain (toFloat d.steps)
+      --(dx,steps) = C.interpolate d.xDomain (toFloat d.steps)
+      (dx,steps) = if d.discrete then (1,d.xs) else (C.interpolate d.xDomain (toFloat d.steps))
       ys = List.map (\(x,y) -> (dims.xm * (xscale x), dims.ym * (yscale y))) <| List.map2 (,) steps (List.map d.f steps)
    in
       GC.alpha visibility <| GC.traced (linetype colour) <| GC.path ys

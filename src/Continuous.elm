@@ -1,4 +1,4 @@
-module Continuous (uniform, normal, standardnormal, exponential, pdfuniform, pdfnormal, pdfstandardnormal, pdfexponential, cdfuniform, cdfnormal, cdfstandardnormal, cdfexponential, area, bins, interpolate, integrate, slope, tangent, normalize, dec, zscore) where
+module Continuous (uniform, normal, standardnormal, exponential, pdfuniform, pdfnormal, pdfstandardnormal, pdfexponential, cdfuniform, cdfnormal, cdfstandardnormal, cdfexponential, area, bins, interpolate, integrate, slope, tangent, normalize, dec, zscore, fib, factorial) where
 
 {-| Functions for calculating values of common continuous probability distributions. 
 
@@ -208,6 +208,14 @@ normalize (xmin,xmax) x = (x - xmin) / (xmax - xmin)
 {-| Calculate z score -}
 zscore : number -> number -> number -> number
 zscore mu sigma x = (x - mu) / sigma
+
+
+{-| Fibonacci -}
+fib : Int -> Float
+fib n = if | n > 19 -> (-1)
+           | n == 0 -> 0
+           | n == 1 -> 1
+           | otherwise -> fib (n-1) + fib (n-2)
 
 
 

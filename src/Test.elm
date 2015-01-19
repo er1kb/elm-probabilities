@@ -10,6 +10,7 @@ import Mouse
 import List
 import Html
 import Continuous as C
+import Discrete as D
 
 
 const = 4
@@ -53,6 +54,7 @@ geoms1 = [
          --geom_integral { aes | colour <- Just darkGreen, visibility <- Just 0.4, dynamic <- Just True, negate <- Just False },
          --geom_trapezoid { aes | baseline <- Just bl },
          geom_bar { aes | baseline <- Just (\x -> sin (4*x)), colour <- Just darkBlue },
+         --geom_step customAes,
          --geom_curve aes,
          --geom_point customAes,
          --geom_trace_polar customAes,
@@ -78,6 +80,14 @@ d2 = (distribution (\x -> 2 + 4 * cos x) (-2*pi,2*pi) 200)
 --d2 = (distribution (\x -> C.pdfstandardnormal x) (-pi,pi) 200)
 --d2 = (distribution (C.pdfnormal 190 7) (170,210) 200)
 
+--d3 = discrete (\n -> C.fib (round n)) (0,8)
+--d3 = discrete (\n -> toFloat <| (round n)+3) (0,8)
+--d3 = discrete (D.pdfpoisson 1) (0,8)
+d3 = discrete (\n -> List.sum <| List.map (D.pdfbinom 10 0.5) [1..n]) (0,10)
+
+--fibs = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181]
+
+
 render m w =  
    flow down [
    flow right 
@@ -88,7 +98,9 @@ render m w =
       --plot (600,600) (distribution (\x -> cos (4*x)) (-pi,pi) 200) geoms3 m w 
       plot (500,600) d2 geoms3 m w 
 --, plot (600,600) { d2 | yScale <- C.normalize (-1,1) } geoms4 m w ]  
-      ], Html.toElement 400 200 <| Html.text ("This is text... x position : " ++ (toString (fst m)))]
+      ], flow right <|  
+      [Html.toElement 400 200 <| Html.text ("This is text... x position : " ++ (toString (fst m))),
+      plot (400,400) d3 geoms4 m w] ]
 
 main = Signal.map2 render Mouse.position Window.dimensions
 
@@ -125,3 +137,12 @@ geoms3 = [
 --         geom_circle { aes | radius <- Just 0.4 }
 --         ]
 
+geoms4 = [  
+          geom_hline aes, geom_vline aes,
+          --geom_hline { customAes | y <- Just 0 },
+          --geom_vline { customAes | x <- Just 0 },
+          geom_points { aes | dynamic <- Just False },
+          xAxis aes, yAxis aes,
+          geom_bar { aes | colour <- Just lightBlue, dynamic <- Just False },
+          geom_step { aes | colour <- Just red },
+          title { aes | txt <- Just "0 ≤ Bin(π=0.5,n=10) ≤ 10" }]
