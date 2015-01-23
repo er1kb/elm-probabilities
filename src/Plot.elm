@@ -1,7 +1,7 @@
 -- function graphs for plotting distributions
 -- a work in progress
 
-module Plot (Distribution, distribution, discrete, geom_step, geom_point, geom_points, geom_bar, geom_trapezoid, geom_integral, geom_curve, geom_hline, geom_vline, geom_hline_polar, geom_vline_polar, geom_circle, geom_angle, geom_curve_polar, geom_integral_polar, geom_position_polar, geom_trace_polar, geom_trace, geom_tangent, yAxis, xAxis, title, legend, geom_doge, plot, background, annotate_integral, Aes, aes, aesDefault, point, bar, trapezoid, geom_none, lookup, Geom) where
+module Plot (Distribution, distribution, discrete, geom_step, geom_trace_wheel, geom_point, geom_points, geom_bar, geom_trapezoid, geom_integral, geom_curve, geom_hline, geom_vline, geom_hline_polar, geom_vline_polar, geom_circle, geom_angle, geom_curve_polar, geom_integral_polar, geom_position_polar, geom_trace_polar, geom_trace, geom_abline, geom_tangent, yAxis, xAxis, title, legend, geom_doge, geom_mario, plot, background, annotate_integral, Aes, aes, aesDefault, point, bar, trapezoid, geom_none, lookup, Geom, axis) where
 
 
 import Discrete as D
@@ -173,6 +173,39 @@ geom_step aes' defaults d dims =
       GC.alpha visibility <| GC.traced (linetype colour) <| GC.path ys
 
 
+-- experimental
+geom_trace_wheel : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_trace_wheel aes' defaults d dims = 
+   let
+       xm = dims.xm
+       ym = dims.ym
+       x = lookup .x aes' defaults
+       y = lookup .y aes' defaults
+       (xmin,xmax) = d.xDomain
+       (ymin,ymax) = d.yDomain
+       linetype = lookup .linetype aes' defaults
+       colour = lookup .colour aes' defaults
+       visibility = lookup .visibility aes' defaults
+       fit = False
+       xyRatio = if fit then d.xyRatio else 1
+       --origin = (-2*pi,0)
+       origin = (x,y)
+       (dx,steps) = C.interpolate (xmin, x) (toFloat d.steps)
+       ys = List.map d.f steps
+       --ys = List.map (\x' -> d.f (x' + (xmax - x))) steps
+       cartesianPoints = List.map2 (,) steps ys  
+       polarPoints = List.map fromPolar (List.map2 (,) ys steps)
+       points' = List.map2 (\(cx,cy) (px,py) -> (((0.5 * py * cos x) - (0.5 * px * sin x)) + x,  
+       ((py * sin x) + (px * cos x)))) cartesianPoints polarPoints
+       --points' = List.map2 (\(cx,cy) (px,py) -> (((px * cos x) - (py * sin x)) + cx, ((px * sin x) + (py * cos x) + cy))) cartesianPoints polarPoints
+       
+       points = List.map (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale y)) points'
+       --points = List.map (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale y)) <| List.map fromPolar <| List.map2 (,) ys steps 
+   in
+      --GC.move (xm * d.xScale (x + xmin),ym * d.yScale (y + ymin)) <|
+      --GC.move origin <|  
+      GC.alpha visibility <| GC.traced (linetype colour) <| GC.path points
+
 
 
 geom_point : Aes -> Aes -> Distribution -> Dimensions -> Geom
@@ -306,7 +339,7 @@ geom_trapezoid aes' defaults d dims =
       linetype = lookup .linetype aes' defaults
       colour = lookup .colour aes' defaults
       visibility = lookup .visibility aes' defaults
-      baseline = lookup .baseline aes' defaults
+      baseline = lookup .fun aes' defaults
       limits = lookup .limits aes' defaults
       (dx,steps) = C.interpolate limits (toFloat dims.nbins)
       --(dx,steps) = C.interpolate d.xDomain (toFloat dims.nbins)
@@ -324,7 +357,7 @@ geom_integral aes' defaults d dims =
       linetype = lookup .linetype aes' defaults
       colour = lookup .colour aes' defaults
       visibility = lookup .visibility aes' defaults
-      baseline = lookup .baseline aes' defaults
+      baseline = lookup .fun aes' defaults
       dynamic = lookup .dynamic aes' defaults
       negate = lookup .negate aes' defaults
 
@@ -383,14 +416,22 @@ geom_vline aes' defaults d dims =
       --x = dims.xpos
       x = lookup .x aes' defaults
       --x = fst dims.pos
+      (ymin,ymax) = d.yDomain
       xm = dims.xm
       ym = dims.ym
       linetype = lookup .linetype aes' defaults
       colour = lookup .colour aes' defaults
       visibility = lookup .visibility aes' defaults
-   in
-      GC.alpha visibility <| GC.traced (linetype colour)  
+      annotate = lookup .annotate aes' defaults
+      label = lookup .label aes' defaults
+      decimals = lookup .decimals aes' defaults
+      translate = lookup .translate aes' defaults
+      txt' = GC.move (xm * d.xScale (x + fst translate), ym * d.yScale (ymax + snd translate)) <| GC.toForm <| Text.plainText <| label ++ (toString (C.dec decimals <| dims.toX x)) 
+      txt = if annotate then txt' else (GC.toForm empty)
+      line = GC.alpha visibility <| GC.traced (linetype colour)  
       <| GC.path [(xm * (d.xScale x),0), (xm * (d.xScale x), ym)] 
+   in
+      GC.group [txt,line]
 
 
 geom_hline_polar : Aes -> Aes -> Distribution -> Dimensions -> Geom
@@ -500,7 +541,9 @@ geom_curve_polar aes' defaults d dims =
        visibility = lookup .visibility aes' defaults
        fit = lookup .fit aes' defaults
        xyRatio = if fit then d.xyRatio else 1
-       origin = (0,0)
+       origin = lookup .translate aes' defaults
+       --origin = (0,0)
+       --ys = List.map (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale (y))) d.polar
        ys = List.map (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale (y))) d.polar
    in
       GC.move origin <| GC.alpha visibility <| GC.traced (linetype colour) <| GC.path ys
@@ -516,7 +559,7 @@ geom_integral_polar aes' defaults d dims =
       limits = lookup .limits aes' defaults
       fit = lookup .fit aes' defaults
       xyRatio = if fit then d.xyRatio else 1
-      baseline = lookup .baseline aes' defaults
+      baseline = lookup .fun aes' defaults
 
       dynamic = lookup .dynamic aes' defaults
       negate = lookup .negate aes' defaults
@@ -549,14 +592,16 @@ geom_position_polar aes' defaults d dims =
    let
        xm = dims.xm
        ym = dims.ym
-       (xpos,ypos) = dims.pos 
+       --(xpos,ypos) = dims.pos 
+       x' = lookup .x aes' defaults
+       y' = lookup .y aes' defaults
        colour = lookup .colour aes' defaults
        visibility = lookup .visibility aes' defaults
        pointsize = lookup .pointsize aes' defaults
        fit = lookup .fit aes' defaults
        xyRatio = if fit then d.xyRatio else 1
        origin = (0,0)
-       pos = (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale y)) <| fromPolar (ypos,xpos)
+       pos = (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale y)) <| fromPolar (y',x')
 
        point = GC.move pos  
                <| GC.move origin <| GC.alpha visibility 
@@ -584,6 +629,9 @@ geom_trace_polar aes' defaults d dims =
    in
       GC.move origin <| GC.alpha visibility <| GC.traced (linetype colour) <| GC.path points
 
+
+
+
 geom_trace : Aes -> Aes -> Distribution -> Dimensions -> Geom
 geom_trace aes' defaults d dims = 
    let
@@ -601,6 +649,30 @@ geom_trace aes' defaults d dims =
       GC.alpha visibility <| GC.traced (linetype colour) <| GC.path ys
 
 
+geom_abline : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_abline aes' defaults d dims = 
+   let
+       xm = dims.xm
+       ym = dims.ym
+       linetype = lookup .linetype aes' defaults
+       linethickness = lookup .linethickness aes' defaults
+       colour = lookup .colour aes' defaults
+       visibility = lookup .visibility aes' defaults
+       limits = lookup .limits aes' defaults
+       dynamic = lookup .dynamic aes' defaults
+       negate = lookup .negate aes' defaults
+       x = lookup .x aes' defaults
+       fun = lookup .fun aes' defaults
+
+       x' = if x < (fst limits) then (fst limits) else x
+       x'' = if x' > (snd limits) then (snd limits) else x'
+
+       limits' = if negate then (x'', snd limits) else (fst limits, x'')
+       (x1,x2) = if dynamic then limits' else limits
+       points = [(xm * d.xScale x1, ym * d.yScale (fun x1)), 
+                 (xm * d.xScale x2, ym * d.yScale (fun x2))] 
+   in
+       GC.alpha visibility <| GC.traced (linetype colour) <| GC.path <| points
 
 geom_tangent : Aes -> Aes -> Distribution -> Dimensions -> Geom
 geom_tangent aes' defaults d dims = 
@@ -679,7 +751,7 @@ yAxis aes' defaults d dims =
        xm = dims.xm
        ym = dims.ym
        axis = lookup .axis aes' defaults
-       label = (snd << .labels) axis
+       axislabel = (snd << .labels) axis
        xmargin = fst dims.margins
        xmin = fst d.xDomain
        --ymin = fst d.yDomain
@@ -687,8 +759,7 @@ yAxis aes' defaults d dims =
        --ymax = snd d.yDomain
        --ymax = snd d.yLimits
        pos = (xm * (d.xScale xmin) - (xmargin / 4),0)
-       --tickPositions = [ymin, 0, ymax]
-       tickPositions = List.filter (\n -> (round n) % 3 == 0) 
+       tickPositions = List.filter (\n -> (round n) % 4 == 0) 
           <| List.map toFloat [ceiling ymin .. floor ymax]
        tickLabels = GC.group <| List.map (\y -> GC.move (-xmargin / 8,ym * d.yScale y)  
          <| GC.toForm <| Text.rightAligned <| Text.fromString <|  
@@ -697,7 +768,7 @@ yAxis aes' defaults d dims =
          <| GC.traced (GC.solid black) <| GC.path [(0,0),(12,0)]) tickPositions
        yBar = GC.traced (GC.solid black) <| GC.path [(10,0),(10,ym)]
        yLabel = GC.move (-xmargin * 0.35, ym * 0.5) <|  
-         GC.toForm <| Text.leftAligned <| Text.fromString label
+         GC.toForm <| Text.leftAligned <| Text.fromString axislabel
    in
       GC.move pos <| GC.group  
       [tickLabels, ticks, yBar, yLabel]
@@ -708,8 +779,8 @@ xAxis aes' defaults d dims =
        xm = dims.xm
        ym = dims.ym
        axis = lookup .axis aes' defaults
-       label = (fst << .labels) axis
-       ymargin = fst dims.margins
+       axislabel = (fst << .labels) axis
+       ymargin = snd dims.margins
        ymin = fst d.yLimits
        (xmin,xmax) = d.xDomain
        pos = (0,ym * (d.yScale ymin) - (ymargin / 12))
@@ -723,7 +794,7 @@ xAxis aes' defaults d dims =
          <| GC.traced (GC.solid black) <| GC.path [(0,0),(0,12)]) tickPositions
        xBar = GC.traced (GC.solid black) <| GC.path [(0,-11),(xm,-11)]
        xLabel = GC.move (xm * 0.5,-ymargin * 0.55) <|  
-         GC.toForm <| Text.centered <| Text.fromString label
+         GC.toForm <| Text.centered <| Text.fromString axislabel
    in
       GC.move pos <| GC.group  
       [tickLabels, ticks, xBar, xLabel]
@@ -732,7 +803,7 @@ xAxis aes' defaults d dims =
 title : Aes -> Aes -> Distribution -> Dimensions -> Geom
 title aes' defaults d dims = 
    let
-       txt = lookup .txt aes' defaults
+       label = lookup .label aes' defaults
        ymargin = fst dims.margins
        xm = dims.xm
        ym = dims.ym
@@ -741,7 +812,7 @@ title aes' defaults d dims =
        midx = ((fst d.xDomain) + (snd d.xDomain)) / 2
        pos = (xm * (d.xScale midx),ym * (d.yScale ymax) + (ymargin / 4))
        --pos = (0,0)
-       ttl = GC.toForm <| Text.centered <| Text.height 22 <| Text.fromString <| txt
+       ttl = GC.toForm <| Text.centered <| Text.height 22 <| Text.fromString <| label
    in
       GC.move pos <| ttl
 
@@ -754,14 +825,14 @@ legend aes' defaults d dims =
        (w',h') = lookup .dims aes' defaults
        (w,h) = (toFloat w', toFloat h')
 
-       txt = lookup .txt aes' defaults
-       --txt = lookup .txt aes' defaults
+       label' = lookup .label aes' defaults
+       --label = lookup .label aes' defaults
        colour = lookup .colour aes' defaults
        translate = lookup .translate aes' defaults
        annotationPosition = (xm * d.xScale (fst translate),  
                              ym * d.yScale (snd translate))
        symbol = GC.move (w * -2,0) <| GC.filled colour <| GC.rect w h
-       label = GC.toForm <| Text.leftAligned <| Text.fromString txt
+       label = GC.toForm <| Text.leftAligned <| Text.fromString label'
    in
        GC.move annotationPosition <| GC.group [symbol, label]
 
@@ -774,14 +845,28 @@ geom_doge aes' defaults d dims =
       dogeimg = image (fst wh) (snd wh) dogeurl
       xm = dims.xm
       ym = dims.ym
-      (xpos,ypos) = dims.pos
+      x = lookup .x aes' defaults
+      y = lookup .y aes' defaults
    in
-      GC.move (xm * d.xScale xpos, ym * d.yScale ypos) <| GC.toForm dogeimg
+      GC.move (xm * d.xScale x, ym * d.yScale y) <| GC.toForm dogeimg
+
+geom_mario : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_mario aes' defaults d dims = 
+   let
+      wh = lookup .dims aes' defaults
+      mariourl = "http://elm-lang.org/imgs/mario/walk/right.gif"
+      marioimg = image (fst wh) (snd wh) mariourl
+      xm = dims.xm
+      ym = dims.ym
+      --(xpos,ypos) = dims.pos
+      x = lookup .x aes' defaults
+      y = lookup .y aes' defaults
+      yoffset = 0.4 * toFloat (snd wh)
+   in
+      GC.move (xm * d.xScale x, yoffset + ym * d.yScale y) <| GC.toForm marioimg
 
 
---plotc : (Int,Int) -> PlotConfig -> (Int,Int) -> (Int,Int) -> Element
---plotc (plotWidth,plotHeight) d geoms (mouseX,mouseY) (windowWidth,windowHeight) =  
---plot : (Int,Int) -> Distribution -> List geom -> (Int,Int) -> (Int,Int) -> Element
+
 plot (plotWidth,plotHeight) d geoms m w =  
    let
       input = { x = (fst m), y = (snd m), width = (fst w), height = (snd w) }
@@ -799,7 +884,7 @@ plot (plotWidth,plotHeight) d geoms m w =
       nbins = round <| (toFloat input.x) / 4   --- 
       wpos = (windowScaleX (toFloat input.x), windowScaleY (toFloat input.y))   --- 
       xpos = (fst d.xDomain) + d.xExtent * (fst wpos)
-      ypos = d.f xpos
+      ypos = if d.discrete then (d.f << (toFloat << round)) xpos else d.f xpos
       xmargin = (toFloat plotWidth) * 0.1
       ymargin = (toFloat plotHeight) * 0.2
       xoffset = (toFloat plotWidth)/2 - xmargin
@@ -808,6 +893,8 @@ plot (plotWidth,plotHeight) d geoms m w =
       innerHeight = (toFloat plotHeight) - ymargin
       ymultiplier = (toFloat plotHeight) - (2 * ymargin)
       xmultiplier = (toFloat plotWidth) - (2 * xmargin)
+      toX = (\x -> (fst d.xDomain) + d.xExtent * (d.xScale x))
+      toY = (\y -> (fst d.yDomain) + d.yExtent * (d.yScale y))
 
       dims : Dimensions
       dims = {
@@ -822,7 +909,9 @@ plot (plotWidth,plotHeight) d geoms m w =
          innerWidth = innerWidth,
          innerHeight = innerHeight,
          ym = ymultiplier,
-         xm = xmultiplier
+         xm = xmultiplier,
+         toX = toX,
+         toY = toY
       }
 
       --zeroX = geom_hline customAes defaults d dims 0
@@ -864,7 +953,7 @@ annotate_integral aes' defaults d dims =
        decimals = lookup .decimals aes' defaults
        translate = lookup .translate aes' defaults
        limits = lookup .limits aes' defaults
-       --baseline = lookup .baseline aes' defaults -- !!
+       --baseline = lookup .fun aes' defaults -- !!
        xmin = fst limits
        xmax = snd limits
        integral = C.integrate limits (toFloat dims.nbins) d.f
@@ -884,7 +973,6 @@ annotate_integral aes' defaults d dims =
 
 {-- 
 TODO: 
-Polar plot of a standard normal distribution is messed up... 
 Set y plotting limits manually, for layering purposes.
 Colouring positive and negative integrals independently?
 Geom_wheel, with rotation? 
@@ -893,7 +981,8 @@ Input time?
 Implement grid...  
 Linestyles and textstyles?! 
 Improve axes: number of ticks etc. 
-Fix circle radius (e g sin over (0,pi)) 
+Annotation for vline and hline
+Polar plot of a standard normal distribution is messed up... 
 --}
 
 
@@ -920,7 +1009,9 @@ type alias Dimensions = {
          innerWidth : Float,
          innerHeight : Float,
          ym : Float,
-         xm : Float
+         xm : Float,
+         toX : (Float -> Float),
+         toY : (Float -> Float)
 }
             
 type alias Aes = { visibility:Maybe Float, 
@@ -931,7 +1022,7 @@ type alias Aes = { visibility:Maybe Float,
                    translate:Maybe (Float,Float),
                    decimals: Maybe Float,
                    dims: Maybe (Int,Int),
-                   txt: Maybe String,
+                   label: Maybe String,
                    delta: Maybe Float,
                    limits: Maybe (Float,Float),
                    annotate: Maybe Bool,
@@ -939,10 +1030,11 @@ type alias Aes = { visibility:Maybe Float,
                    y: Maybe Float,
                    radius: Maybe Float,
                    theta: Maybe Float,
-                   baseline: Maybe (Float -> Float),
+                   fun: Maybe (Float -> Float),
                    dynamic: Maybe Bool,
                    negate: Maybe Bool,
-                   axis: Maybe { labels : (String,String) },
+                   --axis: Maybe { labels : (String,String) },
+                   axis: Maybe Axis,
                    fit: Maybe Bool
                    --input: Maybe { height : Int, width : Int, x : Int, y : Int }
                 }
@@ -956,7 +1048,7 @@ aes = { visibility = Nothing,
         translate = Nothing,
         decimals = Nothing,
         dims = Nothing,
-        txt = Nothing,
+        label = Nothing,
         delta = Nothing,
         limits = Nothing,
         annotate = Nothing,
@@ -964,7 +1056,7 @@ aes = { visibility = Nothing,
         y = Nothing,
         radius = Nothing,
         theta = Nothing,
-        baseline = Nothing,
+        fun = Nothing,
         dynamic = Nothing,
         negate = Nothing,
         axis = Nothing,
@@ -982,7 +1074,7 @@ aesDefault = { visibility = Just 1,
                translate = Just (0,0),
                decimals = Just 2,
                dims = Just (30,3),
-               txt = Just "Plot title",
+               label = Just "...",
                delta = Just 0.1,
                limits = Just (-1,1),
                annotate = Just True, 
@@ -990,11 +1082,19 @@ aesDefault = { visibility = Just 1,
                y = Just 0,
                radius = Just 1,
                theta = Just 0,
-               baseline = Just (\x -> 0),
+               fun = Just (\x -> 0),
                dynamic = Just True,
                negate = Just False,
-               axis = Just { labels = ("X", "Y") },
+               --axis = Just { labels = ("X", "Y"), nticks = 5 },
+               axis = Just (axis ("X","Y") 5),
                fit = Just True
                --input = Nothing
                }
 
+type alias Axis = {
+   labels : (String,String),
+   nticks : Int 
+}
+
+axis : (String,String) -> Int -> Axis
+axis labels nticks = { labels = labels, nticks = nticks }

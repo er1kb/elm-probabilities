@@ -17,10 +17,10 @@ const = 4
 nsteps = 400
 --pc = distribution (\x -> logBase e x) (1,2*pi) 100
 --pc = distribution (\x -> -6 + 3 * sin x) (-1*pi,2*pi) 100
-pc = distribution (\x -> 1 * (cos (const*x))) (0,2*pi) nsteps
-pc2 = distribution (\x -> -1 * (sin (const*x))) (0,2*pi) nsteps
-pc3 = distribution (\x -> 1 * (sin (const*x))) (0,2*pi) nsteps
-pc4 = distribution (\x -> -1 * (cos (const*x))) (0,2*pi) nsteps
+--pc = distribution (\x -> 1 * (cos (const*x))) (0,2*pi) nsteps
+--pc2 = distribution (\x -> -1 * (sin (const*x))) (0,2*pi) nsteps
+--pc3 = distribution (\x -> 1 * (sin (const*x))) (0,2*pi) nsteps
+--pc4 = distribution (\x -> -1 * (cos (const*x))) (0,2*pi) nsteps
 --pc5 = distribution (\x -> 3 * (cos (2*x))) (0,2*pi) 100
 
 --pc5 = distribution (\x -> 3 * (cos (2.01*x))) (-12*pi,12*pi) 100
@@ -47,75 +47,94 @@ pc4 = distribution (\x -> -1 * (cos (const*x))) (0,2*pi) nsteps
 --bl = (\x -> 2 + 4 * sin (1*x))
 bl = (\x -> 0)
 
-customAes = { aes | radius <- Just 2, txt <- Just "grrRRr!", pointsize <- Just 9, colour <- Just darkBlue, visibility <- Just 0.6 }
+customAes = { aes | radius <- Just 2, label <- Just "grrRRr!", pointsize <- Just 9, colour <- Just darkBlue, visibility <- Just 0.6, annotate <- Just False }
 geoms1 = [ 
          --background { aes | colour <- Just lightGrey }, 
-         --geom_integral { aes | baseline <- Just (\x -> 0.5), colour <- Just grey, dynamic <- Just True, negate <- Just False },
+         --geom_integral { aes | fun <- Just (\x -> 0.5), colour <- Just grey, dynamic <- Just True, negate <- Just False },
          --geom_integral { aes | colour <- Just darkGreen, visibility <- Just 0.4, dynamic <- Just True, negate <- Just False },
-         --geom_trapezoid { aes | baseline <- Just bl },
-         geom_bar { aes | baseline <- Just (\x -> sin (4*x)), colour <- Just darkBlue },
+         --geom_trapezoid { aes | fun <- Just bl },
+         --geom_bar { aes | fun <- Just (\x -> sin (4*x)), colour <- Just darkBlue },
          --geom_step customAes,
-         --geom_curve aes,
+         geom_curve customAes,
          --geom_point customAes,
          --geom_trace_polar customAes,
+         geom_trace_wheel { aes | colour <- Just purple },
          geom_trace { aes | colour <- Just orange },
          geom_hline customAes,
          geom_vline customAes,
+         geom_abline { customAes | limits <- Just (-3,3), dynamic <- Just False, fun <- Just (\x -> 2*x), linetype <- Just GC.dotted },
          --geom_tangent { aes | colour <- Just red, delta <- Just 1.5, translate <- Just (-2.6,0.5) },
          --geom_hline { aes | y <- Just 0.5 },
-         xAxis { aes | axis <- Just { labels = ("X", "_") } },  
-         yAxis { aes | axis <- Just { labels = ("_", "Y") }},
-         title { aes | txt <- Just "y = 2 + 4cosx" }
+         --xAxis { aes | axis <- Just { labels = ("X", "_") } },  
+         --yAxis { aes | axis <- Just { labels = ("_", "Y") }},
+         xAxis { aes | axis <- Just (axis ("X...","Y...") 5) },  
+         yAxis { aes | axis <- Just (axis ("X...","Y...") 5) },
+         title { aes | label <- Just "y = cos4x" }
          ]
 --d1 = (distribution (\x -> 4 * (cos (0.5*x))) (0,2*pi) 200)
-d1 = (distribution (\x -> 2 + 4 * cos x) (-2*pi,2*pi) 200)
---d1 = (distribution (\x -> cos (4*x)) (-pi,pi) 200)
+--d1 = (distribution (\x -> 2 + 4 * cos x) (-2*pi,2*pi) 200)
+d1 = (distribution (\x -> cos (4*x)) (-pi,pi) 200)
 --d1 = (distribution (\x -> sin (4*x)) (-pi,pi) 200)
 --d1 = (distribution (\x -> C.pdfstandardnormal x) (-pi,pi) 200)
 --d1 = (distribution (C.pdfnormal 190 7) (170,210) 200)
+
 --d2 = (distribution (\x -> 2 + 4 * (cos (0.5*x))) (0,2*pi) 200)
-d2 = (distribution (\x -> 2 + 4 * cos x) (-2*pi,2*pi) 200)
---d2 = (distribution (\x -> cos (4*x)) (-pi,pi) 200)
+--d2 = (distribution (\x -> 2 + 4 * cos x) (-2*pi,2*pi) 200)
+d2 = (distribution (\x -> cos (4*x)) (-pi,pi) 200)
 --d2 = (distribution (\x -> (sin (4*x))) (-pi,pi) 200)
 --d2 = (distribution (\x -> C.pdfstandardnormal x) (-pi,pi) 200)
 --d2 = (distribution (C.pdfnormal 190 7) (170,210) 200)
 
 --d3 = discrete (\n -> C.fib (round n)) (0,8)
 --d3 = discrete (\n -> toFloat <| (round n)+3) (0,8)
---d3 = discrete (D.pdfpoisson 1) (0,8)
-d3 = discrete (\n -> List.sum <| List.map (D.pdfbinom 10 0.5) [1..n]) (0,10)
+--d3 = discrete ((D.pdfpoisson 3) << (toFloat << round)) (0,10)
+--d3 = discrete (\n -> List.sum <| List.map (D.pdfbinom 10 0.5) [1..(toFloat << round) n]) (0,15)
+--d3 = discrete ((D.pdfbinom 10 0.5) << (toFloat << round)) (0,10)
+--d3 = discrete (D.pdfbinom 60 0.25) (0,50)
+--d3 = discrete (\n -> (1 + (1/n))^n) (1,50)
 
---fibs = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181]
+
 
 
 render m w =  
-   flow down [
-   flow right 
-   <| [ 
-   --layers [ 
-      plot (800,600) d1 geoms1 m w,
-    --plot (800,600) d2 geoms2 m w ], layers [ 
-      --plot (600,600) (distribution (\x -> cos (4*x)) (-pi,pi) 200) geoms3 m w 
-      plot (500,600) d2 geoms3 m w 
---, plot (600,600) { d2 | yScale <- C.normalize (-1,1) } geoms4 m w ]  
-      ], flow right <|  
-      [Html.toElement 400 200 <| Html.text ("This is text... x position : " ++ (toString (fst m))),
-      plot (400,400) d3 geoms4 m w] ]
+   let
+      mouseY = toFloat <| snd m
+      ypos = C.normalize (toFloat <| snd w,0) mouseY
+      n' = (toFloat << floor) (60 * ypos)
+      n = (if n' < 3 then 3 else n')
+      --bin = D.pdfbinom n 0.25
+      bin = D.binom n 0.25
+      d3 = discrete ((\n -> n * 100) << (bin.pdf)) (0,60)
+      extrageoms = [geom_vline { aes | x <- Just bin.mu, label <- Just "µ=", translate <- Just (4,0) }, geom_vline { aes | x <- Just n, label <- Just "n=", translate <- Just (0,-8) }]
+   in
+
+      flow down [
+      flow right 
+      <| [ 
+      --layers [ 
+         plot (800,400) d1 geoms1 m w,
+      --plot (800,600) d2 geoms2 m w ], layers [ 
+         --plot (600,600) (distribution (\x -> cos (4*x)) (-pi,pi) 200) geoms3 m w 
+         plot (400,400) d2 geoms3 m w 
+   --, plot (600,600) { d2 | yScale <- C.normalize (-1,1) } geoms4 m w ]  
+         ], flow right <|  
+         [Html.toElement 400 200 <| Html.text ("This is text... x position : " ++ (toString (fst m))),
+         plot (600,300) d3 (geoms4 ++ extrageoms) m w] ]
 
 main = Signal.map2 render Mouse.position Window.dimensions
 
 
 --geoms2 = [
---         geom_integral { aes | baseline <- Just (\x -> 0.2), colour <- Just darkRed, visibility <- Just 0.2 },
+--         geom_integral { aes | fun <- Just (\x -> 0.2), colour <- Just darkRed, visibility <- Just 0.2 },
 --         geom_point customAes,
 --         geom_trace { aes | colour <- Just orange }
 --         ]
 geoms3 = [ 
          --background { aes | colour <- Just lightGrey }, 
-         --geom_integral_polar { aes | baseline <- Just (\x -> 0.5), colour <- Just darkGreen, visibility <- Just 0.4, negate <- Just False },
-         geom_integral_polar { aes | colour <- Just darkGreen, visibility <- Just 0.4, negate <- Just False, baseline <- Just bl },
-         geom_trace_polar { aes | colour <- Just red },
-         --geom_curve_polar { aes | colour <- Just red },
+         --geom_integral_polar { aes | fun <- Just (\x -> 0.5), colour <- Just darkGreen, visibility <- Just 0.4, negate <- Just False },
+         geom_integral_polar { aes | colour <- Just darkGreen, visibility <- Just 0.4, negate <- Just False, fun <- Just bl },
+         --geom_trace_polar { aes | colour <- Just red },
+         geom_curve_polar { aes | colour <- Just red },
          geom_position_polar customAes,
          geom_angle { aes | colour <- Just red, pointsize <- Just 6 },
          geom_circle customAes,  
@@ -127,22 +146,28 @@ geoms3 = [
          --geom_hline { aes | y <- Just 3.52 },
          --geom_hline { aes | y <- Just -3.52 },
          --geom_vline { aes | x <- Just pi },
-         geom_vline { aes | x <- Just 0 }
+         geom_vline { aes | x <- Just 0, annotate <- Just False }
          ]
 
 --geoms4 = [
---         geom_integral_polar { aes | baseline <- Just (\x -> 0.2), colour <- Just darkRed, visibility <- Just 0.2 },
+--         geom_integral_polar { aes | fun <- Just (\x -> 0.2), colour <- Just darkRed, visibility <- Just 0.2 },
 --         geom_position_polar { aes | colour <- Just orange },
 --         geom_angle { aes | colour <- Just red, pointsize <- Just 6 },
 --         geom_circle { aes | radius <- Just 0.4 }
 --         ]
 
 geoms4 = [  
-          geom_hline aes, geom_vline aes,
-          --geom_hline { customAes | y <- Just 0 },
+          geom_mario { aes | dims <- Just (50,50) },
+          --geom_hline aes, geom_vline aes,
+          geom_hline { customAes | y <- Just 1 },
+          geom_hline { aes | y <- Just e },
+          geom_hline { customAes | y <- Just 0.1 },
+          geom_vline { customAes | x <- Just 15 },
           --geom_vline { customAes | x <- Just 0 },
-          geom_points { aes | dynamic <- Just False },
+          geom_points { aes | dynamic <- Just False, pointsize <- Just 3, colour <- Just darkRed },
           xAxis aes, yAxis aes,
           geom_bar { aes | colour <- Just lightBlue, dynamic <- Just False },
-          geom_step { aes | colour <- Just red },
-          title { aes | txt <- Just "0 ≤ Bin(π=0.5,n=10) ≤ 10" }]
+          --geom_step { aes | colour <- Just red },
+          --geom_curve { aes | colour <- Just green },
+          --geom_tangent { aes | annotate <- Just False },
+          title { aes | label <- Just "Bin(π=0.25,n=n) where 3 ≤ n ≤ 60" }]
