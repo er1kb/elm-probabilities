@@ -1,7 +1,7 @@
 -- function graphs for plotting distributions
 -- a work in progress
 
-module Plot (Distribution, distribution, discrete, geom_step, geom_point, geom_points, geom_bar, geom_trapezoid, geom_integral, geom_curve, geom_hline, geom_vline, geom_hline_polar, geom_vline_polar, geom_circle, geom_angle, geom_curve_polar, geom_integral_polar, geom_position_polar, geom_trace_polar, geom_trace, geom_abline, geom_tangent, yAxis, xAxis, title, legend, geom_doge, geom_mario, plot, background, annotate_integral, Aes, aes, aesDefault, point, bar, trapezoid, geom_none, lookup, Geom) where
+module Plot (Distribution, distribution, discrete, geom_step, geom_point, geom_points, geom_bar, geom_trapezoid, geom_area, geom_curve, geom_hlinerange, geom_vlinerange, geom_hline, geom_vline, geom_hline_polar, geom_vline_polar, geom_circle, geom_angle, geom_curve_polar, geom_area_polar, geom_position_polar, geom_trace_polar, geom_trace, geom_abline, geom_tangent, yAxis, xAxis, title, legend, geom_doge, geom_mario, plot, background, annotate_integral, Aes, aes, aesDefault, point, bar, trapezoid, geom_none, lookup, Geom) where
 
 
 import Discrete as D
@@ -54,7 +54,9 @@ type alias Distribution = {
          yExtent:Float, 
          xLimits:(Float,Float),
          yLimits:(Float,Float),
-         xyRatio:Float
+         xyRatio:Float,
+         toX:(Float -> Float),
+         toY:(Float -> Float)
       }
 
 distribution : (Float -> Float) -> (Float, Float) -> Int -> Distribution
@@ -85,6 +87,8 @@ distribution f (from,to) steps =
        xyRatio = rmax / (snd xDomain)
        --polar = List.map fromPolar <| List.map2 (,) ys xs
        polar = mkPolar xs ys
+       toX = (\x -> (fst xDomain) + xExtent * (xScale x))
+       toY = (\y -> (fst yDomain) + yExtent * (yScale y))
    in
                         {  
                            discrete = False,
@@ -104,7 +108,9 @@ distribution f (from,to) steps =
                            yExtent = yExtent,
                            xLimits = xLimits,
                            yLimits = yLimits,
-                           xyRatio = xyRatio
+                           xyRatio = xyRatio,
+                           toX = toX,
+                           toY = toY
                         }
 
 
@@ -131,6 +137,8 @@ discrete f (from',to') =
        xyRatio = rmax / (snd xDomain)
        --polar = List.map fromPolar <| List.map2 (,) ys xs
        polar = mkPolar xs ys
+       toX = (\x -> (fst xDomain) + xExtent * (xScale x))
+       toY = (\y -> (fst yDomain) + yExtent * (yScale y))
    in
                         {  
                            discrete = True,
@@ -150,7 +158,9 @@ discrete f (from',to') =
                            yExtent = yExtent,
                            xLimits = xLimits,
                            yLimits = yLimits,
-                           xyRatio = xyRatio
+                           xyRatio = xyRatio,
+                           toX = toX,
+                           toY = toY
                         }
 
 geom_step : Aes -> Aes -> Distribution -> Dimensions -> Geom
@@ -324,8 +334,8 @@ geom_trapezoid aes' defaults d dims =
       GC.alpha visibility <| GC.group <| List.map (\x -> GC.outlined (linetype colour) <| GC.polygon x) points
 
 
-geom_integral : Aes -> Aes -> Distribution -> Dimensions -> Geom
-geom_integral aes' defaults d dims = 
+geom_area : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_area aes' defaults d dims = 
    let
       linetype = lookup .linetype aes' defaults
       colour = lookup .colour aes' defaults
@@ -345,7 +355,8 @@ geom_integral aes' defaults d dims =
       --xs = C.bins steps
       xs = List.map (\x -> (x,baseline x)) steps
       rev_steps = List.reverse steps
-      ys = List.map d.f rev_steps
+      f = if d.discrete then (d.f << roundf) else d.f
+      ys = List.map f rev_steps
       --area = xs
       points = xs ++ (List.map2 (,) rev_steps ys)
       area = List.map (\(x,y) -> (xm * (d.xScale x), ym * (d.yScale y))) points 
@@ -368,6 +379,34 @@ geom_curve aes' defaults d dims =
    in
       GC.alpha visibility <| GC.traced (linetype colour) <| GC.path ys
 
+geom_vlinerange : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_vlinerange aes' defaults d dims =
+   GC.toForm empty
+
+
+geom_hlinerange : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_hlinerange aes' defaults d dims =
+   let
+      y = lookup .y aes' defaults
+      xm = dims.xm
+      ym = dims.ym
+      (xmin,xmax) = d.xDomain
+      limits = lookup .limits aes' defaults
+      linetype = lookup .linetype aes' defaults
+      colour = lookup .colour aes' defaults
+      visibility = lookup .visibility aes' defaults
+      annotate = lookup .annotate aes' defaults
+      label = lookup .label aes' defaults
+      precision = lookup .precision aes' defaults
+      translate = lookup .translate aes' defaults
+      txt' = GC.move (xm * d.xScale ((snd limits) + (fst translate)), ym * d.yScale (y + snd translate)) <| GC.toForm <| Text.plainText label
+      -- HOW TO ANNOTATE?
+      txt = if annotate then txt' else (GC.toForm empty)
+      line = GC.alpha visibility <| GC.traced (linetype colour)  
+      <| GC.path [(xm * d.xScale (fst limits), ym * (d.yScale y)), (xm * d.xScale (snd limits), ym * (d.yScale y))] 
+   in
+      GC.group [txt,line]
+
 geom_hline : Aes -> Aes -> Distribution -> Dimensions -> Geom
 geom_hline aes' defaults d dims =
    let
@@ -376,12 +415,23 @@ geom_hline aes' defaults d dims =
       --y = snd dims.pos
       xm = dims.xm
       ym = dims.ym
+      (xmin,xmax) = d.xDomain
+      --limits = lookup .limits aes' defaults
       linetype = lookup .linetype aes' defaults
       colour = lookup .colour aes' defaults
       visibility = lookup .visibility aes' defaults
-   in
-      GC.alpha visibility <| GC.traced (linetype colour)  
+      annotate = lookup .annotate aes' defaults
+      label = lookup .label aes' defaults
+      precision = lookup .precision aes' defaults
+      translate = lookup .translate aes' defaults
+      txt' = GC.move (xm * d.xScale (xmax + fst translate), ym * d.yScale (y + snd translate)) <| GC.toForm <| Text.plainText <| label ++ (toString (C.dec precision <| d.toY y)) 
+      txt = if annotate then txt' else (GC.toForm empty)
+      line = GC.alpha visibility <| GC.traced (linetype colour)  
       <| GC.path [(0,ym * (d.yScale y)), (xm, ym * (d.yScale y))] 
+   in
+      GC.group [txt,line]
+
+
 
 geom_vline : Aes -> Aes -> Distribution -> Dimensions -> Geom
 geom_vline aes' defaults d dims =
@@ -399,7 +449,7 @@ geom_vline aes' defaults d dims =
       label = lookup .label aes' defaults
       precision = lookup .precision aes' defaults
       translate = lookup .translate aes' defaults
-      txt' = GC.move (xm * d.xScale (x + fst translate), ym * d.yScale (ymax + snd translate)) <| GC.toForm <| Text.plainText <| label ++ (toString (C.dec precision <| dims.toX x)) 
+      txt' = GC.move (xm * d.xScale (x + fst translate), ym * d.yScale (ymax + snd translate)) <| GC.toForm <| Text.plainText <| label ++ (toString (C.dec precision <| d.toX x)) 
       txt = if annotate then txt' else (GC.toForm empty)
       line = GC.alpha visibility <| GC.traced (linetype colour)  
       <| GC.path [(xm * (d.xScale x),0), (xm * (d.xScale x), ym)] 
@@ -562,8 +612,8 @@ geom_curve_polar aes' defaults d dims =
       GC.move origin <| GC.alpha visibility <| GC.traced (linetype colour) <| GC.path points
 
 
-geom_integral_polar : Aes -> Aes -> Distribution -> Dimensions -> Geom
-geom_integral_polar aes' defaults d dims = 
+geom_area_polar : Aes -> Aes -> Distribution -> Dimensions -> Geom
+geom_area_polar aes' defaults d dims = 
    let
       xm = dims.xm
       ym = dims.ym
@@ -643,6 +693,8 @@ geom_trace aes' defaults d dims =
                      <| List.map2 (,) steps (List.map d.f steps)
    in
       GC.alpha visibility <| GC.traced (linetype colour) <| GC.path ys
+
+
 
 
 geom_abline : Aes -> Aes -> Distribution -> Dimensions -> Geom
@@ -891,8 +943,8 @@ plot (plotWidth,plotHeight) d geoms m w =
       innerHeight = (toFloat plotHeight) - ymargin
       ymultiplier = (toFloat plotHeight) - (2 * ymargin)
       xmultiplier = (toFloat plotWidth) - (2 * xmargin)
-      toX = (\x -> (fst d.xDomain) + d.xExtent * (d.xScale x))
-      toY = (\y -> (fst d.yDomain) + d.yExtent * (d.yScale y))
+      --toX = (\x -> (fst d.xDomain) + d.xExtent * (d.xScale x))
+      --toY = (\y -> (fst d.yDomain) + d.yExtent * (d.yScale y))
 
       dims : Dimensions
       dims = {
@@ -907,9 +959,9 @@ plot (plotWidth,plotHeight) d geoms m w =
          innerWidth = innerWidth,
          innerHeight = innerHeight,
          ym = ymultiplier,
-         xm = xmultiplier,
-         toX = toX,
-         toY = toY
+         xm = xmultiplier
+         --toX = toX,
+         --toY = toY
       }
 
       --zeroX = geom_hline customAes defaults d dims 0
@@ -971,6 +1023,8 @@ annotate_integral aes' defaults d dims =
 
 {-- 
 TODO: 
+rename xscale/yscale --> fromX/fromY
+move geoms to separate file
 Set y plotting limits manually, for layering purposes.
 Colouring positive and negative integrals independently?
 Input time?
@@ -979,7 +1033,8 @@ Linestyles and textstyles?!
 Improve axes: number of ticks etc. 
 Annotation for vline and hline
 geom_abline_polar?
-Polar plot of a standard normal distribution is messed up... 
+finish geom_vlinerange
+Polar plotting gets messed up when the origin is far from 0... 
 --}
 
 
@@ -1006,9 +1061,9 @@ type alias Dimensions = {
          innerWidth : Float,
          innerHeight : Float,
          ym : Float,
-         xm : Float,
-         toX : (Float -> Float),
-         toY : (Float -> Float)
+         xm : Float
+         --toX : (Float -> Float),
+         --toY : (Float -> Float)
 }
             
 type alias Aes = { visibility:Maybe Float, 
@@ -1090,6 +1145,8 @@ aesDefault = { visibility = Just 1,
                rotate = Just False
                --input = Nothing
                }
+
+roundf = toFloat << round
 
 --type alias Axis = {
 --   labels : (String,String),

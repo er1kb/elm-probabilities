@@ -50,8 +50,8 @@ bl = (\x -> 0)
 customAes = { aes | radius <- Just 2, pointsize <- Just 9, colour <- Just darkBlue, visibility <- Just 0.6, annotate <- Just True }
 geoms1 = [ 
          --background { aes | colour <- Just lightGrey }, 
-         --geom_integral { aes | fun <- Just (\x -> 0.5), colour <- Just grey, dynamic <- Just True, negate <- Just False },
-         --geom_integral { aes | colour <- Just darkGreen, visibility <- Just 0.4, dynamic <- Just True, negate <- Just True },
+         --geom_area { aes | fun <- Just (\x -> 0.5), colour <- Just grey, dynamic <- Just True, negate <- Just False },
+         --geom_area { aes | colour <- Just darkGreen, visibility <- Just 0.4, dynamic <- Just True, negate <- Just True },
          --geom_trapezoid { aes | fun <- Just bl },
          --geom_bar { aes | fun <- Just (\x -> sin (4*x)), colour <- Just darkBlue },
          --geom_step customAes,
@@ -59,7 +59,7 @@ geoms1 = [
          geom_point customAes,
          --geom_trace_polar customAes,
          geom_trace_polar { aes | colour <- Just purple, dynamic <- Just True, rotate <- Just True, negate <- Just True },
-         geom_integral_polar { aes | colour <- Just lightBlue, dynamic <- Just True, rotate <- Just True, negate <- Just True, limits <- Just (-pi/2,pi/2) },
+         geom_area_polar { aes | colour <- Just lightBlue, dynamic <- Just True, rotate <- Just True, negate <- Just True, limits <- Just (-pi/2,pi/2) },
          --geom_curve_polar { aes | colour <- Just purple, dynamic <- Just True, rotate <- Just True },
          geom_circle { aes | colour <- Just purple, dynamic <- Just True, rotate <- Just True },
          geom_angle { aes | colour <- Just red, dynamic <- Just True, rotate <- Just True },
@@ -107,7 +107,7 @@ render m w =
       --bin = D.pdfbinom n 0.25
       bin = D.binom n 0.25
       d3 = discrete ((\n -> n * 100) << (bin.pdf)) (0,60)
-      extrageoms = [geom_vline { aes | x <- Just bin.mu, label <- Just "µ=", translate <- Just (4,0) }, geom_vline { aes | x <- Just n, label <- Just "n=", translate <- Just (0,-8) }]
+      extrageoms = [geom_vline { aes | x <- Just bin.mu, label <- Just "µ=", translate <- Just (4,0) }, geom_vline { aes | x <- Just n, label <- Just "n=", translate <- Just (0,-8) }, geom_hlinerange { aes | y <- Just (-4), limits <- Just (bin.mu - bin.sigma, bin.mu + bin.sigma), label <- Just ("&sigma;=" ++ (toString <| C.dec 2 bin.sigma)), translate <- Just (4,0) }, geom_area { aes | limits <- Just (bin.mu - bin.sigma, bin.mu + bin.sigma), colour <- Just blue, visibility <- Just 0.5, dynamic <- Just False }]
    in
 
       flow down [
@@ -127,14 +127,14 @@ main = Signal.map2 render Mouse.position Window.dimensions
 
 
 --geoms2 = [
---         geom_integral { aes | fun <- Just (\x -> 0.2), colour <- Just darkRed, visibility <- Just 0.2 },
+--         geom_area { aes | fun <- Just (\x -> 0.2), colour <- Just darkRed, visibility <- Just 0.2 },
 --         geom_point customAes,
 --         geom_trace { aes | colour <- Just orange }
 --         ]
 geoms3 = [ 
          --background { aes | colour <- Just lightGrey }, 
-         --geom_integral_polar { aes | fun <- Just (\x -> 0.5), colour <- Just darkGreen, visibility <- Just 0.4, negate <- Just False },
-         geom_integral_polar { aes | colour <- Just darkGreen, visibility <- Just 0.4, negate <- Just False, fun <- Just bl },
+         --geom_area_polar { aes | fun <- Just (\x -> 0.5), colour <- Just darkGreen, visibility <- Just 0.4, negate <- Just False },
+         geom_area_polar { aes | colour <- Just darkGreen, visibility <- Just 0.4, negate <- Just False, fun <- Just bl },
          --geom_trace_polar { aes | colour <- Just red },
          geom_trace_polar { aes | colour <- Just red },
          geom_position_polar customAes,
@@ -152,7 +152,7 @@ geoms3 = [
          ]
 
 --geoms4 = [
---         geom_integral_polar { aes | fun <- Just (\x -> 0.2), colour <- Just darkRed, visibility <- Just 0.2 },
+--         geom_area_polar { aes | fun <- Just (\x -> 0.2), colour <- Just darkRed, visibility <- Just 0.2 },
 --         geom_position_polar { aes | colour <- Just orange },
 --         geom_angle { aes | colour <- Just red, pointsize <- Just 6 },
 --         geom_circle { aes | radius <- Just 0.4 }
@@ -161,9 +161,9 @@ geoms3 = [
 geoms4 = [  
           geom_mario { aes | dims <- Just (50,50) },
           --geom_hline aes, geom_vline aes,
-          geom_hline { customAes | y <- Just 1 },
-          geom_hline { aes | y <- Just e },
-          geom_hline { customAes | y <- Just 0.1 },
+          --geom_hline { customAes | y <- Just 1 },
+          --geom_hline { aes | y <- Just e },
+          --geom_hline { customAes | y <- Just 0.1 },
           geom_vline { customAes | x <- Just 15, annotate <- Just False },
           --geom_vline { customAes | x <- Just 0 },
           geom_points { aes | dynamic <- Just False, pointsize <- Just 3, colour <- Just darkRed },
