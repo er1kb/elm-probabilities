@@ -55,6 +55,7 @@ type alias Distribution = {
          xLimits:(Float,Float),
          yLimits:(Float,Float),
          xyRatio:Float,
+         pOffset:Float,
          toX:(Float -> Float),
          toY:(Float -> Float)
       }
@@ -84,7 +85,11 @@ distribution f (from,to) steps =
        --xScale = C.normalize xLimits
        yDomain = (ymin, ymax)
        yExtent = ymax - ymin
-       xyRatio = rmax / (snd xDomain)
+       --xyRatio = rmax / (snd xDomain)
+       xyRatio = rmax / (xExtent / 2)
+       sign = (from / from) * (to / to)
+       --skew = (abs to) - (abs from)
+       pOffset = (to + from) / 2
        --polar = List.map fromPolar <| List.map2 (,) ys xs
        polar = mkPolar xs ys
        toX = (\x -> (fst xDomain) + xExtent * (xScale x))
@@ -109,6 +114,7 @@ distribution f (from,to) steps =
                            xLimits = xLimits,
                            yLimits = yLimits,
                            xyRatio = xyRatio,
+                           pOffset = pOffset,
                            toX = toX,
                            toY = toY
                         }
@@ -135,6 +141,8 @@ discrete f (from',to') =
        yDomain = (ymin, ymax)
        yExtent = ymax - ymin
        xyRatio = rmax / (snd xDomain)
+       skew = (to - from)
+       pOffset = skew / 2
        --polar = List.map fromPolar <| List.map2 (,) ys xs
        polar = mkPolar xs ys
        toX = (\x -> (fst xDomain) + xExtent * (xScale x))
@@ -159,6 +167,7 @@ discrete f (from',to') =
                            xLimits = xLimits,
                            yLimits = yLimits,
                            xyRatio = xyRatio,
+                           pOffset = pOffset,
                            toX = toX,
                            toY = toY
                         }
@@ -470,10 +479,11 @@ geom_hline_polar aes' defaults d dims =
       visibility = lookup .visibility aes' defaults
       fit = lookup .fit aes' defaults
       xyRatio = if fit then d.xyRatio else 1
+      --offset = if rotate then 0 else d.pOffset
       points = List.map fromPolar  
          <| List.map (\x -> (y,x)) d.xs
       hline = GC.path  
-         <| List.map (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale y)) 
+         <| List.map (\(x,y) -> (xm * d.xScale (d.pOffset + (x / xyRatio)), ym * d.yScale y)) 
          points
          -- <| List.map fromPolar [(xmin, y), (xmax, y)]  
    in
@@ -493,10 +503,11 @@ geom_vline_polar aes' defaults d dims =
       visibility = lookup .visibility aes' defaults
       fit = lookup .fit aes' defaults
       xyRatio = if fit then d.xyRatio else 1
+      --offset = if rotate then 0 else d.pOffset
       points = List.map fromPolar  
          <| List.map (\y -> (y,x)) d.ys
       hline = GC.path  
-         <| List.map (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale y)) 
+         <| List.map (\(x,y) -> (xm * d.xScale (d.pOffset + (x / xyRatio)), ym * d.yScale y)) 
          points
    in
       GC.alpha visibility <| GC.traced (linetype colour) <| hline 
@@ -517,6 +528,7 @@ geom_trace_polar aes' defaults d dims =
        fit' = lookup .fit aes' defaults
        fit = if rotate then False else fit'
        xyRatio = if fit then d.xyRatio else 1
+       offset = if rotate then 0 else d.pOffset
        --origin = (0,0)
        (dx,steps) = C.interpolate (fst d.xDomain, x) (toFloat d.steps)
        --ys = List.map d.f steps
@@ -524,7 +536,7 @@ geom_trace_polar aes' defaults d dims =
        ys = mkPolar steps (List.map d.f steps)
 
        points' = if rotate then revolve ys x else ys
-       points = List.map (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale y)) points'
+       points = List.map (\(x,y) -> (xm * d.xScale (offset + (x / xyRatio)), ym * d.yScale y)) points'
        --points = List.map (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale y)) <| List.map fromPolar <| List.map2 (,) ys steps 
    in
       --GC.move origin <|  
@@ -544,10 +556,11 @@ geom_circle aes' defaults d dims =
       fit' = lookup .fit aes' defaults
       fit = if rotate then False else fit'
       xyRatio = if fit then d.xyRatio else 1
+      offset = if rotate then 0 else d.pOffset
       ys = List.map (fromPolar << (\x -> (d.rmax,x))) d.xs
       points' = if rotate then revolve ys x else ys
 
-      points = List.map (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale y)) points'
+      points = List.map (\(x,y) -> (xm * d.xScale (offset + (x / xyRatio)), ym * d.yScale y)) points'
 
       thing = GC.path points
       origin = (0,0)
@@ -568,6 +581,7 @@ geom_angle aes' defaults d dims =
        fit' = lookup .fit aes' defaults
        fit = if rotate then False else fit'
        xyRatio = if fit then d.xyRatio else 1
+       offset = if rotate then 0 else d.pOffset
        radius = d.yExtent / 2
        x = lookup .x aes' defaults
        annotate = lookup .annotate aes' defaults
@@ -577,12 +591,12 @@ geom_angle aes' defaults d dims =
        point = if rotate then revolve point' x else point'
        (x',y') = List.head point
 
-       pos = (xm * d.xScale (x' / xyRatio), ym * d.yScale y')
-       origin = (0,0)
-       annotationPosition = (xm * d.xScale (fst translate),  
+       pos = (xm * d.xScale (offset + (x' / xyRatio)), ym * d.yScale y')
+       --origin = (0,0)
+       annotationPosition = (xm * d.xScale (d.pOffset + fst translate),  
                              ym * d.yScale (snd translate))
        dot = GC.move pos  
-               <| GC.move origin  
+               --<| GC.move origin  
                <| GC.filled colour <| GC.circle pointsize
        label' = GC.move annotationPosition <| GC.toForm <| Text.rightAligned <| Text.color colour 
                <| Text.fromString <| "&theta; &asymp; " ++ (toString <| C.dec 2 x)  
@@ -605,9 +619,10 @@ geom_curve_polar aes' defaults d dims =
        fit' = lookup .fit aes' defaults
        fit = if rotate then False else fit'
        xyRatio = if fit then d.xyRatio else 1
+       offset = if rotate then 0 else d.pOffset
        origin = lookup .translate aes' defaults
        points' = if rotate then revolve d.polar x else d.polar
-       points = List.map (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale y)) points'
+       points = List.map (\(x,y) -> (xm * d.xScale (offset + (x / xyRatio)), ym * d.yScale y)) points'
    in
       GC.move origin <| GC.alpha visibility <| GC.traced (linetype colour) <| GC.path points
 
@@ -624,6 +639,7 @@ geom_area_polar aes' defaults d dims =
       fit' = lookup .fit aes' defaults
       fit = if rotate then False else fit'
       xyRatio = if fit then d.xyRatio else 1
+      offset = if rotate then 0 else d.pOffset
       baseline = lookup .fun aes' defaults
 
       dynamic = lookup .dynamic aes' defaults
@@ -648,7 +664,7 @@ geom_area_polar aes' defaults d dims =
       points' = List.map fromPolar (f_points ++ baseline_points)
       points = if rotate then revolve points' x else points'
 
-      area = List.map (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale y)) points 
+      area = List.map (\(x,y) -> (xm * d.xScale (offset + (x / xyRatio)), ym * d.yScale y)) points 
    in
       GC.move origin <| GC.alpha visibility <| GC.filled colour <| GC.polygon area
 
@@ -667,8 +683,9 @@ geom_position_polar aes' defaults d dims =
        pointsize = lookup .pointsize aes' defaults
        fit = lookup .fit aes' defaults
        xyRatio = if fit then d.xyRatio else 1
+       --offset = if rotate then 0 else d.pOffset
        origin = (0,0)
-       pos = (\(x,y) -> (xm * d.xScale (x / xyRatio), ym * d.yScale y)) <| fromPolar (y',x')
+       pos = (\(x,y) -> (xm * d.xScale (d.pOffset + (x / xyRatio)), ym * d.yScale y)) <| fromPolar (y',x')
 
        point = GC.move pos  
                <| GC.move origin <| GC.alpha visibility 
