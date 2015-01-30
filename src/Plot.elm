@@ -60,23 +60,20 @@ type alias Distribution = {
          toY:(Float -> Float)
       }
 
-distribution : (Float -> Float) -> (Float, Float) -> Int -> Distribution
-distribution f (from,to) steps = 
+distribution : (Float -> Float) -> (Float, Float) -> (Float, Float) -> Int -> Distribution
+distribution f (xmin,xmax) (ymin,ymax) steps = 
    let
-       xDomain = (from, to)
+       xDomain = (xmin, xmax)
        --yDomain = (-1,1)
-       xExtent = (to - from)
+       xExtent = (xmax - xmin)
        --interpolator = List.tail <| List.map (C.normalize (1,toFloat steps)) [1..toFloat steps] 
        interpolator = List.map (C.normalize (0,toFloat steps)) [0..toFloat steps] 
-       xs = List.map (\x -> from + xExtent * x) interpolator
+       xs = List.map (\x -> xmin + xExtent * x) interpolator
        ys = List.map f xs
        dx = xExtent / (toFloat steps)
        xScale = C.normalize xDomain
-       ymin = List.minimum ys
-       ymax = List.maximum ys
-       --baselinePos = if (ymin < 0) then List.minimum ys else -(ymax / 10)
-       --baselineNeg = if (ymax > 0) then List.maximum ys else abs (ymin / 10) 
-       --yLimits = (baselinePos, baselineNeg)
+       --ymin = List.minimum ys
+       --ymax = List.maximum ys
        rmax = if (abs ymax) > (abs ymin) then (abs ymax) else (abs ymin)
        yLimits = (-rmax, rmax)
        xLimits = yLimits
@@ -87,9 +84,9 @@ distribution f (from,to) steps =
        yExtent = ymax - ymin
        --xyRatio = rmax / (snd xDomain)
        xyRatio = rmax / (xExtent / 2)
-       sign = (from / from) * (to / to)
-       --skew = (abs to) - (abs from)
-       pOffset = (to + from) / 2
+       sign = (xmin / xmin) * (xmax / xmax)
+       --skew = (abs xmax) - (abs from)
+       pOffset = (xmax + xmin) / 2
        --polar = List.map fromPolar <| List.map2 (,) ys xs
        polar = mkPolar xs ys
        toX = (\x -> (fst xDomain) + xExtent * (xScale x))
@@ -120,20 +117,20 @@ distribution f (from,to) steps =
                         }
 
 
-discrete : (Float -> Float) -> (Float, Float) -> Distribution
-discrete f (from',to') = 
+discrete : (Float -> Float) -> (Float, Float) -> (Float, Float) -> Distribution
+discrete f (xmin',xmax') (ymin,ymax) = 
    let
-       from = from' - 0.5
-       to = to' + 0.5
-       xDomain = (from, to)
-       xExtent = (to - from)
-       xs = [from' .. to']
+       xmin = xmin' - 0.5
+       xmax = xmax' + 0.5
+       xDomain = (xmin, xmax)
+       xExtent = (xmax - xmin)
+       xs = [xmin' .. xmax']
        ys = List.map f xs
        steps = List.length xs
        dx = 1
        xScale = C.normalize xDomain
-       ymin = List.minimum ys
-       ymax = List.maximum ys
+       --ymin = List.minimum ys
+       --ymax = List.maximum ys
        rmax = if (abs ymax) > (abs ymin) then (abs ymax) else (abs ymin)
        yLimits = (-rmax, rmax)
        xLimits = yLimits
@@ -141,7 +138,7 @@ discrete f (from',to') =
        yDomain = (ymin, ymax)
        yExtent = ymax - ymin
        xyRatio = rmax / (snd xDomain)
-       skew = (to - from)
+       skew = (xmax - xmin)
        pOffset = skew / 2
        --polar = List.map fromPolar <| List.map2 (,) ys xs
        polar = mkPolar xs ys
@@ -818,6 +815,7 @@ yAxis aes' defaults d dims =
        --axis = lookup .axis aes' defaults
        --axislabel = (snd << .labels) axis
        label = lookup .label aes' defaults
+       tickspacing = lookup .tickspacing aes' defaults
        xmargin = fst dims.margins
        xmin = fst d.xDomain
        --ymin = fst d.yDomain
@@ -825,10 +823,10 @@ yAxis aes' defaults d dims =
        --ymax = snd d.yDomain
        --ymax = snd d.yLimits
        pos = (xm * (d.xScale xmin) - (xmargin / 4),0)
-       tickPositions = List.filter (\n -> (round n) % 4 == 0) 
+       tickPositions = List.filter (\n -> (round n) % tickspacing == 0) 
           <| List.map toFloat [ceiling ymin .. floor ymax]
        tickLabels = GC.group <| List.map (\y -> GC.move (-xmargin / 8,ym * d.yScale y)  
-         <| GC.toForm <| Text.rightAligned <| Text.fromString <|  
+         <| GC.toForm <| Text.rightAligned <| Text.fromString <| 
          toString <| C.dec 2 y) tickPositions
        ticks = GC.group <| List.map (\y -> GC.move (-xmargin * 0.02,ym * d.yScale y)  
          <| GC.traced (GC.solid black) <| GC.path [(0,0),(12,0)]) tickPositions
@@ -847,12 +845,13 @@ xAxis aes' defaults d dims =
        --axis = lookup .axis aes' defaults
        --axislabel = (fst << .labels) axis
        label = lookup .label aes' defaults
+       tickspacing = lookup .tickspacing aes' defaults
        ymargin = snd dims.margins
        ymin = fst d.yLimits
        (xmin,xmax) = d.xDomain
        pos = (0,ym * (d.yScale ymin) - (ymargin / 12))
        --tickPositions = [xmin, 0, xmax]
-       tickPositions = List.filter (\n -> (round n) % 3 == 0) 
+       tickPositions = List.filter (\n -> (round n) % tickspacing == 0) 
           <| List.map toFloat [ceiling xmin .. floor xmax]
        tickLabels = GC.group <| List.map (\x -> GC.move (xm * d.xScale x,-ymargin * 0.3)  
          <| GC.toForm <| Text.centered <| Text.fromString <|  
@@ -1023,16 +1022,19 @@ annotate_integral aes' defaults d dims =
        --baseline = lookup .fun aes' defaults -- !!
        xmin = fst limits
        xmax = snd limits
-       integral = C.integrate limits (toFloat dims.nbins) d.f
+       --integral = C.integrate limits (toFloat dims.nbins) d.f
+       integral = C.integrate limits (toFloat d.steps) d.f
        --xmin = fst d.xDomain
        --xmax = snd d.xDomain
        --integral = C.integrate d.xDomain (toFloat dims.nbins) d.f
    in
-       GC.move (dims.xm * (d.xScale (fst translate)),  
-                dims.ym * (d.yScale (snd translate)))
+       GC.move (dims.xm * fst translate,  
+                dims.ym * snd translate)
+       --GC.move (dims.xm * (d.xScale (fst translate)),  
+       --         dims.ym * (d.yScale (snd translate)))
               <| GC.toForm <| Text.rightAligned <| Text.fromString  
-              <| "number of bins: " ++ (toString dims.nbins) 
-              ++ "\n&#x222b;"  
+              -- <| "number of bins: " ++ (toString dims.nbins) 
+              <| "\n&#x222b;"  
                      ++ " from " ++ (toString <| C.dec precision xmin)  
                      ++ " to " ++ (toString <| C.dec precision xmax)  
                      ++ " &#8776; " ++ (toString <| C.dec precision <| integral)
@@ -1105,7 +1107,8 @@ type alias Aes = { visibility:Maybe Float,
                    --axis: Maybe { labels : (String,String) },
                    --axis: Maybe Axis,
                    fit: Maybe Bool,
-                   rotate: Maybe Bool
+                   rotate: Maybe Bool,
+                   tickspacing: Maybe Int
                    --input: Maybe { height : Int, width : Int, x : Int, y : Int }
                 }
 
@@ -1131,7 +1134,8 @@ aes = { visibility = Nothing,
         negate = Nothing,
         --axis = Nothing,
         fit = Nothing,
-        rotate = Nothing
+        rotate = Nothing,
+        tickspacing = Nothing
         --input = Nothing
      }
 
@@ -1159,8 +1163,9 @@ aesDefault = { visibility = Just 1,
                --axis = Just { labels = ("X", "Y"), nticks = 5 },
                --axis = Just (axis ("X","Y") 5),
                fit = Just True,
-               rotate = Just False
+               rotate = Just False,
                --input = Nothing
+               tickspacing = Just 5 
                }
 
 roundf = toFloat << round

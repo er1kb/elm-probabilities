@@ -203,7 +203,7 @@ dec m n = (toFloat << round <| n * 10^m) / (10^m)
 
 {-| Normalize values to the range of 0,1  -}
 normalize : (number,number) -> number -> number
-normalize (xmin,xmax) x = (x - xmin) / (xmax - xmin)
+normalize (xmin,xmax) x = if xmin - xmax == 0 then 0.5 else (x - xmin) / (xmax - xmin)
 
 {-| Calculate z score -}
 zscore : number -> number -> number -> number

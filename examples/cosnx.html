@@ -3436,626 +3436,6 @@ Elm.Html.make = function (_elm) {
                       ,menuitem: menuitem
                       ,menu: menu};
    return _elm.Html.values;
-};Elm.Html = Elm.Html || {};
-Elm.Html.Attributes = Elm.Html.Attributes || {};
-Elm.Html.Attributes.make = function (_elm) {
-   "use strict";
-   _elm.Html = _elm.Html || {};
-   _elm.Html.Attributes = _elm.Html.Attributes || {};
-   if (_elm.Html.Attributes.values)
-   return _elm.Html.Attributes.values;
-   var _op = {},
-   _N = Elm.Native,
-   _U = _N.Utils.make(_elm),
-   _L = _N.List.make(_elm),
-   _P = _N.Ports.make(_elm),
-   $moduleName = "Html.Attributes",
-   $Basics = Elm.Basics.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Json$Encode = Elm.Json.Encode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $String = Elm.String.make(_elm),
-   $VirtualDom = Elm.VirtualDom.make(_elm);
-   var property = $VirtualDom.property;
-   var stringProperty = F2(function (name,
-   string) {
-      return A2(property,
-      name,
-      $Json$Encode.string(string));
-   });
-   var $class = function (name) {
-      return A2(stringProperty,
-      "className",
-      name);
-   };
-   var id = function (name) {
-      return A2(stringProperty,
-      "id",
-      name);
-   };
-   var title = function (name) {
-      return A2(stringProperty,
-      "title",
-      name);
-   };
-   var accesskey = function ($char) {
-      return A2(stringProperty,
-      "accesskey",
-      $String.fromList(_L.fromArray([$char])));
-   };
-   var contextmenu = function (value) {
-      return A2(stringProperty,
-      "contextmenu",
-      value);
-   };
-   var dir = function (value) {
-      return A2(stringProperty,
-      "dir",
-      value);
-   };
-   var draggable = function (value) {
-      return A2(stringProperty,
-      "draggable",
-      value);
-   };
-   var dropzone = function (value) {
-      return A2(stringProperty,
-      "dropzone",
-      value);
-   };
-   var itemprop = function (value) {
-      return A2(stringProperty,
-      "itemprop",
-      value);
-   };
-   var lang = function (value) {
-      return A2(stringProperty,
-      "lang",
-      value);
-   };
-   var tabindex = function (n) {
-      return A2(stringProperty,
-      "tabIndex",
-      $Basics.toString(n));
-   };
-   var charset = function (value) {
-      return A2(stringProperty,
-      "charset",
-      value);
-   };
-   var content = function (value) {
-      return A2(stringProperty,
-      "content",
-      value);
-   };
-   var httpEquiv = function (value) {
-      return A2(stringProperty,
-      "httpEquiv",
-      value);
-   };
-   var language = function (value) {
-      return A2(stringProperty,
-      "language",
-      value);
-   };
-   var src = function (value) {
-      return A2(stringProperty,
-      "src",
-      value);
-   };
-   var height = function (value) {
-      return A2(stringProperty,
-      "height",
-      $Basics.toString(value));
-   };
-   var width = function (value) {
-      return A2(stringProperty,
-      "width",
-      $Basics.toString(value));
-   };
-   var alt = function (value) {
-      return A2(stringProperty,
-      "alt",
-      value);
-   };
-   var poster = function (value) {
-      return A2(stringProperty,
-      "poster",
-      value);
-   };
-   var kind = function (value) {
-      return A2(stringProperty,
-      "kind",
-      value);
-   };
-   var srclang = function (value) {
-      return A2(stringProperty,
-      "srclang",
-      value);
-   };
-   var sandbox = function (value) {
-      return A2(stringProperty,
-      "sandbox",
-      value);
-   };
-   var srcdoc = function (value) {
-      return A2(stringProperty,
-      "srcdoc",
-      value);
-   };
-   var type$ = function (value) {
-      return A2(stringProperty,
-      "type",
-      value);
-   };
-   var value = function (value) {
-      return A2(stringProperty,
-      "value",
-      value);
-   };
-   var placeholder = function (value) {
-      return A2(stringProperty,
-      "placeholder",
-      value);
-   };
-   var accept = function (value) {
-      return A2(stringProperty,
-      "accept",
-      value);
-   };
-   var acceptCharset = function (value) {
-      return A2(stringProperty,
-      "acceptCharset",
-      value);
-   };
-   var action = function (value) {
-      return A2(stringProperty,
-      "action",
-      value);
-   };
-   var autocomplete = function (bool) {
-      return A2(stringProperty,
-      "autocomplete",
-      bool ? "on" : "off");
-   };
-   var autosave = function (value) {
-      return A2(stringProperty,
-      "autosave",
-      value);
-   };
-   var enctype = function (value) {
-      return A2(stringProperty,
-      "enctype",
-      value);
-   };
-   var formaction = function (value) {
-      return A2(stringProperty,
-      "formaction",
-      value);
-   };
-   var list = function (value) {
-      return A2(stringProperty,
-      "list",
-      value);
-   };
-   var maxlength = function (n) {
-      return A2(stringProperty,
-      "maxLength",
-      $Basics.toString(n));
-   };
-   var method = function (value) {
-      return A2(stringProperty,
-      "method",
-      value);
-   };
-   var name = function (value) {
-      return A2(stringProperty,
-      "name",
-      value);
-   };
-   var pattern = function (value) {
-      return A2(stringProperty,
-      "pattern",
-      value);
-   };
-   var size = function (n) {
-      return A2(stringProperty,
-      "size",
-      $Basics.toString(n));
-   };
-   var $for = function (value) {
-      return A2(stringProperty,
-      "htmlFor",
-      value);
-   };
-   var form = function (value) {
-      return A2(stringProperty,
-      "form",
-      value);
-   };
-   var max = function (value) {
-      return A2(stringProperty,
-      "max",
-      value);
-   };
-   var min = function (value) {
-      return A2(stringProperty,
-      "min",
-      value);
-   };
-   var step = function (n) {
-      return A2(stringProperty,
-      "step",
-      $Basics.toString(n));
-   };
-   var cols = function (n) {
-      return A2(stringProperty,
-      "cols",
-      $Basics.toString(n));
-   };
-   var rows = function (n) {
-      return A2(stringProperty,
-      "rows",
-      $Basics.toString(n));
-   };
-   var wrap = function (value) {
-      return A2(stringProperty,
-      "wrap",
-      value);
-   };
-   var ismap = function (value) {
-      return A2(stringProperty,
-      "ismap",
-      value);
-   };
-   var usemap = function (value) {
-      return A2(stringProperty,
-      "usemap",
-      value);
-   };
-   var shape = function (value) {
-      return A2(stringProperty,
-      "shape",
-      value);
-   };
-   var coords = function (value) {
-      return A2(stringProperty,
-      "coords",
-      value);
-   };
-   var challenge = function (value) {
-      return A2(stringProperty,
-      "challenge",
-      value);
-   };
-   var keytype = function (value) {
-      return A2(stringProperty,
-      "keytype",
-      value);
-   };
-   var align = function (value) {
-      return A2(stringProperty,
-      "align",
-      value);
-   };
-   var cite = function (value) {
-      return A2(stringProperty,
-      "cite",
-      value);
-   };
-   var href = function (value) {
-      return A2(stringProperty,
-      "href",
-      value);
-   };
-   var target = function (value) {
-      return A2(stringProperty,
-      "target",
-      value);
-   };
-   var downloadAs = function (value) {
-      return A2(stringProperty,
-      "download",
-      value);
-   };
-   var hreflang = function (value) {
-      return A2(stringProperty,
-      "hreflang",
-      value);
-   };
-   var media = function (value) {
-      return A2(stringProperty,
-      "media",
-      value);
-   };
-   var ping = function (value) {
-      return A2(stringProperty,
-      "ping",
-      value);
-   };
-   var rel = function (value) {
-      return A2(stringProperty,
-      "rel",
-      value);
-   };
-   var datetime = function (value) {
-      return A2(stringProperty,
-      "datetime",
-      value);
-   };
-   var pubdate = function (value) {
-      return A2(stringProperty,
-      "pubdate",
-      value);
-   };
-   var start = function (n) {
-      return A2(stringProperty,
-      "start",
-      $Basics.toString(n));
-   };
-   var colspan = function (value) {
-      return A2(stringProperty,
-      "colSpan",
-      value);
-   };
-   var headers = function (value) {
-      return A2(stringProperty,
-      "headers",
-      value);
-   };
-   var rowspan = function (value) {
-      return A2(stringProperty,
-      "rowSpan",
-      value);
-   };
-   var scope = function (value) {
-      return A2(stringProperty,
-      "scope",
-      value);
-   };
-   var manifest = function (value) {
-      return A2(stringProperty,
-      "manifest",
-      value);
-   };
-   var boolProperty = F2(function (name,
-   bool) {
-      return A2(property,
-      name,
-      $Json$Encode.bool(bool));
-   });
-   var hidden = function (bool) {
-      return A2(boolProperty,
-      "hidden",
-      bool);
-   };
-   var contenteditable = function (bool) {
-      return A2(boolProperty,
-      "contentEditable",
-      bool);
-   };
-   var spellcheck = function (bool) {
-      return A2(boolProperty,
-      "spellcheck",
-      bool);
-   };
-   var async = function (bool) {
-      return A2(boolProperty,
-      "async",
-      bool);
-   };
-   var defer = function (bool) {
-      return A2(boolProperty,
-      "defer",
-      bool);
-   };
-   var scoped = function (bool) {
-      return A2(boolProperty,
-      "scoped",
-      bool);
-   };
-   var autoplay = function (bool) {
-      return A2(boolProperty,
-      "autoplay",
-      bool);
-   };
-   var controls = function (bool) {
-      return A2(boolProperty,
-      "controls",
-      bool);
-   };
-   var loop = function (bool) {
-      return A2(boolProperty,
-      "loop",
-      bool);
-   };
-   var preload = function (bool) {
-      return A2(boolProperty,
-      "preload",
-      bool);
-   };
-   var $default = function (bool) {
-      return A2(boolProperty,
-      "default",
-      bool);
-   };
-   var seamless = function (bool) {
-      return A2(boolProperty,
-      "seamless",
-      bool);
-   };
-   var checked = function (bool) {
-      return A2(boolProperty,
-      "checked",
-      bool);
-   };
-   var selected = function (bool) {
-      return A2(boolProperty,
-      "selected",
-      bool);
-   };
-   var autofocus = function (bool) {
-      return A2(boolProperty,
-      "autofocus",
-      bool);
-   };
-   var disabled = function (bool) {
-      return A2(boolProperty,
-      "disabled",
-      bool);
-   };
-   var multiple = function (bool) {
-      return A2(boolProperty,
-      "multiple",
-      bool);
-   };
-   var novalidate = function (bool) {
-      return A2(boolProperty,
-      "novalidate",
-      bool);
-   };
-   var readonly = function (bool) {
-      return A2(boolProperty,
-      "readonly",
-      bool);
-   };
-   var required = function (bool) {
-      return A2(boolProperty,
-      "required",
-      bool);
-   };
-   var download = function (bool) {
-      return A2(boolProperty,
-      "download",
-      bool);
-   };
-   var reversed = function (bool) {
-      return A2(boolProperty,
-      "reversed",
-      bool);
-   };
-   var classList = function (list) {
-      return $class($String.join(" ")($List.map($Basics.fst)($List.filter($Basics.snd)(list))));
-   };
-   var style = function (props) {
-      return property("style")($Json$Encode.object($List.map(function (_v0) {
-         return function () {
-            switch (_v0.ctor)
-            {case "_Tuple2":
-               return {ctor: "_Tuple2"
-                      ,_0: _v0._0
-                      ,_1: $Json$Encode.string(_v0._1)};}
-            _U.badCase($moduleName,
-            "on line 136, column 35 to 57");
-         }();
-      })(props)));
-   };
-   var key = function (k) {
-      return A2(stringProperty,
-      "key",
-      k);
-   };
-   _elm.Html.Attributes.values = {_op: _op
-                                 ,key: key
-                                 ,style: style
-                                 ,classList: classList
-                                 ,property: property
-                                 ,stringProperty: stringProperty
-                                 ,boolProperty: boolProperty
-                                 ,$class: $class
-                                 ,hidden: hidden
-                                 ,id: id
-                                 ,title: title
-                                 ,accesskey: accesskey
-                                 ,contenteditable: contenteditable
-                                 ,contextmenu: contextmenu
-                                 ,dir: dir
-                                 ,draggable: draggable
-                                 ,dropzone: dropzone
-                                 ,itemprop: itemprop
-                                 ,lang: lang
-                                 ,spellcheck: spellcheck
-                                 ,tabindex: tabindex
-                                 ,async: async
-                                 ,charset: charset
-                                 ,content: content
-                                 ,defer: defer
-                                 ,httpEquiv: httpEquiv
-                                 ,language: language
-                                 ,scoped: scoped
-                                 ,src: src
-                                 ,height: height
-                                 ,width: width
-                                 ,alt: alt
-                                 ,autoplay: autoplay
-                                 ,controls: controls
-                                 ,loop: loop
-                                 ,preload: preload
-                                 ,poster: poster
-                                 ,$default: $default
-                                 ,kind: kind
-                                 ,srclang: srclang
-                                 ,sandbox: sandbox
-                                 ,seamless: seamless
-                                 ,srcdoc: srcdoc
-                                 ,type$: type$
-                                 ,value: value
-                                 ,checked: checked
-                                 ,placeholder: placeholder
-                                 ,selected: selected
-                                 ,accept: accept
-                                 ,acceptCharset: acceptCharset
-                                 ,action: action
-                                 ,autocomplete: autocomplete
-                                 ,autofocus: autofocus
-                                 ,autosave: autosave
-                                 ,disabled: disabled
-                                 ,enctype: enctype
-                                 ,formaction: formaction
-                                 ,list: list
-                                 ,maxlength: maxlength
-                                 ,method: method
-                                 ,multiple: multiple
-                                 ,name: name
-                                 ,novalidate: novalidate
-                                 ,pattern: pattern
-                                 ,readonly: readonly
-                                 ,required: required
-                                 ,size: size
-                                 ,$for: $for
-                                 ,form: form
-                                 ,max: max
-                                 ,min: min
-                                 ,step: step
-                                 ,cols: cols
-                                 ,rows: rows
-                                 ,wrap: wrap
-                                 ,ismap: ismap
-                                 ,usemap: usemap
-                                 ,shape: shape
-                                 ,coords: coords
-                                 ,challenge: challenge
-                                 ,keytype: keytype
-                                 ,align: align
-                                 ,cite: cite
-                                 ,href: href
-                                 ,target: target
-                                 ,download: download
-                                 ,downloadAs: downloadAs
-                                 ,hreflang: hreflang
-                                 ,media: media
-                                 ,ping: ping
-                                 ,rel: rel
-                                 ,datetime: datetime
-                                 ,pubdate: pubdate
-                                 ,reversed: reversed
-                                 ,start: start
-                                 ,colspan: colspan
-                                 ,headers: headers
-                                 ,rowspan: rowspan
-                                 ,scope: scope
-                                 ,manifest: manifest};
-   return _elm.Html.Attributes.values;
 };Elm.Json = Elm.Json || {};
 Elm.Json.Decode = Elm.Json.Decode || {};
 Elm.Json.Decode.make = function (_elm) {
@@ -4450,316 +3830,169 @@ Elm.Main.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Color = Elm.Color.make(_elm),
    $Continuous = Elm.Continuous.make(_elm),
-   $Discrete = Elm.Discrete.make(_elm),
-   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Mouse = Elm.Mouse.make(_elm),
    $Plot = Elm.Plot.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Window = Elm.Window.make(_elm);
-   var ndtext = "Normalfördelningen är en välkänd kontinuerlig fördelning som kan användas istället för binomialfördelningen om en av flera möjliga tumregler uppfylls, till exempel nπ≥5 och n(1-π)≥5. Här betyder det att n≥5/π = n≥20. Med andra ord kan vi byta ut binomialfördelningen mot en motsvarande normalfördelning då antalet försök är minst 20. Fördelningen N(µ,σ) konstrueras med väntevärdet och standardavvikelsen från den ursprungliga binomialfördelningen. Om det vi försöker mäta liknar en normalfördelning så kan vi räkna med att ungefär två tredjedelar (68,3%) av utfallen sker inom ±1 standardavvikelse omkring väntevärdet. Integralen anges här i procent men arean av det färgade området är egentligen 0,683.";
-   var potext = "Poissonfördelningen är en annan diskret sannolikhetsfördelning som kan användas för att efterlikna binomialfördelningen. Eftersom poissonfördelningen används för mer ovanliga/osannolika händelser så passar den bra för stora n och små π, dvs ett stort antal försök och liten sannolikhet för positivt utfall. En tumregel är n ≥ 10 och π ≤ 0,1. Med andra ord är den olämplig att använda här då π=0.25. Poängen med diagrammet är snarare att visa fördelningarna och hur de liknar varandra. Poissonfördelningen har en något plattare form och en större standardavvikelse, dvs att det totala utfallet förväntas variera inom ett större intervall. Standardavvikelsen för en poissonfördelning är för övrigt roten ur väntevärdet. ";
-   var bintext = "Binomialfördelningen beskriver sannolikheter för två ömsesidigt uteslutande utfall och ett känt antal försök. Det gäller till exempel olika typer av spel, där utfallen är vinst och förlust. Varje försök är oberoende: utfallet av ett tärningskast beror inte på det föregående kastet. För att konstruera denna fördelning behövs två komponenter: sannolikheten för att händelsen inträffar (π) och antal försök (n). I verkligheten sker en slumpmässig variation men i det långa loppet kommer antalet positiva utfall att närma sig väntevärdet (µ), som enkelt beräknas genom n * π. Binomialfördelningen är en diskret fördelning, eftersom x-värdena (0..n) utgörs av heltal. Allt eftersom antalet försök växer blir binomialfördelningen mer omständlig att beräkna, och det kan därför vara en god idé att \"approximera\" den med en liknande fördelning. Exemplet till höger illustrerar fördelningen för mellan 4 och 60 försök, då sannolikheten för positivt utfall är en fjärdedel.";
-   var mkGeoms = F3(function (n,
-   pdist,
-   use) {
-      return _L.fromArray([$Plot.geom_vline(_U.replace([["x"
-                                                        ,$Maybe.Just(pdist.mu)]
-                                                       ,["label"
-                                                        ,$Maybe.Just("µ=")]
-                                                       ,["translate"
-                                                        ,$Maybe.Just({ctor: "_Tuple2"
-                                                                     ,_0: 4
-                                                                     ,_1: 0})]],
-                          $Plot.aes))
-                          ,$Plot.geom_vline(_U.replace([["x"
-                                                        ,$Maybe.Just(n)]
-                                                       ,["label"
-                                                        ,$Maybe.Just("n=")]
-                                                       ,["translate"
-                                                        ,$Maybe.Just({ctor: "_Tuple2"
-                                                                     ,_0: 0
-                                                                     ,_1: -8})]
-                                                       ,["colour"
-                                                        ,$Maybe.Just($Color.darkGrey)]],
-                          $Plot.aes))
-                          ,$Plot.geom_hlinerange(_U.replace([["y"
-                                                             ,$Maybe.Just(-4)]
-                                                            ,["limits"
-                                                             ,$Maybe.Just({ctor: "_Tuple2"
-                                                                          ,_0: pdist.mu - pdist.sigma
-                                                                          ,_1: pdist.mu + pdist.sigma})]
-                                                            ,["label"
-                                                             ,$Maybe.Just(A2($Basics._op["++"],
-                                                             "&sigma;=",
-                                                             $Basics.toString(A2($Continuous.dec,
-                                                             2,
-                                                             pdist.sigma))))]
-                                                            ,["translate"
-                                                             ,$Maybe.Just({ctor: "_Tuple2"
-                                                                          ,_0: 4
-                                                                          ,_1: 0})]],
-                          $Plot.aes))
-                          ,$Plot.geom_hlinerange(_U.replace([["y"
-                                                             ,$Maybe.Just(-6)]
-                                                            ,["limits"
-                                                             ,$Maybe.Just({ctor: "_Tuple2"
-                                                                          ,_0: pdist.mu - 2 * pdist.sigma
-                                                                          ,_1: pdist.mu + 2 * pdist.sigma})]
-                                                            ,["label"
-                                                             ,$Maybe.Just("")]
-                                                            ,["translate"
-                                                             ,$Maybe.Just({ctor: "_Tuple2"
-                                                                          ,_0: 4
-                                                                          ,_1: 0})]],
-                          $Plot.aes))
-                          ,$Plot.geom_hlinerange(_U.replace([["y"
-                                                             ,$Maybe.Just(-8)]
-                                                            ,["limits"
-                                                             ,$Maybe.Just({ctor: "_Tuple2"
-                                                                          ,_0: pdist.mu - 3 * pdist.sigma
-                                                                          ,_1: pdist.mu + 3 * pdist.sigma})]
-                                                            ,["label"
-                                                             ,$Maybe.Just("")]
-                                                            ,["translate"
-                                                             ,$Maybe.Just({ctor: "_Tuple2"
-                                                                          ,_0: 4
-                                                                          ,_1: 0})]],
-                          $Plot.aes))
-                          ,$Plot.geom_area(_U.replace([["limits"
-                                                       ,$Maybe.Just({ctor: "_Tuple2"
-                                                                    ,_0: pdist.mu - pdist.sigma
-                                                                    ,_1: pdist.mu + pdist.sigma})]
-                                                      ,["colour"
-                                                       ,$Maybe.Just(use ? $Color.darkGreen : $Color.darkBlue)]
-                                                      ,["visibility"
-                                                       ,$Maybe.Just(0.5)]
-                                                      ,["dynamic"
-                                                       ,$Maybe.Just(false)]],
-                          $Plot.aes))]);
-   });
-   var geomsC = _L.fromArray([$Plot.geom_mario(_U.replace([["dims"
-                                                           ,$Maybe.Just({ctor: "_Tuple2"
-                                                                        ,_0: 50
-                                                                        ,_1: 50})]],
+   var customAes = _U.replace([["radius"
+                               ,$Maybe.Just(2)]
+                              ,["pointsize",$Maybe.Just(9)]
+                              ,["colour"
+                               ,$Maybe.Just($Color.darkBlue)]
+                              ,["visibility",$Maybe.Just(0.6)]
+                              ,["annotate"
+                               ,$Maybe.Just(true)]],
+   $Plot.aes);
+   var geoms3 = _L.fromArray([$Plot.geom_trace_polar(_U.replace([["colour"
+                                                                 ,$Maybe.Just($Color.purple)]
+                                                                ,["dynamic"
+                                                                 ,$Maybe.Just(true)]
+                                                                ,["negate"
+                                                                 ,$Maybe.Just(true)]],
                              $Plot.aes))
-                             ,$Plot.geom_vline(_U.replace([["x"
-                                                           ,$Maybe.Just(20)]
+                             ,$Plot.geom_position_polar(customAes)
+                             ,$Plot.geom_angle(_U.replace([["colour"
+                                                           ,$Maybe.Just($Color.red)]
+                                                          ,["pointsize"
+                                                           ,$Maybe.Just(6)]
+                                                          ,["translate"
+                                                           ,$Maybe.Just({ctor: "_Tuple2"
+                                                                        ,_0: -0.5 * $Basics.pi
+                                                                        ,_1: 0.5})]],
+                             $Plot.aes))
+                             ,$Plot.geom_circle(customAes)
+                             ,$Plot.geom_vline_polar(customAes)
+                             ,$Plot.geom_hline(_U.replace([["y"
+                                                           ,$Maybe.Just(0)]
                                                           ,["annotate"
                                                            ,$Maybe.Just(false)]
                                                           ,["colour"
-                                                           ,$Maybe.Just($Color.darkGreen)]
-                                                          ,["linetype"
-                                                           ,$Maybe.Just($Graphics$Collage.dotted)]],
+                                                           ,$Maybe.Just($Color.darkGrey)]],
                              $Plot.aes))
-                             ,$Plot.geom_curve(_U.replace([["dynamic"
+                             ,$Plot.geom_vline(_U.replace([["x"
+                                                           ,$Maybe.Just($Basics.pi)]
+                                                          ,["annotate"
                                                            ,$Maybe.Just(false)]
                                                           ,["colour"
-                                                           ,$Maybe.Just($Color.grey)]],
-                             $Plot.aes))
-                             ,$Plot.xAxis(_U.replace([["label"
-                                                      ,$Maybe.Just("X")]],
-                             $Plot.aes))
-                             ,$Plot.yAxis(_U.replace([["label"
-                                                      ,$Maybe.Just("%")]],
+                                                           ,$Maybe.Just($Color.darkGrey)]],
                              $Plot.aes))]);
-   var geomsD = _L.fromArray([$Plot.geom_mario(_U.replace([["dims"
-                                                           ,$Maybe.Just({ctor: "_Tuple2"
-                                                                        ,_0: 50
-                                                                        ,_1: 50})]],
+   var geoms1 = _L.fromArray([$Plot.geom_curve(customAes)
+                             ,$Plot.geom_point(customAes)
+                             ,$Plot.geom_trace_polar(_U.replace([["colour"
+                                                                 ,$Maybe.Just($Color.purple)]
+                                                                ,["dynamic"
+                                                                 ,$Maybe.Just(true)]
+                                                                ,["rotate"
+                                                                 ,$Maybe.Just(true)]
+                                                                ,["negate"
+                                                                 ,$Maybe.Just(true)]],
                              $Plot.aes))
+                             ,$Plot.geom_angle(_U.replace([["colour"
+                                                           ,$Maybe.Just($Color.red)]
+                                                          ,["dynamic"
+                                                           ,$Maybe.Just(true)]
+                                                          ,["rotate"
+                                                           ,$Maybe.Just(true)]],
+                             $Plot.aes))
+                             ,$Plot.geom_trace(_U.replace([["colour"
+                                                           ,$Maybe.Just($Color.orange)]],
+                             $Plot.aes))
+                             ,$Plot.geom_vline(_U.replace([["label"
+                                                           ,$Maybe.Just("x = ")]
+                                                          ,["translate"
+                                                           ,$Maybe.Just({ctor: "_Tuple2"
+                                                                        ,_0: 0.5
+                                                                        ,_1: 0})]],
+                             customAes))
                              ,$Plot.xAxis(_U.replace([["label"
                                                       ,$Maybe.Just("X")]],
                              $Plot.aes))
                              ,$Plot.yAxis(_U.replace([["label"
-                                                      ,$Maybe.Just("%")]],
-                             $Plot.aes))
-                             ,$Plot.geom_bar(_U.replace([["colour"
-                                                         ,$Maybe.Just($Color.lightBlue)]
-                                                        ,["dynamic"
-                                                         ,$Maybe.Just(false)]],
+                                                      ,$Maybe.Just("Y")]],
                              $Plot.aes))]);
    var render = F2(function (m,w) {
       return function () {
-         var p = 0.25;
+         var mouseX = $Basics.toFloat($Basics.fst(m));
+         var xpos = A2($Continuous.normalize,
+         {ctor: "_Tuple2"
+         ,_0: $Basics.toFloat($Basics.fst(w))
+         ,_1: 0},
+         mouseX);
          var mouseY = $Basics.toFloat($Basics.snd(m));
          var ypos = A2($Continuous.normalize,
          {ctor: "_Tuple2"
-         ,_0: 0.95 * function ($) {
+         ,_0: 0.9 * function ($) {
             return $Basics.toFloat($Basics.snd($));
          }(w)
-         ,_1: 0.1 * function ($) {
+         ,_1: 0.2 * function ($) {
             return $Basics.toFloat($Basics.snd($));
          }(w)},
          mouseY);
          var n$ = function ($) {
             return $Basics.toFloat($Basics.floor($));
-         }(60 * ypos);
+         }(4 * ypos);
          var n = _U.cmp(n$,
-         4) < 0 ? 4 : _U.cmp(n$,
-         60) > 0 ? 60 : n$;
-         var bin = A2($Discrete.binom,
-         n,
-         p);
-         var bindist = A2($Plot.discrete,
-         function ($) {
-            return function (n) {
-               return n * 100;
-            }(bin.pdf($));
+         0) < 0 ? 0 : _U.cmp(n$,
+         4) > 0 ? 4 : n$;
+         var d1 = A3($Plot.distribution,
+         function (x) {
+            return $Basics.cos(n * x);
          },
-         {ctor: "_Tuple2",_0: 0,_1: 60});
-         var bindist2 = A2($Plot.discrete,
-         bin.pdf,
-         {ctor: "_Tuple2",_0: 0,_1: 60});
-         var mu = A2($Continuous.dec,
-         2,
-         bin.mu);
-         var potitle = _L.fromArray([$Plot.title(_U.replace([["label"
-                                                             ,$Maybe.Just(A2($Basics._op["++"],
-                                                             "Po(µ=",
-                                                             A2($Basics._op["++"],
-                                                             $Basics.toString(mu),
-                                                             ")")))]],
-         $Plot.aes))]);
-         var s = A2($Continuous.dec,
-         2,
-         bin.sigma);
-         var ndtitle = _L.fromArray([$Plot.title(_U.replace([["label"
-                                                             ,$Maybe.Just(A2($Basics._op["++"],
-                                                             "N(µ=",
-                                                             A2($Basics._op["++"],
-                                                             $Basics.toString(mu),
-                                                             A2($Basics._op["++"],
-                                                             ",&sigma;=",
-                                                             A2($Basics._op["++"],
-                                                             $Basics.toString(s),
-                                                             ")")))))]],
-         $Plot.aes))]);
-         var ndintegral = _L.fromArray([$Plot.annotate_integral(_U.replace([["translate"
-                                                                            ,$Maybe.Just({ctor: "_Tuple2"
-                                                                                         ,_0: 0.8
-                                                                                         ,_1: 0.6})]
-                                                                           ,["limits"
-                                                                            ,$Maybe.Just({ctor: "_Tuple2"
-                                                                                         ,_0: mu - s
-                                                                                         ,_1: mu + s})]],
-         $Plot.aes))]);
-         var po = $Discrete.poisson(bin.mu);
-         var podist = A2($Plot.discrete,
-         function ($) {
-            return function (n) {
-               return n * 100;
-            }(po.pdf($));
-         },
-         {ctor: "_Tuple2",_0: 0,_1: 60});
-         var nd = A2($Continuous.normal,
-         bin.mu,
-         bin.sigma);
-         var nddist = A3($Plot.distribution,
-         function ($) {
-            return function (n) {
-               return n * 100;
-            }(nd.pdf($));
-         },
-         {ctor: "_Tuple2",_0: 0,_1: 60},
+         {ctor: "_Tuple2"
+         ,_0: 0
+         ,_1: 2 * $Basics.pi},
          200);
-         var bingeoms = A3(mkGeoms,
-         n,
-         bin,
-         true);
-         var bintitle = _L.fromArray([$Plot.title(_U.replace([["label"
-                                                              ,$Maybe.Just(A2($Basics._op["++"],
-                                                              "Bin(π=0.25,n=",
-                                                              A2($Basics._op["++"],
-                                                              $Basics.toString(n),
-                                                              ")")))]],
+         var plotTitle = _L.fromArray([$Plot.title(_U.replace([["label"
+                                                               ,$Maybe.Just(A2($Basics._op["++"],
+                                                               "y = cos",
+                                                               A2($Basics._op["++"],
+                                                               $Basics.toString(n),
+                                                               "x")))]],
          $Plot.aes))]);
-         var pogeoms = A3(mkGeoms,
-         n,
-         po,
-         false);
-         var ndgeoms = A3(mkGeoms,
-         n,
-         nd,
-         _U.cmp(n,20) > -1);
          return A2($Graphics$Element.flow,
          $Graphics$Element.down,
-         _L.fromArray([A2($Html.toElement,
-                      1000,
-                      50)(A2($Html.h1,
-                      _L.fromArray([$Html$Attributes.align("center")]),
-                      _L.fromArray([$Html.text("Binomialfördelningen och dess vänner")])))
-                      ,$Graphics$Element.flow($Graphics$Element.right)(_L.fromArray([A2($Html.toElement,
-                                                                                    500,
-                                                                                    300)($Html.text(bintext))
+         _L.fromArray([A5($Plot.plot,
+                      {ctor: "_Tuple2"
+                      ,_0: 1200
+                      ,_1: 300},
+                      d1,
+                      A2($Basics._op["++"],
+                      geoms1,
+                      plotTitle),
+                      m,
+                      w)
+                      ,$Graphics$Element.flow($Graphics$Element.right)(_L.fromArray([A2($Graphics$Element.spacer,
+                                                                                    450,
+                                                                                    300)
                                                                                     ,A5($Plot.plot,
                                                                                     {ctor: "_Tuple2"
-                                                                                    ,_0: 600
+                                                                                    ,_0: 300
                                                                                     ,_1: 300},
-                                                                                    bindist,
-                                                                                    A2($Basics._op["++"],
-                                                                                    geomsD,
-                                                                                    A2($Basics._op["++"],
-                                                                                    bingeoms,
-                                                                                    bintitle)),
+                                                                                    d1,
+                                                                                    geoms3,
                                                                                     m,
-                                                                                    w)]))
-                      ,$Graphics$Element.flow($Graphics$Element.right)(_L.fromArray([A2($Html.toElement,
-                                                                                    500,
-                                                                                    300)($Html.text(ndtext))
-                                                                                    ,$Graphics$Element.flow($Graphics$Element.outward)(_L.fromArray([A5($Plot.plot,
-                                                                                                                                                    {ctor: "_Tuple2"
-                                                                                                                                                    ,_0: 600
-                                                                                                                                                    ,_1: 300},
-                                                                                                                                                    nddist,
-                                                                                                                                                    A2($Basics._op["++"],
-                                                                                                                                                    geomsC,
-                                                                                                                                                    A2($Basics._op["++"],
-                                                                                                                                                    ndgeoms,
-                                                                                                                                                    ndtitle)),
-                                                                                                                                                    m,
-                                                                                                                                                    w)
-                                                                                                                                                    ,A5($Plot.plot,
-                                                                                                                                                    {ctor: "_Tuple2"
-                                                                                                                                                    ,_0: 600
-                                                                                                                                                    ,_1: 300},
-                                                                                                                                                    nddist,
-                                                                                                                                                    ndintegral,
-                                                                                                                                                    m,
-                                                                                                                                                    w)]))]))
-                      ,$Graphics$Element.flow($Graphics$Element.right)(_L.fromArray([A2($Html.toElement,
-                                                                                    500,
-                                                                                    300)($Html.text(potext))
-                                                                                    ,A5($Plot.plot,
-                                                                                    {ctor: "_Tuple2"
-                                                                                    ,_0: 600
-                                                                                    ,_1: 300},
-                                                                                    podist,
-                                                                                    A2($Basics._op["++"],
-                                                                                    geomsD,
-                                                                                    A2($Basics._op["++"],
-                                                                                    pogeoms,
-                                                                                    potitle)),
-                                                                                    m,
-                                                                                    w)]))]));
+                                                                                    w)
+                                                                                    ,A2($Graphics$Element.spacer,
+                                                                                    450,
+                                                                                    300)]))]));
       }();
    });
    var main = A3($Signal.map2,
    render,
    $Mouse.position,
    $Window.dimensions);
+   var nsteps = 400;
+   var $const = 4;
    _elm.Main.values = {_op: _op
+                      ,$const: $const
+                      ,nsteps: nsteps
+                      ,geoms1: geoms1
+                      ,customAes: customAes
                       ,render: render
                       ,main: main
-                      ,geomsD: geomsD
-                      ,geomsC: geomsC
-                      ,mkGeoms: mkGeoms
-                      ,bintext: bintext
-                      ,potext: potext
-                      ,ndtext: ndtext};
+                      ,geoms3: geoms3};
    return _elm.Main.values;
 };Elm.Maybe = Elm.Maybe || {};
 Elm.Maybe.make = function (_elm) {
