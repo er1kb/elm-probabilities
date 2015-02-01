@@ -24,7 +24,7 @@ render m w =
              | n' > 60 -> 60
              | otherwise -> n'
       p = 0.25
-      ylim = (-40,40) 
+      ylim = (-8,50) 
       bin = D.binom n p
       bindist = discrete ((\n -> n * 100) << (bin.pdf)) (0,60) ylim
       bindist2 = discrete bin.pdf (0,60) ylim
@@ -41,48 +41,52 @@ render m w =
       ndgeoms = mkGeoms n nd (n >= 20)
       ndtitle = [title { aes | label <- Just ("N(µ=" ++ toString mu  
                                            ++ ",&sigma;=" ++ toString s ++ ")") } ]
-      ndintegral = [annotate_integral { aes | translate <- Just (0.8,0.6), limits <- Just (mu-s,mu+s) }] 
+      ndintegral = [annotate_integral { aes | translate <- Just (0.8,0.5), limits <- Just (mu-s,mu+s) }] 
    in
 
       flow down [ 
          Html.toElement 1000 50 <| Html.h1 [HA.align "center"] [Html.text "Binomialfördelningen och dess vänner"] 
                 ,
          flow right <|  
-            [Html.toElement 500 300 <| Html.text bintext,
-            plot (600,300) bindist (geomsD ++ bingeoms ++ bintitle) m w], 
+            [Html.toElement 600 250 <| Html.text bintext,
+            plot (600,250) bindist (geomsD ++ bingeoms ++ bintitle) m w], 
 
          flow right <| 
-            [Html.toElement 500 300 <| Html.text ndtext,
+            [Html.toElement 600 250 <| Html.text ndtext,
                flow outward <| 
-               [plot (600,300) nddist (geomsC ++ ndgeoms ++ ndtitle) m w,
-               plot (600,300) nddist ndintegral m w] ],
+               [plot (600,250) nddist (geomsC ++ ndgeoms ++ ndtitle) m w,
+               plot (600,250) nddist ndintegral m w] ],
 
          flow right <| 
-            [Html.toElement 500 300 <| Html.text potext,
-            plot (600,300) podist (geomsD ++ pogeoms ++ potitle) m w
+            [Html.toElement 600 250 <| Html.text potext,
+            plot (600,250) podist (geomsD ++ pogeoms ++ potitle) m w
 
             ]
          ]
 
+
 main = Signal.map2 render Mouse.position Window.dimensions
 
 geomsD = [  
-          geom_mario { aes | dims <- Just (50,50) },
+          --geom_image { aes | dims <- Just (50,50), label <- Just "https://31.media.tumblr.com/b23ef59e7838d323c281de41a31d672a/tumblr_inline_n0rlcbgFBe1s0subn.gif", translate <- Just (0,25), x <- Just 57.5, y <- Just 0 },
+          background { aes | colour <- Just lightBlue, visibility <- Just 0.4 },
+          geom_image { aes | dims <- Just (50,50), label <- Just "http://elm-lang.org/imgs/mario/walk/right.gif", translate <- Just (0,20) },
           --geom_vline { aes | x <- Just 15, annotate <- Just False },
-          --geom_points { aes | dynamic <- Just False, pointsize <- Just 3, colour <- Just darkRed },
-          xAxis { aes | label <- Just "X", tickspacing <- Just 10 },  
-          yAxis { aes | label <- Just "%", tickspacing <- Just 20 },
+          geom_point { aes | dynamic <- Just False, pointsize <- Just 3, colour <- Just darkRed },
+          xAxis { aes | label <- Just "Antal försök", tickspacing <- Just 10 },  
+          yAxis { aes | label <- Just "Sannolikhet %", tickspacing <- Just 10, rotate <- Just True },
           geom_bar { aes | colour <- Just lightBlue, dynamic <- Just False }]
 
 geomsC = [  
-          geom_mario { aes | dims <- Just (50,50) },
+          background { aes | colour <- Just lightBlue, visibility <- Just 0.4 },
+          geom_image { aes | dims <- Just (50,50), label <- Just "http://elm-lang.org/imgs/mario/walk/right.gif", translate <- Just (0,20) },
           --geom_vline { aes | x <- Just 15, annotate <- Just False },
           geom_vline { aes | x <- Just 20, annotate <- Just False, colour <- Just darkGreen, linetype <- Just GC.dotted },
           --geom_points { aes | dynamic <- Just False, pointsize <- Just 3, colour <- Just darkRed },
           geom_curve { aes | dynamic <- Just False, colour <- Just grey },
-          xAxis { aes | label <- Just "X", tickspacing <- Just 10 },  
-          yAxis { aes | label <- Just "%", tickspacing <- Just 20 }
-          --geom_bar { aes | colour <- Just lightBlue, dynamic <- Just False }  
+          xAxis { aes | label <- Just "Antal försök", tickspacing <- Just 10 },  
+          yAxis { aes | label <- Just "Sannolikhet %", tickspacing <- Just 10, rotate <- Just True }
+          --geom_tangent { aes | translate <- Just (57,5) }
           ]
 
 mkGeoms n pdist use = [ 
@@ -91,7 +95,8 @@ mkGeoms n pdist use = [
    geom_hlinerange { aes | y <- Just (-4), limits <- Just (pdist.mu - pdist.sigma, pdist.mu + pdist.sigma), label <- Just ("&sigma;=" ++ (toString <| C.dec 2 pdist.sigma)), translate <- Just (4,0) },  
    geom_hlinerange { aes | y <- Just (-6), limits <- Just (pdist.mu - 2*pdist.sigma, pdist.mu + 2*pdist.sigma), label <- Just "", translate <- Just (4,0) },  
    geom_hlinerange { aes | y <- Just (-8), limits <- Just (pdist.mu - 3*pdist.sigma, pdist.mu + 3*pdist.sigma), label <- Just "", translate <- Just (4,0) },  
-   geom_area { aes | limits <- Just (pdist.mu - pdist.sigma, pdist.mu + pdist.sigma), colour <- Just (if use then darkGreen else darkBlue), visibility <- Just 0.5, dynamic <- Just False } ] 
+   geom_area { aes | limits <- Just (pdist.mu - pdist.sigma, pdist.mu + pdist.sigma), colour <- Just (if use then darkGreen else darkBlue), visibility <- Just 0.5, dynamic <- Just False }
+   ] 
 
 bintext = "Binomialfördelningen beskriver sannolikheter för två ömsesidigt uteslutande utfall och ett känt antal försök. Det gäller till exempel olika typer av spel, där utfallen är vinst och förlust. Varje försök är oberoende: utfallet av ett tärningskast beror inte på det föregående kastet. För att konstruera denna fördelning behövs två komponenter: sannolikheten för att händelsen inträffar (π) och antal försök (n). I verkligheten sker en slumpmässig variation men i det långa loppet kommer antalet positiva utfall att närma sig väntevärdet (µ), som enkelt beräknas genom n * π. Binomialfördelningen är en diskret fördelning, eftersom x-värdena (0..n) utgörs av heltal. Allt eftersom antalet försök växer blir binomialfördelningen mer omständlig att beräkna, och det kan därför vara en god idé att \"approximera\" den med en liknande fördelning. Exemplet till höger illustrerar fördelningen för mellan 4 och 60 försök, då sannolikheten för positivt utfall är en fjärdedel."
 
