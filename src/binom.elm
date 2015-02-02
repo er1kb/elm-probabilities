@@ -24,12 +24,13 @@ render m w =
              | n' > 60 -> 60
              | otherwise -> n'
       p = 0.25
-      ylim = (-8,50) 
+      --p = C.dec 3 (1/6)
+      ylim = (-9,50) 
       bin = D.binom n p
       bindist = discrete ((\n -> n * 100) << (bin.pdf)) (0,60) ylim
       bindist2 = discrete bin.pdf (0,60) ylim
       bingeoms = mkGeoms n bin True
-      bintitle = [title { aes | label <- Just ("Bin(π=0.25,n=" ++ toString n ++ ")") }] 
+      bintitle = [title { aes | label <- Just ("Bin(π=" ++ toString p ++ ",n=" ++ toString n ++ ")") }] 
       mu = C.dec 2 bin.mu
       s = C.dec 2 bin.sigma
       po = D.poisson bin.mu
@@ -72,7 +73,7 @@ geomsD = [
           background { aes | colour <- Just lightBlue, visibility <- Just 0.4 },
           geom_image { aes | dims <- Just (50,50), label <- Just "http://elm-lang.org/imgs/mario/walk/right.gif", translate <- Just (0,20) },
           --geom_vline { aes | x <- Just 15, annotate <- Just False },
-          geom_point { aes | dynamic <- Just False, pointsize <- Just 3, colour <- Just darkRed },
+          --geom_points { aes | dynamic <- Just False, pointsize <- Just 3, colour <- Just darkRed },
           xAxis { aes | label <- Just "Antal försök", tickspacing <- Just 10 },  
           yAxis { aes | label <- Just "Sannolikhet %", tickspacing <- Just 10, rotate <- Just True },
           geom_bar { aes | colour <- Just lightBlue, dynamic <- Just False }]
@@ -92,9 +93,9 @@ geomsC = [
 mkGeoms n pdist use = [ 
    geom_vline { aes | x <- Just pdist.mu, label <- Just "µ=", translate <- Just (4,0) },  
    geom_vline { aes | x <- Just n, label <- Just "n=", translate <- Just (0,-8), colour <- Just darkGrey },  
-   geom_hlinerange { aes | y <- Just (-4), limits <- Just (pdist.mu - pdist.sigma, pdist.mu + pdist.sigma), label <- Just ("&sigma;=" ++ (toString <| C.dec 2 pdist.sigma)), translate <- Just (4,0) },  
-   geom_hlinerange { aes | y <- Just (-6), limits <- Just (pdist.mu - 2*pdist.sigma, pdist.mu + 2*pdist.sigma), label <- Just "", translate <- Just (4,0) },  
-   geom_hlinerange { aes | y <- Just (-8), limits <- Just (pdist.mu - 3*pdist.sigma, pdist.mu + 3*pdist.sigma), label <- Just "", translate <- Just (4,0) },  
+   geom_hlinerange { aes | y <- Just (-3), limits <- Just (pdist.mu - pdist.sigma, pdist.mu + pdist.sigma), label <- Just ("&sigma;=" ++ (toString <| C.dec 2 pdist.sigma)), translate <- Just (6,0) },  
+   geom_hlinerange { aes | y <- Just (-5), limits <- Just (pdist.mu - 2*pdist.sigma, pdist.mu + 2*pdist.sigma), label <- Just "", translate <- Just (4,0) },  
+   geom_hlinerange { aes | y <- Just (-7), limits <- Just (pdist.mu - 3*pdist.sigma, pdist.mu + 3*pdist.sigma), label <- Just "", translate <- Just (4,0) },  
    geom_area { aes | limits <- Just (pdist.mu - pdist.sigma, pdist.mu + pdist.sigma), colour <- Just (if use then darkGreen else darkBlue), visibility <- Just 0.5, dynamic <- Just False }
    ] 
 

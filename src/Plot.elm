@@ -173,7 +173,9 @@ geom_step aes' defaults d dims =
       linetype = lookup .linetype aes' defaults
       x = lookup .x aes' defaults
       dynamic = lookup .dynamic aes' defaults
-      nsteps = if dynamic then (toFloat dims.nbins) else (toFloat d.steps) 
+      nsteps' = lookup .nsteps aes' defaults
+      nsteps = if dynamic then (toFloat nsteps') else (toFloat d.steps) 
+      --nsteps = if dynamic then (toFloat dims.nbins) else (toFloat d.steps) 
       (dx,steps') = if d.discrete then (1,d.xs) else (C.interpolate d.xDomain nsteps)
       lastx = List.head <| List.reverse steps'
       points = List.concatMap (\x -> [(x, d.f x),(if (x < lastx) then x+dx else x, d.f x)]) steps'
@@ -224,7 +226,9 @@ geom_points aes' defaults d dims =
       pointsize = lookup .pointsize aes' defaults
       visibility = lookup .visibility aes' defaults
       dynamic = lookup .dynamic aes' defaults
-      nsteps = if dynamic then (toFloat dims.nbins) else (toFloat d.steps) 
+      nsteps' = lookup .nsteps aes' defaults
+      nsteps = if dynamic then (toFloat nsteps') else (toFloat d.steps) 
+      --nsteps = if dynamic then (toFloat dims.nbins) else (toFloat d.steps) 
       (dx,steps) = if d.discrete then (1,d.xs) else (C.interpolate d.xDomain nsteps)
       points = List.map (point (xm,ym) (d.xScale,d.yScale) d.f) steps
    in
@@ -255,7 +259,9 @@ geom_bar aes' defaults d dims =
       limits' = lookup .limits aes' defaults
       limits = if d.discrete then d.xDomain else limits'
       dynamic = lookup .dynamic aes' defaults
-      nsteps = if dynamic then (toFloat dims.nbins) else (toFloat d.steps) 
+      nsteps' = lookup .nsteps aes' defaults
+      nsteps = if dynamic then (toFloat nsteps') else (toFloat d.steps) 
+      --nsteps = if dynamic then (toFloat dims.nbins) else (toFloat d.steps) 
       (dx',steps) = if d.discrete then (1,d.xs) else (C.interpolate d.xDomain nsteps)
       dx = dx' / 2
       --xs = C.bins <| List.map (\x -> x - dx) steps
@@ -310,8 +316,9 @@ geom_trapezoid aes' defaults d dims =
       visibility = lookup .visibility aes' defaults
       baseline = lookup .fun aes' defaults
       limits = lookup .limits aes' defaults
-      (dx,steps) = C.interpolate limits (toFloat dims.nbins)
-      --(dx,steps) = C.interpolate d.xDomain (toFloat dims.nbins)
+      nsteps = lookup .nsteps aes' defaults
+      (dx,steps) = C.interpolate limits (toFloat nsteps)
+      --(dx,steps) = C.interpolate limits (toFloat dims.nbins)
       xs = C.bins steps
       points = List.map (trapezoid (xm,ym) (d.xScale,d.yScale) d.f baseline) xs 
    in
@@ -351,13 +358,15 @@ geom_area aes' defaults d dims =
 geom_curve : Aes -> Aes -> Distribution -> Dimensions -> Geom
 geom_curve aes' defaults d dims = 
    let
+      xm = dims.xm
+      ym = dims.ym
       linetype = lookup .linetype aes' defaults
       colour = lookup .colour aes' defaults
       visibility = lookup .visibility aes' defaults
       linethickness = lookup .linethickness aes' defaults -- not actually used yet
       --(dx,steps) = C.interpolate d.xDomain (toFloat d.steps)
       (dx,steps) = if d.discrete then (1,d.xs) else (C.interpolate d.xDomain (toFloat d.steps))
-      ys = List.map (\(x,y) -> (dims.xm * (d.xScale x), dims.ym * (d.yScale y))) <| List.map2 (,) steps (List.map d.f steps)
+      ys = List.map (\(x,y) -> (xm * (d.xScale x), ym * (d.yScale y))) <| List.map2 (,) steps (List.map d.f steps)
    in
       GC.alpha visibility <| GC.traced (linetype colour) <| GC.path ys
 
@@ -908,11 +917,12 @@ plot (plotWidth,plotHeight) d geoms m w =
                                 limits <- Just d.xDomain,
                                 x <- Just xpos,  
                                 y <- Just ypos, 
-                                theta <- Just (pi / 4)
+                                theta <- Just (pi / 4),
+                                nsteps <- Just nsteps
                              }
       windowScaleX = C.normalize (0,toFloat input.width)    --- 
       windowScaleY = C.normalize (0,toFloat input.height)   ---
-      nbins = round <| (toFloat input.x) / 4   --- 
+      nsteps = round <| (toFloat input.x) / 4   --- 
       wpos = (windowScaleX (toFloat input.x), windowScaleY (toFloat input.y))   --- 
       xpos = (fst d.xDomain) + d.xExtent * (fst wpos)
       ypos = if d.discrete then (d.f << (toFloat << round)) xpos else d.f xpos
@@ -920,19 +930,11 @@ plot (plotWidth,plotHeight) d geoms m w =
       ymargin = (toFloat plotHeight) * 0.2
       xoffset = (toFloat plotWidth)/2 - xmargin
       yoffset = (toFloat plotHeight)/2 - ymargin
-      --innerWidth = (toFloat plotWidth) - xmargin
-      --innerHeight = (toFloat plotHeight) - ymargin
       ymultiplier = (toFloat plotHeight) - (2 * ymargin)
       xmultiplier = (toFloat plotWidth) - (2 * xmargin)
 
       dims : Dimensions
       dims = {
-         --windowScaleX = windowScaleX,
-         --windowScaleY = windowScaleY,
-         nbins = nbins,
-         --wpos = wpos,
-         --xmargin = xmargin,  
-         --ymargin = ymargin, 
          margins = (xmargin,ymargin),
          plotWidth = (toFloat plotWidth),
          plotHeight = (toFloat plotHeight),
@@ -961,7 +963,6 @@ background aes' defaults d dims =
    in
       GC.group  
       [ 
-         --GC.move (dims.xoffset, dims.yoffset) <| GC.group  
          GC.move (xm * 0.5, ym * 0.5) <| GC.group  
          <| [GC.alpha visibility <| GC.filled colour <| GC.rect dims.plotWidth dims.plotHeight,
             GC.filled colour2 <| GC.rect xm ym],  
@@ -998,16 +999,14 @@ rename xscale/yscale --> fromX/fromY
 move geoms to separate file
 Colouring positive and negative integrals independently?
 How to annotate lineranges? 
-Input time?
 Implement grid?
 Some kind of theme object for background colours, fonts, etc.?
-Decrease right margin or make use of it?
+Decrease right margin or make better use of it?
 Linestyles and textstyles?! 
 Improve axes: number of ticks etc.
-Factor out x and y labels from axes, to be able to move them independently?
+Factor out x and y labels from axes, to be able to move/rotate them independently?
 geom_abline_polar?
-Make all annotation positions absolute? 
-remove "dims", put steps and everything else in aes to simplify
+Annotation position given in the scale of x,y or percent of plot height,width or both?
 --}
 
 
@@ -1023,12 +1022,6 @@ lookup key child parent = let
                                 (Nothing, Just p) -> p
 
 type alias Dimensions = {
-         --windowScaleX : (Float -> Float),
-         --windowScaleY : (Float -> Float),
-         nbins : Int,
-         --wpos : (Float,Float),
-         --xmargin : Float,
-         --ymargin : Float,
          margins : (Float,Float),
          plotWidth : Float,
          plotHeight : Float,
@@ -1058,7 +1051,8 @@ type alias Aes = { visibility:Maybe Float,
                    negate: Maybe Bool,
                    fit: Maybe Bool,
                    rotate: Maybe Bool,
-                   tickspacing: Maybe Int
+                   tickspacing: Maybe Int, 
+                   nsteps: Maybe Int
                 }
 
 aes : Aes
@@ -1084,7 +1078,8 @@ aes = { visibility = Nothing,
         negate = Nothing,
         fit = Nothing,
         rotate = Nothing,
-        tickspacing = Nothing
+        tickspacing = Nothing,
+        nsteps = Nothing
      }
 
 
@@ -1111,7 +1106,8 @@ aesDefault = { visibility = Just 1,
                negate = Just False,
                fit = Just True,
                rotate = Just False,
-               tickspacing = Just 5 
+               tickspacing = Just 5,
+               nsteps = Just 10
                }
 
 roundf = toFloat << round

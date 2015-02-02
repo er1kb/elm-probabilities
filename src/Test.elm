@@ -58,6 +58,7 @@ geoms1 = [
          geom_hline { aes | annotate <- Just False, colour <- Just darkGrey, y <- Just 0 },
          geom_hline { aes | annotate <- Just False, colour <- Just darkGrey, y <- Just 1 },
          geom_hline { aes | annotate <- Just False, colour <- Just darkGrey, y <- Just -1 },
+         geom_bar { aes | fun <- Just (\x -> sin (4*x)), colour <- Just darkBlue },
          xAxis { aes | label <- Just "X" },  
          yAxis { aes | label <- Just "Y" }
          ]
@@ -126,7 +127,7 @@ render m w =
       n = if | n' < 0 -> 0
              | n' > 400 -> 400 
              | otherwise -> n'
-      const = n * 0.01
+      const = C.dec 2 <| n * 0.01
       --bin = D.pdfbinom n 0.25
       --bin = D.binom n 0.25
       --d3 = discrete ((\n -> n * 100) << (bin.pdf)) (0,60)
