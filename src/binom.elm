@@ -10,8 +10,8 @@ import Mouse
 import List
 import Html
 import Html.Attributes as HA
-import Continuous as C
-import Discrete as D
+import Statistics.Continuous as C
+import Statistics.Discrete as D
 
 render m w =  
    let
@@ -38,7 +38,7 @@ render m w =
       pogeoms = mkGeoms n po False
       potitle = [title { aes | label <- Just ("Po(µ=" ++ toString mu ++ ")") } ]
       nd = C.normal bin.mu bin.sigma
-      nddist = distribution ((\n -> n * 100) << (nd.pdf)) (0,60) ylim 200
+      nddist = continuous ((\n -> n * 100) << (nd.pdf)) (0,60) ylim 200
       ndgeoms = mkGeoms n nd (n >= 20)
       ndtitle = [title { aes | label <- Just ("N(µ=" ++ toString mu  
                                            ++ ",&sigma;=" ++ toString s ++ ")") } ]
@@ -75,7 +75,7 @@ geomsD = [
           --geom_vline { aes | x <- Just 15, annotate <- Just False },
           --geom_points { aes | dynamic <- Just False, pointsize <- Just 3, colour <- Just darkRed },
           xAxis { aes | label <- Just "Antal försök", tickspacing <- Just 10 },  
-          yAxis { aes | label <- Just "Sannolikhet %", tickspacing <- Just 10, rotate <- Just True },
+          yAxis { aes | label <- Just "Sannolikhet %", tickspacing <- Just 10, revolve <- Just True },
           geom_bar { aes | colour <- Just lightBlue, dynamic <- Just False }]
 
 geomsC = [  
@@ -86,7 +86,7 @@ geomsC = [
           --geom_points { aes | dynamic <- Just False, pointsize <- Just 3, colour <- Just darkRed },
           geom_curve { aes | dynamic <- Just False, colour <- Just grey },
           xAxis { aes | label <- Just "Antal försök", tickspacing <- Just 10 },  
-          yAxis { aes | label <- Just "Sannolikhet %", tickspacing <- Just 10, rotate <- Just True }
+          yAxis { aes | label <- Just "Sannolikhet %", tickspacing <- Just 10, revolve <- Just True }
           --geom_tangent { aes | translate <- Just (57,5) }
           ]
 
