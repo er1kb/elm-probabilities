@@ -1,4 +1,4 @@
-module Continuous (uniform, normal, standardnormal, exponential, pdfuniform, pdfnormal, pdfstandardnormal, pdfexponential, cdfuniform, cdfnormal, cdfstandardnormal, cdfexponential, area, bins, interpolate, integrate, slope, tangent, normalize, dec, zscore, fib, factorial) where
+module Statistics.Continuous (uniform, normal, standardnormal, exponential, pdfuniform, pdfnormal, pdfstandardnormal, pdfexponential, cdfuniform, cdfnormal, cdfstandardnormal, cdfexponential, area, bins, interpolate, integrate, slope, tangent, normalize, dec, zscore, fib, factorial, mean, variance, stddev, linreg) where
 
 {-| Functions for calculating values of common continuous probability distributions. 
 
@@ -13,7 +13,6 @@ module Continuous (uniform, normal, standardnormal, exponential, pdfuniform, pdf
 
 -}
 
-import Debug
 import List
 
 
@@ -219,37 +218,48 @@ fib n = if | n > 19 -> (-1)
 
 
 
-{- HARDCORE TESTING ROUTINES BELOW :-) -}
+--correlate xs ys
+--stddev
+--mean
 
---main = asText <| pdfnormal 0 1 0
---main = asText <| zip [1,2,3] <| map (dec 3 << cdfnormal 0 1 100) [(-1,1),(-2,2),(-3,3)]
---main = asText <| map (dec 3 << (\x -> cdfnormal 0 1 100 (-x,x))) [1,2,3]
---main = asText <| map (dec 3 << (\x -> cdfnormal 0 1 x (-1,1))) [2,4,6,10,100]
---main = asText <| chunks [1,2,3] 
---main = asText <| map (\(a,b) -> (dec 3 a, dec 3 b)) <| integrate (-1,1) 10 (pdfnormal 0 1)
---main = asText <| integrate (-1,1) 10 (pdfnormal 0 1)
---main = asText <| cdfnormal 0 1 10 (-1,1)
---main = asText <| zip [1,2,3] <| map (dec 3 << cdfnormal 0 1 100) [(-1,1),(-2,2),(-3,3)]
---main = asText <| cdfexponential 0.5 10 (0,2) 
---main = asText <| cdfstandardnormal 100 (-1,1)
---main = asText <| cdfexponential (1/20) 100 (0,5)
---main = asText <| 1 - cdfexponential (1/20) 100 (0,40)
---main = asText <| integrate (25,30) 100 <| pdfuniform (0,30)
---main = asText <| normalize (0,8) 4
---main = asText <| cdfuniform
---main = asText <| dec 3 <| integrate (0,1) 100 (\x -> e^x)
---main = asText <| dec 3 <| integrate (1,pi) 100 (\x -> 1/x)
---main = asText <| slope 0.01 2 (\x -> 1/x)
---main = asText <| tangent 0.01 2 (\x -> 1/x)
---meh = normal 100 10
---main = asText <| (dec 3 << meh.p) (90,110)
---main = asText <| meh.f 80
---meh = standardnormal
---main = asText <| (dec 3 << meh.p) (-1,1)
---meh = exponential 0.5 
---main = asText <| (dec 3 << meh.p) (0,3)
+mean xs = (List.sum xs) / (toFloat <| List.length xs)
 
---integrating a volume of revolution around the x axis -->
---main = asText <| dec 2 <| integrate (1,3) 100 (\x -> pi * (1 / sqrt x)^2)
+variance xs =  
+   let
+       n = List.length xs
+       meanx = mean xs
+       sqDev = List.sum <| List.map (\x -> (x - meanx)^2) xs
+   in
+       sqDev / (toFloat n - 1)
 
---main = asText <| dec 2 <| integrate (-1, 1) 100 pdfstandardnormal
+stddev xs = sqrt <| variance xs 
+
+
+type alias LinearRegression = {
+   a : Float,
+   b : Float,
+   f : (Float -> Float),
+   residuals : List Float
+}
+
+--linreg : List (Float,Float) -> (Float -> Float)
+linreg : List (Float,Float) -> LinearRegression
+linreg pairs =  
+   let
+       n = List.length pairs
+       xs = List.map fst pairs
+       ys = List.map snd pairs
+       meanx = mean xs
+       meany = mean ys
+       sdx = stddev xs
+       sdy = stddev ys
+       xyDeviations = List.sum <| List.map (\(x,y) -> (x - meanx) * (y - meany)) pairs
+       r = xyDeviations / ((toFloat n - 1) * sdx * sdy)
+       b = r * (sdy / sdx)
+       a = meany - (b * meanx) 
+       f = (\x -> a + b * x)
+       residuals = List.map (\(x,y) -> dec 2 <| y - (f x)) pairs
+   in
+       { a = dec 4 a, b = dec 4 b, f = f, residuals = residuals }
+
+-- Slope comes out wrong! 
