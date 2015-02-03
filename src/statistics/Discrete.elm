@@ -1,4 +1,4 @@
-module Statistics.Discrete (combinations, permutations, binom, hyper, poisson, pdfbinom, pdfhyper, pdfpoisson, cdfbinom, cdfhyper, cdfpoisson) where
+module Statistics.Discrete (combinations, permutations, binom, hyper, poisson, pdfbinom, pdfhyper, pdfpoisson, cdfbinom, cdfhyper, cdfpoisson, factorial, fib) where
 --
 {-| Functions for calculating values of common discrete probability distributions. 
 
@@ -13,6 +13,9 @@ module Statistics.Discrete (combinations, permutations, binom, hyper, poisson, p
 
 # Cumulative density functions
 @docs cdfbinom, cdfhyper, cdfpoisson
+
+# Helpers
+@docs factorial, fib
 
 -}
 
@@ -40,8 +43,8 @@ permutations : number -> number -> number
 permutations n k = if | k > n -> 0
                       | otherwise -> (factorial n) / factorial (n - k)
 
-type alias Binom = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:List Float }
---type Binom d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:[Float] }
+--type alias Binom = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:List Float }
+type alias Binom = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:(Float -> Float) }
 
 {-| Constructs a new binomial distribution with n tries and prob probability of "success" on each try. -}
 binom : number -> number -> Binom
@@ -53,8 +56,8 @@ binom n prob = { name="binomial",
                  cdf=cdfbinom n prob }
 
 
-type alias Hyper = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:List Float }
---type Hyper d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:[Float] }
+--type alias Hyper = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:List Float }
+type alias Hyper = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:(Float -> Float) }
 
 {-| Constructs a new hypergeometric distribution with n tries and prob probability of "success" on each try. -}
 hyper : number -> number -> number -> Hyper
@@ -66,8 +69,8 @@ hyper pN pS n = { name="hypergeometric",
                   cdf=cdfhyper pN pS n }
 
 
-type alias Poisson = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:(Float -> List Float) }
---type Poisson d = { d | name:String, discrete:Bool, mu:Float, sigma:Float, f:(Float -> Float), p:(Float -> [Float]) }
+--type alias Poisson = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:(Float -> List Float) }
+type alias Poisson = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:(Float -> Float) }
 
 {-| Constructs a new Poisson distribution with mean mu. -}
 poisson : number -> Poisson
@@ -96,8 +99,10 @@ pdfbinom n prob x =
 
     cdfbinom 4 0.5 == [0.0625, 0.3125, 0.6875, 0.9375, 1]
 -}
-cdfbinom : number -> number -> List number
-cdfbinom n prob = List.tail <| List.scanl (+) 0 <| List.map (pdfbinom n prob) [0..n]
+--cdfbinom : number -> number -> List number
+--cdfbinom n prob = List.tail <| List.scanl (+) 0 <| List.map (pdfbinom n prob) [0..n]
+cdfbinom : number -> number -> number -> number
+cdfbinom n prob x = List.sum <| List.map (pdfbinom n prob) [0..x]
 
 
 {-| Hypergeometric probability distribution function, for mutually dependent events. 
@@ -117,8 +122,10 @@ pdfhyper pN pS n x =
 
     cdfhyper 50 25 4 == [0.055, 0.305, 0.695, 0.945, 1] 
 -}
-cdfhyper : number -> number -> number -> List number
-cdfhyper pN pS n = List.tail <| List.scanl (+) 0 <| List.map (pdfhyper pN pS n) [0..n]
+--cdfhyper : number -> number -> number -> List number
+--cdfhyper pN pS n = List.tail <| List.scanl (+) 0 <| List.map (pdfhyper pN pS n) [0..n]
+cdfhyper : number -> number -> number -> number -> number
+cdfhyper pN pS n x = List.sum <| List.map (pdfhyper pN pS n) [0..x]
 
 
 {-| Poisson probability distribution function, for anticipating unlikely events. Given a known average of mu, what is the likelihood of x? For example, if a certain workplace has 2 hard drive failures a week on average, compute the probability of getting 3 failures in a given week. 
@@ -132,8 +139,10 @@ pdfpoisson mu x = ((mu^x)*(e^(-mu))) / factorial x
 
     cdfpoisson 2 5 == [0.135, 0.406, 0.677, 0.857, 0.947, 0.983] 
 -}
-cdfpoisson : number -> number -> List number
-cdfpoisson mu x = List.tail <| List.scanl (+) 0 <| List.map (pdfpoisson mu) [0..x]
+--cdfpoisson : number -> number -> List number
+--cdfpoisson mu x = List.tail <| List.scanl (+) 0 <| List.map (pdfpoisson mu) [0..x]
+cdfpoisson : number -> number -> number
+cdfpoisson mu x = List.sum <| List.map (pdfpoisson mu) [0..x]
 
 
 {- Utility functions -}
@@ -146,20 +155,11 @@ dec : number -> number -> number
 dec m n = (toFloat << round <| n * 10^m) / (10^m)
 
 
-{- HARDCORE TESTING ROUTINES BELOW :-) -}
+{-| Calculates the Fibonacci sequence. Capped at 19 to avoid unintentional lock-ups and because it probably doesn't make sense to visualize more than that. -}
+fib : Int -> Float
+fib n = if | n > 19 -> (-1)
+           | n == 0 -> 0
+           | n == 1 -> 1
+           | otherwise -> fib (n-1) + fib (n-2)
 
---main = asText <| combinations 10 5
---main = asText <| map (permutations 4) [1..4]
---main = asText <| permutations 4 2
---main = asText <| map (pdfbinom 4 0.5) [0..4]
---main = asText <| (pdfbinom 4 0.5) 2
---main = asText <| map (dec 9 << pdfbinom 4 0.5) [0..5]
---main = asText <| map (dec 2 << pdfbinom 3 0.3) [0..3] 
---main = asText <| cdfbinom 4 0.5
---main = asText <| map (dec 2 << pdfhyper 20 6 3) [0..3] 
---main = asText <| map (dec 3 << pdfhyper 50 25 4) [0..4] 
---main = asText <| map (dec 3 << pdfhyper 20 6 3) [0..3] 
---main = asText <| map (dec 3) (cdfhyper 50 25 4) 
---main = asText <| map ((dec 3) << (pdfpoisson 5)) [0..10]
---main = asText <| map (dec 3) (cdfpoisson 2 5)
---main = asText <| map (dec 3 << pdfpoisson 2) [0..5]
+

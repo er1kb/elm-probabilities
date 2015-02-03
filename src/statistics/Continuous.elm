@@ -1,8 +1,8 @@
-module Statistics.Continuous (uniform, normal, standardnormal, exponential, pdfuniform, pdfnormal, pdfstandardnormal, pdfexponential, cdfuniform, cdfnormal, cdfstandardnormal, cdfexponential, area, bins, interpolate, integrate, slope, tangent, normalize, dec, zscore, fib, factorial, mean, variance, stddev, linreg) where
+module Statistics.Continuous (uniform, normal, standardnormal, exponential, pdfuniform, pdfnormal, pdfstandardnormal, pdfexponential, cdfuniform, cdfnormal, cdfstandardnormal, cdfexponential, area, bins, interpolate, integrate, slope, tangent, normalize, dec, zscore, mean, variance, stddev, correlate, linreg) where
 
 {-| Functions for calculating values of common continuous probability distributions. 
 
-# Distribution constructors
+# Probability distribution constructors
 @docs uniform, normal, standardnormal, exponential
 
 # Probability density functions
@@ -10,6 +10,12 @@ module Statistics.Continuous (uniform, normal, standardnormal, exponential, pdfu
 
 # Cumulative density functions 
 @docs cdfuniform, cdfnormal, cdfstandardnormal, cdfexponential
+
+# Statistical computation
+@docs mean, variance, stddev, linreg
+
+# Helpers
+@docs area, interpolate, integrate, slope, tangent, normalize, dec, zscore 
 
 -}
 
@@ -144,7 +150,7 @@ area dx (y1,y2) = dx * (y1 + y2) / 2
 bins : List number -> List (number,number)
 bins ys = List.map2 (,) (List.take ((List.length ys)-1) ys) (List.tail ys)
 
-{-| Interpolate an interval for integration and plotting. -}
+{-| Interpolating an interval for integration and plotting. -}
 interpolate (from,to) nsteps = 
    let
        dxrange = (to - from) -- length of the interval
@@ -180,9 +186,10 @@ slope dx x f =
    in
        (y2 - y1) / dx
 
+
 {-| Finding the tangent (derivative) of a function at a given point.  
 Returns a record containing slope and intercept. -}
---tangent : ...
+tangent : Float -> Float -> (Float -> Float) -> { dx:Float, intercept:Float, slope:Float, x:Float }
 tangent dx x f =  
    let
        m = dec 3 <| slope dx x f
@@ -192,9 +199,6 @@ tangent dx x f =
 
 
 {- Utility functions -}
-{-| Factorial for a number n is the product of [1..n]. It can be used to calculate combinations and permutations. It is implemented backwards and recursively, starting with n * (n-1), then (n * (n-1)) * (n-2), and so on. -}
-factorial : number -> number
-factorial n = if n < 1 then 1 else n * factorial (n-1)
 
 {-| Rounds a number n to m number of decimals -}
 dec : number -> number -> number
@@ -209,21 +213,13 @@ zscore : number -> number -> number -> number
 zscore mu sigma x = (x - mu) / sigma
 
 
-{-| Fibonacci -}
-fib : Int -> Float
-fib n = if | n > 19 -> (-1)
-           | n == 0 -> 0
-           | n == 1 -> 1
-           | otherwise -> fib (n-1) + fib (n-2)
 
-
-
---correlate xs ys
---stddev
---mean
-
+{-| Calculate the mean of a list -}
+mean : List Float -> Float
 mean xs = (List.sum xs) / (toFloat <| List.length xs)
 
+{-| Calculate the variance of a list -}
+variance : List Float -> Float
 variance xs =  
    let
        n = List.length xs
@@ -232,7 +228,24 @@ variance xs =
    in
        sqDev / (toFloat n - 1)
 
+{-| Calculate the standard deviation of a list -}
+stddev : List Float -> Float
 stddev xs = sqrt <| variance xs 
+
+correlate : List (Float,Float) -> Float
+correlate pairs = 
+   let
+       n = List.length pairs
+       xs = List.map fst pairs
+       ys = List.map snd pairs
+       meanx = mean xs
+       meany = mean ys
+       sdx = stddev xs
+       sdy = stddev ys
+       xyDeviations = List.sum <| List.map (\(x,y) -> (x - meanx) * (y - meany)) pairs
+       r = xyDeviations / ((toFloat n - 1) * sdx * sdy)
+   in
+       dec 4 r
 
 
 type alias LinearRegression = {
@@ -253,8 +266,9 @@ linreg pairs =
        meany = mean ys
        sdx = stddev xs
        sdy = stddev ys
-       xyDeviations = List.sum <| List.map (\(x,y) -> (x - meanx) * (y - meany)) pairs
-       r = xyDeviations / ((toFloat n - 1) * sdx * sdy)
+       --xyDeviations = List.sum <| List.map (\(x,y) -> (x - meanx) * (y - meany)) pairs
+       --r = xyDeviations / ((toFloat n - 1) * sdx * sdy)
+       r = correlate pairs
        b = r * (sdy / sdx)
        a = meany - (b * meanx) 
        f = (\x -> a + b * x)
