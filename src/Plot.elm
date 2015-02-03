@@ -1,7 +1,7 @@
 -- function graphs for plotting distributions
 -- a work in progress
 
-module Plot (Graph, continuous, discrete, fromPairs, geom_step, geom_point, geom_points, geom_bar, geom_trapezoid, geom_area, geom_curve, geom_hlinerange, geom_vlinerange, geom_hline, geom_vline, geom_hline_polar, geom_vline_polar, geom_circle, geom_angle, geom_curve_polar, geom_area_polar, geom_position_polar, geom_trace_polar, geom_trace, geom_abline, geom_tangent, yAxis, xAxis, title, legend, geom_image, plot, background, annotate_integral, Aes, aes, aesDefault, point, bar, trapezoid, lookup, Dimensions, Geom, geom_none) where
+module Plot (Graph, continuous, discrete, fromPairs, residuals, geom_step, geom_point, geom_points, geom_bar, geom_trapezoid, geom_area, geom_curve, geom_hlinerange, geom_vlinerange, geom_hline, geom_vline, geom_hline_polar, geom_vline_polar, geom_circle, geom_angle, geom_curve_polar, geom_area_polar, geom_position_polar, geom_trace_polar, geom_trace, geom_abline, geom_tangent, yAxis, xAxis, title, legend, geom_image, plot, background, annotate_integral, Aes, aes, aesDefault, point, bar, trapezoid, lookup, Dimensions, Geom, geom_none) where
 
 
 import Statistics.Discrete as D
@@ -209,6 +209,28 @@ fromPairs tuples (xmin,xmax) (ymin,ymax) =
                            toY = toY
                         }
 
+
+residuals : Aes -> Aes -> Graph -> Dimensions -> Geom
+residuals aes' defaults d dims =
+   let
+      --x = lookup .x aes' defaults
+      xm = dims.xm
+      ym = dims.ym
+      (ymin,ymax) = d.yDomain
+      fun = lookup .fun aes' defaults
+      linetype = lookup .linetype aes' defaults
+      colour = lookup .colour aes' defaults
+      visibility = lookup .visibility aes' defaults
+      --annotate = lookup .annotate aes' defaults
+      --label = lookup .label aes' defaults
+      --precision = lookup .precision aes' defaults
+      --translate = lookup .translate aes' defaults
+      --txt' = move (xm * d.xScale (x + (fst translate)), ym * d.yScale ((snd limits) + snd translate)) <| toForm <| plainText label
+      --txt = if annotate then txt' else (toForm empty)
+      lineranges = map (\(x,y) -> alpha visibility <| traced (linetype colour)  
+      <| path [(xm * d.xScale x, ym * d.yScale y), (xm * d.xScale x, ym * d.yScale (fun x))]) d.pairs
+   in
+      group lineranges
 
 
 
@@ -420,6 +442,8 @@ geom_curve aes' defaults d dims =
       ys = map (\(x,y) -> (xm * (d.xScale x), ym * (d.yScale y))) <| map2 (,) steps (map d.f steps)
    in
       alpha visibility <| traced (linetype colour) <| path ys
+
+
 
 geom_vlinerange : Aes -> Aes -> Graph -> Dimensions -> Geom
 geom_vlinerange aes' defaults d dims =
