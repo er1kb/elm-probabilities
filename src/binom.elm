@@ -13,6 +13,7 @@ import Html.Attributes as HA
 import Statistics.Continuous as C
 import Statistics.Discrete as D
 
+
 render m w =  
    let
       mouseY = toFloat <| snd m
@@ -64,6 +65,7 @@ render m w =
 
             ]
          ]
+
 
 
 main = Signal.map2 render Mouse.position Window.dimensions
