@@ -5,3 +5,4 @@
 *.swo
 accident*
 elm.js
+/src/Statistics/Data/fromR.R
