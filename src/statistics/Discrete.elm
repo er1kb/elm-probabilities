@@ -56,6 +56,7 @@ binom n prob = { name="binomial",
                  cdf=cdfbinom n prob }
 
 
+
 --type alias Hyper = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:List Float }
 type alias Hyper = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:(Float -> Float) }
 

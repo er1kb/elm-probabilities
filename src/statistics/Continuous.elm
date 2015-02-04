@@ -122,6 +122,7 @@ cdfuniform = 1.0
 --TODO
 
 
+
 cdfnormal : number -> number -> number -> (number,number) -> number
 cdfnormal mu sigma nsteps (from,to) = 
    integrate (from,to) nsteps (pdfnormal mu sigma)
