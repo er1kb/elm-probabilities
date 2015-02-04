@@ -1,5 +1,22 @@
 module Statistics.Data.Mtcars(mpg,cyl,disp,hp,drat,wt,qsec,vs,am,gear,carb) where 
 
+{-| 32 * 11 dataset from the R Datasets package on car specs.
+https://stat.ethz.ch/R-manual/R-patched/library/datasets/html/mtcars.html
+
+Variable names (copied from the above url):
+mpg	Miles/(US) gallon
+cyl	Number of cylinders
+disp	Displacement (cu.in.)
+hp	Gross horsepower
+drat	Rear axle ratio
+wt	Weight (lb/1000)
+qsec	1/4 mile time
+vs	V/S
+am	Transmission (0 = automatic, 1 = manual)
+gear	Number of forward gears
+carb	Number of carburetors
+-}
+
 
 mpg = [21,21,22.8,21.4,18.7,18.1,14.3,24.4,22.8,19.2,17.8,16.4,17.3,15.2,10.4,10.4,14.7,32.4,30.4,33.9,21.5,15.5,15.2,13.3,19.2,27.3,26,30.4,15.8,19.7,15,21.4]
 
