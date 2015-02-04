@@ -1,4 +1,4 @@
-module Statistics.Discrete (combinations, permutations, binom, hyper, poisson, pdfbinom, pdfhyper, pdfpoisson, cdfbinom, cdfhyper, cdfpoisson, factorial, fib) where
+module Statistics.Discrete (combinations, permutations, binom, hyper, poisson, pdfbinom, pdfhyper, pdfpoisson, cdfbinom, cdfhyper, cdfpoisson, pdftable, cdftable, factorial, fib) where
 --
 {-| Functions for calculating values of common discrete probability distributions. 
 
@@ -15,7 +15,7 @@ module Statistics.Discrete (combinations, permutations, binom, hyper, poisson, p
 @docs cdfbinom, cdfhyper, cdfpoisson
 
 # Helpers
-@docs factorial, fib
+@docs pdftable, cdftable, factorial, fib
 
 -}
 
@@ -43,7 +43,6 @@ permutations : number -> number -> number
 permutations n k = if | k > n -> 0
                       | otherwise -> (factorial n) / factorial (n - k)
 
---type alias Binom = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:List Float }
 type alias Binom = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:(Float -> Float) }
 
 {-| Constructs a new binomial distribution with n tries and prob probability of "success" on each try. -}
@@ -57,7 +56,6 @@ binom n prob = { name="binomial",
 
 
 
---type alias Hyper = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:List Float }
 type alias Hyper = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:(Float -> Float) }
 
 {-| Constructs a new hypergeometric distribution with n tries and prob probability of "success" on each try. -}
@@ -70,7 +68,6 @@ hyper pN pS n = { name="hypergeometric",
                   cdf=cdfhyper pN pS n }
 
 
---type alias Poisson = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:(Float -> List Float) }
 type alias Poisson = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:(Float -> Float) }
 
 {-| Constructs a new Poisson distribution with mean mu. -}
@@ -96,12 +93,10 @@ pdfbinom n prob x =
            if | x > n -> 0
               | otherwise -> nCx * ((prob^x) * (1 - prob)^(n-x)) 
 
-{-| Cumulative binomial probability for mutually independent events. Returns a list with the running total of probabilities from 0 to n. 
+{-| Cumulative binomial probability for mutually independent events. Returns the total probability of 0 to x. 
 
-    cdfbinom 4 0.5 == [0.0625, 0.3125, 0.6875, 0.9375, 1]
+    cdfbinom 4 0.5 2 == 0.6875
 -}
---cdfbinom : number -> number -> List number
---cdfbinom n prob = List.tail <| List.scanl (+) 0 <| List.map (pdfbinom n prob) [0..n]
 cdfbinom : number -> number -> number -> number
 cdfbinom n prob x = List.sum <| List.map (pdfbinom n prob) [0..x]
 
@@ -121,11 +116,9 @@ pdfhyper pN pS n x =
 
 {-| Cumulative hypergeometric probability for mutually dependent events. Returns a list with the running total of probabilities from 0 to n.
 
-    cdfhyper 50 25 4 == [0.055, 0.305, 0.695, 0.945, 1] 
+    cdfhyper 50 25 4 2 == 0.695
 -}
---cdfhyper : number -> number -> number -> List number
---cdfhyper pN pS n = List.tail <| List.scanl (+) 0 <| List.map (pdfhyper pN pS n) [0..n]
-cdfhyper : number -> number -> number -> number -> number
+cdfhyper : Float -> Float -> Float -> Float -> Float
 cdfhyper pN pS n x = List.sum <| List.map (pdfhyper pN pS n) [0..x]
 
 
@@ -138,22 +131,25 @@ pdfpoisson mu x = ((mu^x)*(e^(-mu))) / factorial x
 
 {-| Cumulative poisson probability for unlikely events. Returns a list with the running total of probabilities from 0 to x. The list does not sum to 1 as the number of events is not limited by x. For example, in the above example it is possible to have 6 hard drive failures or more in one week, although probabilities become very small the further you get from the expected value. 
 
-    cdfpoisson 2 5 == [0.135, 0.406, 0.677, 0.857, 0.947, 0.983] 
+    cdfpoisson 2 2 == 0.677 
 -}
---cdfpoisson : number -> number -> List number
---cdfpoisson mu x = List.tail <| List.scanl (+) 0 <| List.map (pdfpoisson mu) [0..x]
-cdfpoisson : number -> number -> number
+cdfpoisson : Float -> Float -> Float
 cdfpoisson mu x = List.sum <| List.map (pdfpoisson mu) [0..x]
 
 
 {- Utility functions -}
+
+
+{-| List of probabilities for 0 .. x -}
+pdftable dist x = List.map (dist.pdf) [0..x]
+
+{-| List of cumulative probabilities for 0 .. x. -}
+cdftable dist x = List.tail <| List.scanl (+) 0 <| List.map (dist.cdf) [0..x]
+
+
 {-| Factorial for a number n is the product of [1..n]. It can be used to calculate combinations and permutations. It is implemented backwards and recursively, starting with n * (n-1), then (n * (n-1)) * (n-2), and so on. -}
 factorial : number -> number
 factorial n = if n < 1 then 1 else n * factorial (n-1)
-
-{-| Rounds a number n to m number of decimals -}
-dec : number -> number -> number
-dec m n = (toFloat << round <| n * 10^m) / (10^m)
 
 
 {-| Calculates the Fibonacci sequence. Capped at 19 to avoid unintentional lock-ups and because it probably doesn't make sense to visualize more than that. -}

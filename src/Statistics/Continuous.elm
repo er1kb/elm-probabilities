@@ -22,7 +22,7 @@ module Statistics.Continuous (uniform, normal, standardnormal, exponential, pdfu
 import List
 
 
-type alias Uniform = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:(Float), interval:(Float,Float) }
+type alias Uniform = { name:String, discrete:Bool, mu:Float, sigma:Float, pdf:(Float -> Float), cdf:(Float -> Float), interval:(Float,Float) }
 
 {-| Constructs a new uniform distribution with the given interval. -}
 uniform : (number,number) -> Uniform
@@ -31,7 +31,7 @@ uniform (from,to) = { name="uniform",
                       mu=(to-from)/2, 
                       sigma=sqrt ((to - from)^2 / 12),
                       pdf=pdfuniform (from,to),
-                      cdf=cdfuniform,
+                      cdf=cdfuniform (from,to),
                       interval=(from,to) }
 
 
@@ -64,7 +64,7 @@ standardnormal = { name="standard normal",
 type alias Exponential = { name:String, discrete:Bool, lambda:Float, pdf:(Float -> Float), cdf:((Float,Float) -> Float) }
 
 {-| Constructs a new exponential distribution with the lambda parameter. -}
-exponential : number -> Exponential
+exponential : Float -> Exponential
 exponential lambda = { name="exponential",  
                        discrete=False,
                        lambda=lambda,
@@ -74,7 +74,7 @@ exponential lambda = { name="exponential",
 
 
 {-| Probability density function for a normal distribution with mean mu and standard deviation sigma. This function computes the height of the curve at a given x. -}
-pdfuniform : (number,number) -> number -> number
+pdfuniform : (Float,Float) -> Float -> Float
 pdfuniform (from,to) x = 
    let 
       a = from
@@ -86,7 +86,7 @@ pdfuniform (from,to) x =
 
 
 {-| Probability density function for a normal distribution with mean mu and standard deviation sigma. This function computes the height of the curve at a given x. -}
-pdfnormal : number -> number -> number -> number
+pdfnormal : Float -> Float -> Float -> Float
 pdfnormal mu sigma x = 
       let top = 1 / (sigma * sqrt (2 * pi))
           exponent = (-0.5) * ((x - mu) / sigma)^2
@@ -95,18 +95,23 @@ pdfnormal mu sigma x =
 
 
 {-| Probability density function for a standardized normal distribution, with mean 0 and standard deviation 1. -}
-pdfstandardnormal : number -> number
+pdfstandardnormal : Float -> Float
 pdfstandardnormal x = pdfnormal 0 1 x
 
 
 
 {-| Probability density function for an exponential distribution. -}
-pdfexponential : number -> number -> number
+pdfexponential : Float -> Float -> Float
 pdfexponential lambda x = 
    let 
        pdf = lambda * e^(-lambda * x)
    in
       if x >= 0 then pdf else 0
+
+
+{-| Cumulative density function for a uniform distribution with mean mu and standard deviation sigma. -}
+cdfuniform : (Float,Float) -> Float -> Float
+cdfuniform (from,to) x = (x - from) / (to - from)
 
 
 {-| Cumulative density function for a normal distribution. Returns an approximate one-sided integral of the interval [from, to] using the trapezium rule. More steps/breaks will yield a higher precision. 
@@ -116,27 +121,22 @@ pdfexponential lambda x =
     map (dec 3 << (\x -> cdfnormal 0 1 100 (-x,x))) [1,2,3] == [0.683,0.954,0.997]
 -}
 
-{-| Cumulative density function for a uniform distribution with mean mu and standard deviation sigma. This function computes the height of the curve at a given x. -}
-cdfuniform : number
-cdfuniform = 1.0
---TODO
 
-
-
-cdfnormal : number -> number -> number -> (number,number) -> number
+cdfnormal : Float -> Float -> Float -> (Float,Float) -> Float
 cdfnormal mu sigma nsteps (from,to) = 
    integrate (from,to) nsteps (pdfnormal mu sigma)
+
 
 
 {-| Cumulative density function for a standardized normal distribution.  
 
    cdfstandardnormal 10 (-1,1) == 0.683   -- ≈68 % within ±1 standard deviation around the mean
 -}
-cdfstandardnormal :  number -> (number,number) -> number
+cdfstandardnormal :  Float -> (Float,Float) -> Float
 cdfstandardnormal nsteps (from,to) = integrate (from,to) nsteps (pdfnormal 0 1)
 
 
-cdfexponential : number -> number -> (number,number) -> number
+cdfexponential : Float -> Float -> (Float,Float) -> Float
 cdfexponential lambda nsteps (from,to) = 
    let from2 = if from >= 0 then from else 0
    in integrate (from2,to) nsteps (pdfexponential lambda)
@@ -144,11 +144,11 @@ cdfexponential lambda nsteps (from,to) =
 
 
 {-| Approximating an integral with a trapezium/trapezoid shape. -}
-area : number -> (number,number) -> number
+area : Float -> (Float,Float) -> Float
 area dx (y1,y2) = dx * (y1 + y2) / 2
 
 {-| Splitting a list of x values into adjacent bins, as in a histogram. A list [a,b,c,d] becomes [(a,b),(b,c),(c,d)] -}
-bins : List number -> List (number,number)
+bins : List Float -> List (Float,Float)
 bins ys = List.map2 (,) (List.take ((List.length ys)-1) ys) (List.tail ys)
 
 {-| Interpolating an interval for integration and plotting. -}
@@ -202,24 +202,24 @@ tangent dx x f =
 {- Utility functions -}
 
 {-| Rounds a number n to m number of decimals -}
-dec : number -> number -> number
+dec : Float -> Float -> Float
 dec m n = (toFloat << round <| n * 10^m) / (10^m)
 
 {-| Normalize values to the range of 0,1  -}
-normalize : (number,number) -> number -> number
+normalize : (Float,Float) -> Float -> Float
 normalize (xmin,xmax) x = if xmin - xmax == 0 then 0.5 else (x - xmin) / (xmax - xmin)
 
 {-| Calculate z score -}
-zscore : number -> number -> number -> number
+zscore : Float -> Float -> Float -> Float
 zscore mu sigma x = (x - mu) / sigma
 
 
 
-{-| Calculate the mean of a list -}
+{-| Mean of a list -}
 mean : List Float -> Float
 mean xs = (List.sum xs) / (toFloat <| List.length xs)
 
-{-| Calculate the variance of a list -}
+{-| Variance of a list -}
 variance : List Float -> Float
 variance xs =  
    let
@@ -229,10 +229,11 @@ variance xs =
    in
        sqDev / (toFloat n - 1)
 
-{-| Calculate the standard deviation of a list -}
+{-| Standard deviation of a list -}
 stddev : List Float -> Float
 stddev xs = sqrt <| variance xs 
 
+{-| Correlation coefficient (Pearson's R) for a list of (x,y) tuples -}
 correlate : List (Float,Float) -> Float
 correlate pairs = 
    let
@@ -256,7 +257,7 @@ type alias LinearRegression = {
    residuals : List Float
 }
 
---linreg : List (Float,Float) -> (Float -> Float)
+{-| Least squares linear regression. Fits a linear model to a list of (x,y) tuples and returns a record containing intercept (a), slope (b), regression function (f) and residuals. -}
 linreg : List (Float,Float) -> LinearRegression
 linreg pairs =  
    let
@@ -267,9 +268,9 @@ linreg pairs =
        meany = mean ys
        sdx = stddev xs
        sdy = stddev ys
-       --xyDeviations = List.sum <| List.map (\(x,y) -> (x - meanx) * (y - meany)) pairs
-       --r = xyDeviations / ((toFloat n - 1) * sdx * sdy)
-       r = correlate pairs
+       xyDeviations = List.sum <| List.map (\(x,y) -> (x - meanx) * (y - meany)) pairs
+       r = xyDeviations / ((toFloat n - 1) * sdx * sdy)
+       --r = correlate pairs
        b = r * (sdy / sdx)
        a = meany - (b * meanx) 
        f = (\x -> a + b * x)
@@ -277,4 +278,3 @@ linreg pairs =
    in
        { a = dec 4 a, b = dec 4 b, f = f, residuals = residuals }
 
--- Slope comes out wrong! 
