@@ -1,7 +1,4 @@
--- function graphs for plotting distributions
--- a work in progress
-
-module Plot (Graph, continuous, discrete, fromPairs, residuals, geom_step, geom_point, geom_points, geom_bar, geom_trapezoid, geom_area, geom_curve, geom_hlinerange, geom_vlinerange, geom_hline, geom_vline, geom_hline_polar, geom_vline_polar, geom_circle, geom_angle, geom_curve_polar, geom_area_polar, geom_position_polar, geom_trace_polar, geom_trace, geom_abline, geom_tangent, yAxis, xAxis, title, legend, geom_image, plot, background, annotate_integral, Aes, aes, aesDefault, point, bar, trapezoid, lookup, Dimensions, Geom, geom_none) where
+module Plot (Graph, continuous, discrete, fromPairs, geom_vlineranges, geom_step, geom_text, geom_point, geom_points, geom_bar, geom_trapezoid, geom_area, geom_curve, geom_hlinerange, geom_vlinerange, geom_hline, geom_vline, geom_hline_polar, geom_vline_polar, geom_circle, geom_angle, geom_curve_polar, geom_abline_polar, geom_area_polar, geom_position_polar, geom_trace_polar, geom_trace, geom_abline, derivative, yAxis, xAxis, title, legend, geom_image, plot, background, annotate_integral, Aes, aes, aesDefault, point, bar, trapezoid, lookup, Dimensions, Geom) where
 
 
 import Statistics.Discrete as D
@@ -12,16 +9,46 @@ import Color (Color, lightGrey, black)
 import Text (plainText, fromString, color, height, leftAligned, centered, rightAligned)
 import List (map, map2, concatMap, filter, head, tail, reverse, minimum, maximum, length)
 
+{-| Functions for calculating values of common continuous probability distributions. 
+
+# Plot a graph
+@docs plot, Graph, continuous, discrete, fromPairs
+
+# Aesthetics
+@docs aes, aesDefault
+
+# Standard charting elements
+@docs background, title, xAxis, yAxis
+
+# Geoms
+Visual mappings.
+@docs geom_step, geom_text, geom_point, geom_points, geom_bar, geom_trapezoid, geom_area, geom_curve, geom_hlinerange, geom_vlinerange, geom_vlineranges, geom_hline, geom_vline, geom_hline_polar, geom_vline_polar, geom_circle, geom_angle, geom_curve_polar, geom_area_polar, geom_position_polar, geom_trace_polar, geom_trace, geom_abline, geom_image  
+
+# Layers
+More problem specific features that may include different kinds of visual mappings.
+@docs derivative
+
+# Annotations
+@docs legend, annotate_integral
+
+-}
+
+--point, bar, trapezoid,  
+--lookup, Dimensions, Geom
+
+
+
 
 type alias Geom = Form
 
-geom_none : Aes -> Aes -> Graph -> Dimensions -> Geom
-geom_none aes' defaults d dims = 
-   let
-      x = lookup .x aes' defaults
-   in
-      toForm <| plainText <| toString x
+--geom_none : Aes -> Aes -> Graph -> Dimensions -> Geom
+--geom_none aes' defaults d dims = 
+--   let
+--      x = lookup .x aes' defaults
+--   in
+--      toForm <| plainText <| toString x
 
+roundf = toFloat << round
 
 mkPolar xs ys = map fromPolar <| map2 (,) ys xs
 
@@ -210,8 +237,8 @@ fromPairs tuples (xmin,xmax) (ymin,ymax) =
                         }
 
 
-residuals : Aes -> Aes -> Graph -> Dimensions -> Geom
-residuals aes' defaults d dims =
+geom_vlineranges : Aes -> Aes -> Graph -> Dimensions -> Geom
+geom_vlineranges aes' defaults d dims =
    let
       --x = lookup .x aes' defaults
       xm = dims.xm
@@ -258,6 +285,27 @@ geom_step aes' defaults d dims =
       alpha visibility <| traced (linetype colour) <| path ys
 
 
+geom_text : Aes -> Aes -> Graph -> Dimensions -> Geom
+geom_text aes' defaults d dims = 
+   let
+      xm = dims.xm
+      ym = dims.ym
+      colour = lookup .colour aes' defaults
+      label = lookup .label aes' defaults
+      translate = lookup .translate aes' defaults
+      precision = lookup .precision aes' defaults
+      pointsize = lookup .pointsize aes' defaults
+      visibility = lookup .visibility aes' defaults
+      x = lookup .x aes' defaults
+      y = lookup .y aes' defaults
+      pos = (xm * d.xScale x, ym * d.yScale y)
+      annotationPosition = (xm * (d.xScale x) + (fst translate),  
+                            ym * (d.yScale y) + (snd translate))
+      txt = label ++ (toString <| C.dec precision x) ++ ", " ++ (toString <| C.dec precision y)
+      label' = move annotationPosition <| toForm <| rightAligned <| color colour 
+              <| fromString <| txt
+   in
+      label'
 
 
 
@@ -667,7 +715,6 @@ geom_angle aes' defaults d dims =
                <| fromString <| "&theta; &asymp; " ++ (toString <| C.dec 2 x)  
                ++ "\nr = " ++ (toString <| C.dec 2 (d.f x))
        label = if annotate then label' else (toForm empty)
-
    in
       group [dot, label]
 
@@ -690,6 +737,44 @@ geom_curve_polar aes' defaults d dims =
        points = map (\(x,y) -> (xm * d.xScale (offset + (x / xyRatio)), ym * d.yScale y)) points'
    in
       move origin <| alpha visibility <| traced (linetype colour) <| path points
+
+
+geom_abline_polar : Aes -> Aes -> Graph -> Dimensions -> Geom
+geom_abline_polar aes' defaults d dims = 
+   let
+       xm = dims.xm
+       ym = dims.ym
+       linetype = lookup .linetype aes' defaults
+       linethickness = lookup .linethickness aes' defaults
+       colour = lookup .colour aes' defaults
+       visibility = lookup .visibility aes' defaults
+       limits = lookup .limits aes' defaults
+       dynamic = lookup .dynamic aes' defaults
+       negate = lookup .negate aes' defaults
+       x = lookup .x aes' defaults
+       fun = lookup .fun aes' defaults
+
+       revolve = lookup .revolve aes' defaults
+       fit' = lookup .fit aes' defaults
+       fit = if revolve then False else fit'
+       xyRatio = if fit then d.xyRatio else 1
+       offset = if revolve then 0 else d.pOffset
+
+       x' = if x < (fst limits) then (fst limits) else x
+       x'' = if x' > (snd limits) then (snd limits) else x'
+
+
+       limits' = if negate then (x'', snd limits) else (fst limits, x'')
+       (x1,x2) = if dynamic then limits' else limits
+
+       (dx,steps) = C.interpolate (x1, x2) (toFloat d.steps)
+       ys = mkPolar steps (map fun steps)
+       points' = if revolve then spin ys x else ys
+       points = map (\(x,y) -> (xm * d.xScale (offset + (x / xyRatio)), ym * d.yScale y)) points'
+       --points = [(xm * d.xScale x1, ym * d.yScale (fun x1)), 
+       --          (xm * d.xScale x2, ym * d.yScale (fun x2))] 
+   in
+       alpha visibility <| traced (linetype colour) <| path <| points
 
 
 geom_area_polar : Aes -> Aes -> Graph -> Dimensions -> Geom
@@ -777,7 +862,6 @@ geom_trace aes' defaults d dims =
 
 
 
-
 geom_abline : Aes -> Aes -> Graph -> Dimensions -> Geom
 geom_abline aes' defaults d dims = 
    let
@@ -804,8 +888,8 @@ geom_abline aes' defaults d dims =
        alpha visibility <| traced (linetype colour) <| path <| points
 
 
-geom_tangent : Aes -> Aes -> Graph -> Dimensions -> Geom
-geom_tangent aes' defaults d dims = 
+derivative : Aes -> Aes -> Graph -> Dimensions -> Geom
+derivative aes' defaults d dims = 
    let
        xm = dims.xm
        ym = dims.ym
@@ -865,7 +949,17 @@ geom_tangent aes' defaults d dims =
        annotation
        ]
        
-
+mkTicks (a,b) tickspacing' = 
+  let
+    r = b - a
+    m = head <| reverse <| filter (\m -> 10^m <= r) [-10..10] -- -1
+    ten = if m <= 0 then 10^(m - 1) else 1 -- 0.1
+    tickspacing = ceiling (tickspacing' / ten)
+    ticks = map (\n -> ten * (toFloat n)) <|
+            filter (\n -> if n /= 0 then n % tickspacing == 0 else True) 
+            [ceiling (a / ten) .. floor (b / ten)]
+  in
+    ticks
 
 
 yAxis : Aes -> Aes -> Graph -> Dimensions -> Geom
@@ -886,8 +980,9 @@ yAxis aes' defaults d dims =
        xmin = fst d.xDomain
        (ymin,ymax) = d.yLimits
        pos = (xm * (d.xScale xmin) - (xmargin / 4),0)
-       tickPositions = filter (\n -> (round n) % tickspacing == 0) 
-          <| map toFloat [ceiling ymin .. floor ymax]
+       tickPositions = mkTicks (ymin,ymax) tickspacing
+       --tickPositions = filter (\n -> (round n) % tickspacing == 0) 
+       --   <| map toFloat [ceiling ymin .. floor ymax]
        tickLabels = group <| map (\y -> move (xoffset + (-xmargin / 5), yoffset + ym * d.yScale y)  
          <| toForm <| rightAligned <| fromString <| 
          labelfun (toString <| C.dec precision y)) tickPositions
@@ -919,8 +1014,9 @@ xAxis aes' defaults d dims =
        (xmin,xmax) = d.xDomain
        pos = (0,ym * (d.yScale ymin) - (ymargin / 8))
        --tickPositions = [xmin, 0, xmax]
-       tickPositions = filter (\n -> (round n) % tickspacing == 0) 
-          <| map toFloat [ceiling xmin .. floor xmax]
+       tickPositions = mkTicks (xmin,xmax) tickspacing
+       --tickPositions = filter (\n -> (round n) % tickspacing == 0) 
+       --   <| map toFloat [ceiling xmin .. floor xmax]
        tickLabels = group <| map (\x -> move (xoffset + (xm * xscale x),yoffset + (-ymargin / 3))  
          <| toForm <| centered <| fromString <|  
          toString <| C.dec precision x) tickPositions
@@ -971,16 +1067,17 @@ legend aes' defaults d dims =
 geom_image : Aes -> Aes -> Graph -> Dimensions -> Geom
 geom_image aes' defaults d dims = 
    let
-      wh = lookup .dims aes' defaults
+      (w,h) = lookup .dims aes' defaults
       url = lookup .label aes' defaults
-      img = image (fst wh) (snd wh) url
+      img = image w h url
       xm = dims.xm
       ym = dims.ym
       x = lookup .x aes' defaults
       y = lookup .y aes' defaults
+      theta = lookup .theta aes' defaults
       (xoffset,yoffset) = lookup .translate aes' defaults
    in
-      move (xm * d.xScale x, yoffset + ym * d.yScale y) <| toForm img
+      rotate theta <| move (xm * d.xScale x, yoffset + ym * d.yScale y) <| toForm img
 
 
 
@@ -993,7 +1090,7 @@ plot (plotWidth,plotHeight) d geoms m w =
                                 limits <- Just d.xDomain,
                                 x <- Just xpos,  
                                 y <- Just ypos, 
-                                theta <- Just (pi / 4),
+                                --theta <- Just (pi / 4),
                                 nsteps <- Just nsteps
                              }
       windowScaleX = C.normalize (0,toFloat input.width)    --- 
@@ -1071,18 +1168,20 @@ annotate_integral aes' defaults d dims =
 
 {-- 
 TODO: 
-rename xscale/yscale --> fromX/fromY
-move geoms to separate file
+Make y limits optional (Maybe) for graph constructor, to allow for variable axis limits
+Add documentation to Plot module
+Consistent naming of single and multiple geoms, eg point/points
+Rename xscale/yscale --> fromX/fromY
 Colouring positive and negative integrals independently?
 How to annotate lineranges? 
 Implement grid?
 Some kind of theme object for background colours, fonts, etc.?
-Decrease right margin or make better use of it?
+Decrease right margin or make better use of the empty space?
 Linestyles and textstyles?! 
 Improve axes: number of ticks etc.
 Factor out x and y labels from axes, to be able to move/rotate them independently?
-geom_abline_polar?
-Annotation position given in the scale of x,y or percent of plot height,width or both?
+Geom_abline_polar?
+"Translate" given in the scale of x,y or percent of plot height,width or both?
 --}
 
 
@@ -1127,7 +1226,7 @@ type alias Aes = { visibility:Maybe Float,
                    negate: Maybe Bool,
                    fit: Maybe Bool,
                    revolve: Maybe Bool,
-                   tickspacing: Maybe Int, 
+                   tickspacing: Maybe Float, 
                    nsteps: Maybe Int
                 }
 
@@ -1182,8 +1281,7 @@ aesDefault = { visibility = Just 1,
                negate = Just False,
                fit = Just True,
                revolve = Just False,
-               tickspacing = Just 5,
+               tickspacing = Just 1,
                nsteps = Just 10
                }
 
-roundf = toFloat << round
