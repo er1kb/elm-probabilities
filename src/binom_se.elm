@@ -12,6 +12,8 @@ import Html
 import Html.Attributes as HA
 import Statistics.Continuous as C
 import Statistics.Discrete as D
+--import Statistics.Data.Mtcars
+--import Statistics.Data.Iris
 
 
 render m w =  
@@ -44,7 +46,7 @@ render m w =
       ndtitle = [title { aes | label <- Just ("N(µ=" ++ toString mu  
                                            ++ ",&sigma;=" ++ toString s ++ ")") } ]
       ndintegral = [annotate_integral { aes | translate <- Just (0.8,0.5), limits <- Just (mu-s,mu+s) }] 
-   in
+   in 
 
       flow down [ 
          Html.toElement 1000 50 <| Html.h1 [HA.align "center"] [Html.text "Binomialfördelningen och dess vänner"] 
@@ -65,6 +67,7 @@ render m w =
 
             ]
          ]
+
 
 
 
@@ -89,7 +92,7 @@ geomsC = [
           geom_curve { aes | dynamic <- Just False, colour <- Just grey },
           xAxis { aes | label <- Just "Antal försök", tickspacing <- Just 10 },  
           yAxis { aes | label <- Just "Sannolikhet %", tickspacing <- Just 10, revolve <- Just True }
-          --geom_tangent { aes | translate <- Just (57,5) }
+          --tangent { aes | translate <- Just (57,5) }
           ]
 
 mkGeoms n pdist use = [ 
