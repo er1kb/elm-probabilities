@@ -2865,626 +2865,6 @@ Elm.Html.make = function (_elm) {
                       ,menuitem: menuitem
                       ,menu: menu};
    return _elm.Html.values;
-};Elm.Html = Elm.Html || {};
-Elm.Html.Attributes = Elm.Html.Attributes || {};
-Elm.Html.Attributes.make = function (_elm) {
-   "use strict";
-   _elm.Html = _elm.Html || {};
-   _elm.Html.Attributes = _elm.Html.Attributes || {};
-   if (_elm.Html.Attributes.values)
-   return _elm.Html.Attributes.values;
-   var _op = {},
-   _N = Elm.Native,
-   _U = _N.Utils.make(_elm),
-   _L = _N.List.make(_elm),
-   _P = _N.Ports.make(_elm),
-   $moduleName = "Html.Attributes",
-   $Basics = Elm.Basics.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Json$Encode = Elm.Json.Encode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $String = Elm.String.make(_elm),
-   $VirtualDom = Elm.VirtualDom.make(_elm);
-   var property = $VirtualDom.property;
-   var stringProperty = F2(function (name,
-   string) {
-      return A2(property,
-      name,
-      $Json$Encode.string(string));
-   });
-   var $class = function (name) {
-      return A2(stringProperty,
-      "className",
-      name);
-   };
-   var id = function (name) {
-      return A2(stringProperty,
-      "id",
-      name);
-   };
-   var title = function (name) {
-      return A2(stringProperty,
-      "title",
-      name);
-   };
-   var accesskey = function ($char) {
-      return A2(stringProperty,
-      "accesskey",
-      $String.fromList(_L.fromArray([$char])));
-   };
-   var contextmenu = function (value) {
-      return A2(stringProperty,
-      "contextmenu",
-      value);
-   };
-   var dir = function (value) {
-      return A2(stringProperty,
-      "dir",
-      value);
-   };
-   var draggable = function (value) {
-      return A2(stringProperty,
-      "draggable",
-      value);
-   };
-   var dropzone = function (value) {
-      return A2(stringProperty,
-      "dropzone",
-      value);
-   };
-   var itemprop = function (value) {
-      return A2(stringProperty,
-      "itemprop",
-      value);
-   };
-   var lang = function (value) {
-      return A2(stringProperty,
-      "lang",
-      value);
-   };
-   var tabindex = function (n) {
-      return A2(stringProperty,
-      "tabIndex",
-      $Basics.toString(n));
-   };
-   var charset = function (value) {
-      return A2(stringProperty,
-      "charset",
-      value);
-   };
-   var content = function (value) {
-      return A2(stringProperty,
-      "content",
-      value);
-   };
-   var httpEquiv = function (value) {
-      return A2(stringProperty,
-      "httpEquiv",
-      value);
-   };
-   var language = function (value) {
-      return A2(stringProperty,
-      "language",
-      value);
-   };
-   var src = function (value) {
-      return A2(stringProperty,
-      "src",
-      value);
-   };
-   var height = function (value) {
-      return A2(stringProperty,
-      "height",
-      $Basics.toString(value));
-   };
-   var width = function (value) {
-      return A2(stringProperty,
-      "width",
-      $Basics.toString(value));
-   };
-   var alt = function (value) {
-      return A2(stringProperty,
-      "alt",
-      value);
-   };
-   var poster = function (value) {
-      return A2(stringProperty,
-      "poster",
-      value);
-   };
-   var kind = function (value) {
-      return A2(stringProperty,
-      "kind",
-      value);
-   };
-   var srclang = function (value) {
-      return A2(stringProperty,
-      "srclang",
-      value);
-   };
-   var sandbox = function (value) {
-      return A2(stringProperty,
-      "sandbox",
-      value);
-   };
-   var srcdoc = function (value) {
-      return A2(stringProperty,
-      "srcdoc",
-      value);
-   };
-   var type$ = function (value) {
-      return A2(stringProperty,
-      "type",
-      value);
-   };
-   var value = function (value) {
-      return A2(stringProperty,
-      "value",
-      value);
-   };
-   var placeholder = function (value) {
-      return A2(stringProperty,
-      "placeholder",
-      value);
-   };
-   var accept = function (value) {
-      return A2(stringProperty,
-      "accept",
-      value);
-   };
-   var acceptCharset = function (value) {
-      return A2(stringProperty,
-      "acceptCharset",
-      value);
-   };
-   var action = function (value) {
-      return A2(stringProperty,
-      "action",
-      value);
-   };
-   var autocomplete = function (bool) {
-      return A2(stringProperty,
-      "autocomplete",
-      bool ? "on" : "off");
-   };
-   var autosave = function (value) {
-      return A2(stringProperty,
-      "autosave",
-      value);
-   };
-   var enctype = function (value) {
-      return A2(stringProperty,
-      "enctype",
-      value);
-   };
-   var formaction = function (value) {
-      return A2(stringProperty,
-      "formaction",
-      value);
-   };
-   var list = function (value) {
-      return A2(stringProperty,
-      "list",
-      value);
-   };
-   var maxlength = function (n) {
-      return A2(stringProperty,
-      "maxLength",
-      $Basics.toString(n));
-   };
-   var method = function (value) {
-      return A2(stringProperty,
-      "method",
-      value);
-   };
-   var name = function (value) {
-      return A2(stringProperty,
-      "name",
-      value);
-   };
-   var pattern = function (value) {
-      return A2(stringProperty,
-      "pattern",
-      value);
-   };
-   var size = function (n) {
-      return A2(stringProperty,
-      "size",
-      $Basics.toString(n));
-   };
-   var $for = function (value) {
-      return A2(stringProperty,
-      "htmlFor",
-      value);
-   };
-   var form = function (value) {
-      return A2(stringProperty,
-      "form",
-      value);
-   };
-   var max = function (value) {
-      return A2(stringProperty,
-      "max",
-      value);
-   };
-   var min = function (value) {
-      return A2(stringProperty,
-      "min",
-      value);
-   };
-   var step = function (n) {
-      return A2(stringProperty,
-      "step",
-      $Basics.toString(n));
-   };
-   var cols = function (n) {
-      return A2(stringProperty,
-      "cols",
-      $Basics.toString(n));
-   };
-   var rows = function (n) {
-      return A2(stringProperty,
-      "rows",
-      $Basics.toString(n));
-   };
-   var wrap = function (value) {
-      return A2(stringProperty,
-      "wrap",
-      value);
-   };
-   var ismap = function (value) {
-      return A2(stringProperty,
-      "ismap",
-      value);
-   };
-   var usemap = function (value) {
-      return A2(stringProperty,
-      "usemap",
-      value);
-   };
-   var shape = function (value) {
-      return A2(stringProperty,
-      "shape",
-      value);
-   };
-   var coords = function (value) {
-      return A2(stringProperty,
-      "coords",
-      value);
-   };
-   var challenge = function (value) {
-      return A2(stringProperty,
-      "challenge",
-      value);
-   };
-   var keytype = function (value) {
-      return A2(stringProperty,
-      "keytype",
-      value);
-   };
-   var align = function (value) {
-      return A2(stringProperty,
-      "align",
-      value);
-   };
-   var cite = function (value) {
-      return A2(stringProperty,
-      "cite",
-      value);
-   };
-   var href = function (value) {
-      return A2(stringProperty,
-      "href",
-      value);
-   };
-   var target = function (value) {
-      return A2(stringProperty,
-      "target",
-      value);
-   };
-   var downloadAs = function (value) {
-      return A2(stringProperty,
-      "download",
-      value);
-   };
-   var hreflang = function (value) {
-      return A2(stringProperty,
-      "hreflang",
-      value);
-   };
-   var media = function (value) {
-      return A2(stringProperty,
-      "media",
-      value);
-   };
-   var ping = function (value) {
-      return A2(stringProperty,
-      "ping",
-      value);
-   };
-   var rel = function (value) {
-      return A2(stringProperty,
-      "rel",
-      value);
-   };
-   var datetime = function (value) {
-      return A2(stringProperty,
-      "datetime",
-      value);
-   };
-   var pubdate = function (value) {
-      return A2(stringProperty,
-      "pubdate",
-      value);
-   };
-   var start = function (n) {
-      return A2(stringProperty,
-      "start",
-      $Basics.toString(n));
-   };
-   var colspan = function (value) {
-      return A2(stringProperty,
-      "colSpan",
-      value);
-   };
-   var headers = function (value) {
-      return A2(stringProperty,
-      "headers",
-      value);
-   };
-   var rowspan = function (value) {
-      return A2(stringProperty,
-      "rowSpan",
-      value);
-   };
-   var scope = function (value) {
-      return A2(stringProperty,
-      "scope",
-      value);
-   };
-   var manifest = function (value) {
-      return A2(stringProperty,
-      "manifest",
-      value);
-   };
-   var boolProperty = F2(function (name,
-   bool) {
-      return A2(property,
-      name,
-      $Json$Encode.bool(bool));
-   });
-   var hidden = function (bool) {
-      return A2(boolProperty,
-      "hidden",
-      bool);
-   };
-   var contenteditable = function (bool) {
-      return A2(boolProperty,
-      "contentEditable",
-      bool);
-   };
-   var spellcheck = function (bool) {
-      return A2(boolProperty,
-      "spellcheck",
-      bool);
-   };
-   var async = function (bool) {
-      return A2(boolProperty,
-      "async",
-      bool);
-   };
-   var defer = function (bool) {
-      return A2(boolProperty,
-      "defer",
-      bool);
-   };
-   var scoped = function (bool) {
-      return A2(boolProperty,
-      "scoped",
-      bool);
-   };
-   var autoplay = function (bool) {
-      return A2(boolProperty,
-      "autoplay",
-      bool);
-   };
-   var controls = function (bool) {
-      return A2(boolProperty,
-      "controls",
-      bool);
-   };
-   var loop = function (bool) {
-      return A2(boolProperty,
-      "loop",
-      bool);
-   };
-   var preload = function (bool) {
-      return A2(boolProperty,
-      "preload",
-      bool);
-   };
-   var $default = function (bool) {
-      return A2(boolProperty,
-      "default",
-      bool);
-   };
-   var seamless = function (bool) {
-      return A2(boolProperty,
-      "seamless",
-      bool);
-   };
-   var checked = function (bool) {
-      return A2(boolProperty,
-      "checked",
-      bool);
-   };
-   var selected = function (bool) {
-      return A2(boolProperty,
-      "selected",
-      bool);
-   };
-   var autofocus = function (bool) {
-      return A2(boolProperty,
-      "autofocus",
-      bool);
-   };
-   var disabled = function (bool) {
-      return A2(boolProperty,
-      "disabled",
-      bool);
-   };
-   var multiple = function (bool) {
-      return A2(boolProperty,
-      "multiple",
-      bool);
-   };
-   var novalidate = function (bool) {
-      return A2(boolProperty,
-      "novalidate",
-      bool);
-   };
-   var readonly = function (bool) {
-      return A2(boolProperty,
-      "readonly",
-      bool);
-   };
-   var required = function (bool) {
-      return A2(boolProperty,
-      "required",
-      bool);
-   };
-   var download = function (bool) {
-      return A2(boolProperty,
-      "download",
-      bool);
-   };
-   var reversed = function (bool) {
-      return A2(boolProperty,
-      "reversed",
-      bool);
-   };
-   var classList = function (list) {
-      return $class($String.join(" ")($List.map($Basics.fst)($List.filter($Basics.snd)(list))));
-   };
-   var style = function (props) {
-      return property("style")($Json$Encode.object($List.map(function (_v0) {
-         return function () {
-            switch (_v0.ctor)
-            {case "_Tuple2":
-               return {ctor: "_Tuple2"
-                      ,_0: _v0._0
-                      ,_1: $Json$Encode.string(_v0._1)};}
-            _U.badCase($moduleName,
-            "on line 136, column 35 to 57");
-         }();
-      })(props)));
-   };
-   var key = function (k) {
-      return A2(stringProperty,
-      "key",
-      k);
-   };
-   _elm.Html.Attributes.values = {_op: _op
-                                 ,key: key
-                                 ,style: style
-                                 ,classList: classList
-                                 ,property: property
-                                 ,stringProperty: stringProperty
-                                 ,boolProperty: boolProperty
-                                 ,$class: $class
-                                 ,hidden: hidden
-                                 ,id: id
-                                 ,title: title
-                                 ,accesskey: accesskey
-                                 ,contenteditable: contenteditable
-                                 ,contextmenu: contextmenu
-                                 ,dir: dir
-                                 ,draggable: draggable
-                                 ,dropzone: dropzone
-                                 ,itemprop: itemprop
-                                 ,lang: lang
-                                 ,spellcheck: spellcheck
-                                 ,tabindex: tabindex
-                                 ,async: async
-                                 ,charset: charset
-                                 ,content: content
-                                 ,defer: defer
-                                 ,httpEquiv: httpEquiv
-                                 ,language: language
-                                 ,scoped: scoped
-                                 ,src: src
-                                 ,height: height
-                                 ,width: width
-                                 ,alt: alt
-                                 ,autoplay: autoplay
-                                 ,controls: controls
-                                 ,loop: loop
-                                 ,preload: preload
-                                 ,poster: poster
-                                 ,$default: $default
-                                 ,kind: kind
-                                 ,srclang: srclang
-                                 ,sandbox: sandbox
-                                 ,seamless: seamless
-                                 ,srcdoc: srcdoc
-                                 ,type$: type$
-                                 ,value: value
-                                 ,checked: checked
-                                 ,placeholder: placeholder
-                                 ,selected: selected
-                                 ,accept: accept
-                                 ,acceptCharset: acceptCharset
-                                 ,action: action
-                                 ,autocomplete: autocomplete
-                                 ,autofocus: autofocus
-                                 ,autosave: autosave
-                                 ,disabled: disabled
-                                 ,enctype: enctype
-                                 ,formaction: formaction
-                                 ,list: list
-                                 ,maxlength: maxlength
-                                 ,method: method
-                                 ,multiple: multiple
-                                 ,name: name
-                                 ,novalidate: novalidate
-                                 ,pattern: pattern
-                                 ,readonly: readonly
-                                 ,required: required
-                                 ,size: size
-                                 ,$for: $for
-                                 ,form: form
-                                 ,max: max
-                                 ,min: min
-                                 ,step: step
-                                 ,cols: cols
-                                 ,rows: rows
-                                 ,wrap: wrap
-                                 ,ismap: ismap
-                                 ,usemap: usemap
-                                 ,shape: shape
-                                 ,coords: coords
-                                 ,challenge: challenge
-                                 ,keytype: keytype
-                                 ,align: align
-                                 ,cite: cite
-                                 ,href: href
-                                 ,target: target
-                                 ,download: download
-                                 ,downloadAs: downloadAs
-                                 ,hreflang: hreflang
-                                 ,media: media
-                                 ,ping: ping
-                                 ,rel: rel
-                                 ,datetime: datetime
-                                 ,pubdate: pubdate
-                                 ,reversed: reversed
-                                 ,start: start
-                                 ,colspan: colspan
-                                 ,headers: headers
-                                 ,rowspan: rowspan
-                                 ,scope: scope
-                                 ,manifest: manifest};
-   return _elm.Html.Attributes.values;
 };Elm.Json = Elm.Json || {};
 Elm.Json.Decode = Elm.Json.Decode || {};
 Elm.Json.Decode.make = function (_elm) {
@@ -3881,359 +3261,388 @@ Elm.Main.make = function (_elm) {
    $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
    $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Mouse = Elm.Mouse.make(_elm),
    $Plot = Elm.Plot.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Statistics$Continuous = Elm.Statistics.Continuous.make(_elm),
-   $Statistics$Discrete = Elm.Statistics.Discrete.make(_elm),
+   $Statistics$Data$Iris = Elm.Statistics.Data.Iris.make(_elm),
+   $Statistics$Data$Mtcars = Elm.Statistics.Data.Mtcars.make(_elm),
    $Window = Elm.Window.make(_elm);
-   var ndtext = "Normalfördelningen är en välkänd kontinuerlig fördelning som kan användas istället för binomialfördelningen om en av flera möjliga tumregler uppfylls, till exempel nπ≥5 och n(1-π)≥5. Här betyder det att n≥5/π = n≥20. Med andra ord kan vi byta ut binomialfördelningen mot en motsvarande normalfördelning då antalet försök är minst 20. Fördelningen N(µ,σ) konstrueras med väntevärdet och standardavvikelsen från den ursprungliga binomialfördelningen. Om det vi försöker mäta liknar en normalfördelning så kan vi räkna med att ungefär två tredjedelar (68,3%) av utfallen sker inom ±1 standardavvikelse omkring väntevärdet. Integralen anges här i procent men arean av det färgade området är egentligen 0,683.";
-   var potext = "Poissonfördelningen är en annan diskret sannolikhetsfördelning som kan användas för att efterlikna binomialfördelningen. Eftersom poissonfördelningen används för mer ovanliga/osannolika händelser så passar den bra för stora n och små π, dvs ett stort antal försök och liten sannolikhet för positivt utfall. En tumregel är n ≥ 10 och π ≤ 0,1. Med andra ord är den olämplig att använda här då π=0.25. Poängen med diagrammet är snarare att visa fördelningarna och hur de liknar varandra. Poissonfördelningen har en något plattare form och en större standardavvikelse, dvs att det totala utfallet förväntas variera inom ett större intervall. Standardavvikelsen för en poissonfördelning är för övrigt roten ur väntevärdet. ";
-   var bintext = "Binomialfördelningen beskriver sannolikheter för två ömsesidigt uteslutande utfall och ett känt antal försök. Det gäller till exempel olika typer av spel, där utfallen är vinst och förlust. Varje försök är oberoende: utfallet av ett tärningskast beror inte på det föregående kastet. För att konstruera denna fördelning behövs två komponenter: sannolikheten för att händelsen inträffar (π) och antal försök (n). I verkligheten sker en slumpmässig variation men i det långa loppet kommer antalet positiva utfall att närma sig väntevärdet (µ), som enkelt beräknas genom n * π. Binomialfördelningen är en diskret fördelning, eftersom x-värdena (0..n) utgörs av heltal. Allt eftersom antalet försök växer blir binomialfördelningen mer omständlig att beräkna, och det kan därför vara en god idé att \"approximera\" den med en liknande fördelning. Exemplet till höger illustrerar fördelningen för mellan 4 och 60 försök, då sannolikheten för positivt utfall är en fjärdedel.";
-   var mkGeoms = F3(function (n,
-   pdist,
-   use) {
-      return _L.fromArray([$Plot.geom_vline(_U.replace([["x"
-                                                        ,$Maybe.Just(pdist.mu)]
-                                                       ,["label"
-                                                        ,$Maybe.Just("µ=")]
-                                                       ,["translate"
-                                                        ,$Maybe.Just({ctor: "_Tuple2"
-                                                                     ,_0: 4
-                                                                     ,_1: 0})]],
-                          $Plot.aes))
-                          ,$Plot.geom_vline(_U.replace([["x"
-                                                        ,$Maybe.Just(n)]
-                                                       ,["label"
-                                                        ,$Maybe.Just("n=")]
-                                                       ,["translate"
-                                                        ,$Maybe.Just({ctor: "_Tuple2"
-                                                                     ,_0: 0
-                                                                     ,_1: -8})]
-                                                       ,["colour"
-                                                        ,$Maybe.Just($Color.darkGrey)]],
-                          $Plot.aes))
-                          ,$Plot.geom_hlinerange(_U.replace([["y"
-                                                             ,$Maybe.Just(-3)]
-                                                            ,["limits"
-                                                             ,$Maybe.Just({ctor: "_Tuple2"
-                                                                          ,_0: pdist.mu - pdist.sigma
-                                                                          ,_1: pdist.mu + pdist.sigma})]
-                                                            ,["label"
-                                                             ,$Maybe.Just(A2($Basics._op["++"],
-                                                             "&sigma;=",
-                                                             $Basics.toString(A2($Statistics$Continuous.dec,
-                                                             2,
-                                                             pdist.sigma))))]
-                                                            ,["translate"
-                                                             ,$Maybe.Just({ctor: "_Tuple2"
-                                                                          ,_0: 6
-                                                                          ,_1: 0})]],
-                          $Plot.aes))
-                          ,$Plot.geom_hlinerange(_U.replace([["y"
-                                                             ,$Maybe.Just(-5)]
-                                                            ,["limits"
-                                                             ,$Maybe.Just({ctor: "_Tuple2"
-                                                                          ,_0: pdist.mu - 2 * pdist.sigma
-                                                                          ,_1: pdist.mu + 2 * pdist.sigma})]
-                                                            ,["label"
-                                                             ,$Maybe.Just("")]
-                                                            ,["translate"
-                                                             ,$Maybe.Just({ctor: "_Tuple2"
-                                                                          ,_0: 4
-                                                                          ,_1: 0})]],
-                          $Plot.aes))
-                          ,$Plot.geom_hlinerange(_U.replace([["y"
-                                                             ,$Maybe.Just(-7)]
-                                                            ,["limits"
-                                                             ,$Maybe.Just({ctor: "_Tuple2"
-                                                                          ,_0: pdist.mu - 3 * pdist.sigma
-                                                                          ,_1: pdist.mu + 3 * pdist.sigma})]
-                                                            ,["label"
-                                                             ,$Maybe.Just("")]
-                                                            ,["translate"
-                                                             ,$Maybe.Just({ctor: "_Tuple2"
-                                                                          ,_0: 4
-                                                                          ,_1: 0})]],
-                          $Plot.aes))
-                          ,$Plot.geom_area(_U.replace([["limits"
-                                                       ,$Maybe.Just({ctor: "_Tuple2"
-                                                                    ,_0: pdist.mu - pdist.sigma
-                                                                    ,_1: pdist.mu + pdist.sigma})]
-                                                      ,["colour"
-                                                       ,$Maybe.Just(use ? $Color.darkGreen : $Color.darkBlue)]
-                                                      ,["visibility"
-                                                       ,$Maybe.Just(0.5)]
-                                                      ,["dynamic"
-                                                       ,$Maybe.Just(false)]],
-                          $Plot.aes))]);
-   });
-   var geomsC = _L.fromArray([$Plot.background(_U.replace([["colour"
-                                                           ,$Maybe.Just($Color.lightBlue)]
-                                                          ,["visibility"
-                                                           ,$Maybe.Just(0.4)]],
-                             $Plot.aes))
-                             ,$Plot.geom_image(_U.replace([["dims"
-                                                           ,$Maybe.Just({ctor: "_Tuple2"
-                                                                        ,_0: 50
-                                                                        ,_1: 50})]
-                                                          ,["label"
-                                                           ,$Maybe.Just("http://elm-lang.org/imgs/mario/walk/right.gif")]
-                                                          ,["translate"
-                                                           ,$Maybe.Just({ctor: "_Tuple2"
-                                                                        ,_0: 0
-                                                                        ,_1: 20})]],
-                             $Plot.aes))
-                             ,$Plot.geom_vline(_U.replace([["x"
-                                                           ,$Maybe.Just(20)]
-                                                          ,["annotate"
-                                                           ,$Maybe.Just(false)]
-                                                          ,["colour"
-                                                           ,$Maybe.Just($Color.darkGreen)]
-                                                          ,["linetype"
-                                                           ,$Maybe.Just($Graphics$Collage.dotted)]],
-                             $Plot.aes))
-                             ,$Plot.geom_curve(_U.replace([["dynamic"
-                                                           ,$Maybe.Just(false)]
-                                                          ,["colour"
-                                                           ,$Maybe.Just($Color.grey)]],
-                             $Plot.aes))
-                             ,$Plot.xAxis(_U.replace([["label"
-                                                      ,$Maybe.Just("Antal försök")]
-                                                     ,["tickspacing"
-                                                      ,$Maybe.Just(10)]],
-                             $Plot.aes))
-                             ,$Plot.yAxis(_U.replace([["label"
-                                                      ,$Maybe.Just("Sannolikhet %")]
-                                                     ,["tickspacing"
-                                                      ,$Maybe.Just(10)]
-                                                     ,["revolve"
-                                                      ,$Maybe.Just(true)]],
-                             $Plot.aes))]);
-   var geomsD = _L.fromArray([$Plot.background(_U.replace([["colour"
-                                                           ,$Maybe.Just($Color.lightBlue)]
-                                                          ,["visibility"
-                                                           ,$Maybe.Just(0.4)]],
-                             $Plot.aes))
-                             ,$Plot.geom_image(_U.replace([["dims"
-                                                           ,$Maybe.Just({ctor: "_Tuple2"
-                                                                        ,_0: 50
-                                                                        ,_1: 50})]
-                                                          ,["label"
-                                                           ,$Maybe.Just("http://elm-lang.org/imgs/mario/walk/right.gif")]
-                                                          ,["translate"
-                                                           ,$Maybe.Just({ctor: "_Tuple2"
-                                                                        ,_0: 0
-                                                                        ,_1: 20})]],
-                             $Plot.aes))
-                             ,$Plot.xAxis(_U.replace([["label"
-                                                      ,$Maybe.Just("Antal försök")]
-                                                     ,["tickspacing"
-                                                      ,$Maybe.Just(10)]],
-                             $Plot.aes))
-                             ,$Plot.yAxis(_U.replace([["label"
-                                                      ,$Maybe.Just("Sannolikhet %")]
-                                                     ,["tickspacing"
-                                                      ,$Maybe.Just(10)]
-                                                     ,["revolve"
-                                                      ,$Maybe.Just(true)]],
-                             $Plot.aes))
-                             ,$Plot.geom_bar(_U.replace([["colour"
-                                                         ,$Maybe.Just($Color.lightBlue)]
-                                                        ,["dynamic"
-                                                         ,$Maybe.Just(false)]],
-                             $Plot.aes))]);
    var render = F2(function (m,w) {
       return function () {
-         var ylim = {ctor: "_Tuple2"
-                    ,_0: -9
-                    ,_1: 50};
-         var p = 0.25;
-         var mouseY = $Basics.toFloat($Basics.snd(m));
-         var ypos = A2($Statistics$Continuous.normalize,
-         {ctor: "_Tuple2"
-         ,_0: 0.95 * function ($) {
-            return $Basics.toFloat($Basics.snd($));
-         }(w)
-         ,_1: 0.1 * function ($) {
-            return $Basics.toFloat($Basics.snd($));
-         }(w)},
-         mouseY);
-         var n$ = function ($) {
-            return $Basics.toFloat($Basics.floor($));
-         }(60 * ypos);
-         var n = _U.cmp(n$,
-         4) < 0 ? 4 : _U.cmp(n$,
-         60) > 0 ? 60 : n$;
-         var bin = A2($Statistics$Discrete.binom,
-         n,
-         p);
-         var bindist = A3($Plot.discrete,
-         function ($) {
-            return function (n) {
-               return n * 100;
-            }(bin.pdf($));
+         var ps = 4;
+         var vis = 0.6;
+         var geoms_setosa = _L.fromArray([$Plot.geom_points(_U.replace([["dynamic"
+                                                                        ,$Maybe.Just(false)]
+                                                                       ,["colour"
+                                                                        ,$Maybe.Just($Color.blue)]
+                                                                       ,["pointsize"
+                                                                        ,$Maybe.Just(ps)]
+                                                                       ,["visibility"
+                                                                        ,$Maybe.Just(vis)]],
+                                         $Plot.aes))
+                                         ,$Plot.legend(_U.replace([["translate"
+                                                                   ,$Maybe.Just({ctor: "_Tuple2"
+                                                                                ,_0: 1
+                                                                                ,_1: 4})]
+                                                                  ,["label"
+                                                                   ,$Maybe.Just("Setosa")]
+                                                                  ,["colour"
+                                                                   ,$Maybe.Just($Color.blue)]],
+                                         $Plot.aes))
+                                         ,$Plot.geom_vline(_U.replace([["x"
+                                                                       ,$Maybe.Just(1.462)]
+                                                                      ,["colour"
+                                                                       ,$Maybe.Just($Color.blue)]
+                                                                      ,["label"
+                                                                       ,$Maybe.Just("mean = ")]
+                                                                      ,["linetype"
+                                                                       ,$Maybe.Just($Graphics$Collage.dotted)]],
+                                         $Plot.aes))]);
+         var geoms_versicolor = _L.fromArray([$Plot.geom_points(_U.replace([["dynamic"
+                                                                            ,$Maybe.Just(false)]
+                                                                           ,["colour"
+                                                                            ,$Maybe.Just($Color.orange)]
+                                                                           ,["pointsize"
+                                                                            ,$Maybe.Just(ps)]
+                                                                           ,["visibility"
+                                                                            ,$Maybe.Just(vis)]],
+                                             $Plot.aes))
+                                             ,$Plot.legend(_U.replace([["translate"
+                                                                       ,$Maybe.Just({ctor: "_Tuple2"
+                                                                                    ,_0: 1
+                                                                                    ,_1: 3.5})]
+                                                                      ,["label"
+                                                                       ,$Maybe.Just("Versicolor")]
+                                                                      ,["colour"
+                                                                       ,$Maybe.Just($Color.orange)]],
+                                             $Plot.aes))
+                                             ,$Plot.geom_vline(_U.replace([["x"
+                                                                           ,$Maybe.Just(4.26)]
+                                                                          ,["colour"
+                                                                           ,$Maybe.Just($Color.orange)]
+                                                                          ,["label"
+                                                                           ,$Maybe.Just("mean = ")]
+                                                                          ,["linetype"
+                                                                           ,$Maybe.Just($Graphics$Collage.dotted)]],
+                                             $Plot.aes))]);
+         var geoms_virginica = _L.fromArray([$Plot.geom_points(_U.replace([["dynamic"
+                                                                           ,$Maybe.Just(false)]
+                                                                          ,["colour"
+                                                                           ,$Maybe.Just($Color.red)]
+                                                                          ,["pointsize"
+                                                                           ,$Maybe.Just(ps)]
+                                                                          ,["visibility"
+                                                                           ,$Maybe.Just(vis)]],
+                                            $Plot.aes))
+                                            ,$Plot.legend(_U.replace([["translate"
+                                                                      ,$Maybe.Just({ctor: "_Tuple2"
+                                                                                   ,_0: 1
+                                                                                   ,_1: 3})]
+                                                                     ,["label"
+                                                                      ,$Maybe.Just("Virginica")]
+                                                                     ,["colour"
+                                                                      ,$Maybe.Just($Color.red)]],
+                                            $Plot.aes))
+                                            ,$Plot.geom_vline(_U.replace([["x"
+                                                                          ,$Maybe.Just(5.552)]
+                                                                         ,["colour"
+                                                                          ,$Maybe.Just($Color.red)]
+                                                                         ,["label"
+                                                                          ,$Maybe.Just("mean = ")]
+                                                                         ,["linetype"
+                                                                          ,$Maybe.Just($Graphics$Collage.dotted)]],
+                                            $Plot.aes))]);
+         var iris = A3($List.map2,
+         F2(function (v0,v1) {
+            return {ctor: "_Tuple2"
+                   ,_0: v0
+                   ,_1: v1};
+         }),
+         $Statistics$Data$Iris.petalLength,
+         $Statistics$Data$Iris.petalWidth);
+         var d_iris = A3($Plot.fromPairs,
+         iris,
+         {ctor: "_Tuple2",_0: 0,_1: 7},
+         {ctor: "_Tuple2",_0: -2,_1: 5});
+         var lm_iris = $Statistics$Continuous.linreg(iris);
+         var geoms_iris = _L.fromArray([$Plot.geom_hline(_U.replace([["y"
+                                                                     ,$Maybe.Just(0)]
+                                                                    ,["annotate"
+                                                                     ,$Maybe.Just(false)]
+                                                                    ,["colour"
+                                                                     ,$Maybe.Just($Color.darkGrey)]],
+                                       $Plot.aes))
+                                       ,$Plot.title(_U.replace([["label"
+                                                                ,$Maybe.Just("Linear regression of the Iris dataset: petalWidth ~ petalLength")]],
+                                       $Plot.aes))
+                                       ,$Plot.xAxis(_U.replace([["tickspacing"
+                                                                ,$Maybe.Just(2)]
+                                                               ,["translate"
+                                                                ,$Maybe.Just({ctor: "_Tuple2"
+                                                                             ,_0: 0
+                                                                             ,_1: -5})]
+                                                               ,["label"
+                                                                ,$Maybe.Just("Petal Length")]],
+                                       $Plot.aes))
+                                       ,$Plot.yAxis(_U.replace([["tickspacing"
+                                                                ,$Maybe.Just(2)]
+                                                               ,["revolve"
+                                                                ,$Maybe.Just(true)]
+                                                               ,["label"
+                                                                ,$Maybe.Just("Petal Width")]],
+                                       $Plot.aes))
+                                       ,$Plot.geom_abline(_U.replace([["fun"
+                                                                      ,$Maybe.Just(lm_iris.f)]
+                                                                     ,["dynamic"
+                                                                      ,$Maybe.Just(false)]
+                                                                     ,["limits"
+                                                                      ,$Maybe.Just({ctor: "_Tuple2"
+                                                                                   ,_0: 0
+                                                                                   ,_1: 7})]],
+                                       $Plot.aes))]);
+         var iris$ = A3($List.map2,
+         F2(function (_v0,s) {
+            return function () {
+               switch (_v0.ctor)
+               {case "_Tuple2":
+                  return {ctor: "_Tuple3"
+                         ,_0: _v0._0
+                         ,_1: _v0._1
+                         ,_2: s};}
+               _U.badCase($moduleName,
+               "on line 52, column 39 to 44");
+            }();
+         }),
+         iris,
+         $Statistics$Data$Iris.species);
+         var setosa = $List.map(function (_v9) {
+            return function () {
+               switch (_v9.ctor)
+               {case "_Tuple3":
+                  return {ctor: "_Tuple2"
+                         ,_0: _v9._0
+                         ,_1: _v9._1};}
+               _U.badCase($moduleName,
+               "on line 53, column 39 to 42");
+            }();
+         })(A2($List.filter,
+         function (_v4) {
+            return function () {
+               switch (_v4.ctor)
+               {case "_Tuple3":
+                  return _U.eq(_v4._2,"setosa");}
+               _U.badCase($moduleName,
+               "on line 53, column 73 to 86");
+            }();
          },
-         {ctor: "_Tuple2",_0: 0,_1: 60},
-         ylim);
-         var bindist2 = A3($Plot.discrete,
-         bin.pdf,
-         {ctor: "_Tuple2",_0: 0,_1: 60},
-         ylim);
-         var mu = A2($Statistics$Continuous.dec,
-         2,
-         bin.mu);
-         var potitle = _L.fromArray([$Plot.title(_U.replace([["label"
-                                                             ,$Maybe.Just(A2($Basics._op["++"],
-                                                             "Po(µ=",
-                                                             A2($Basics._op["++"],
-                                                             $Basics.toString(mu),
-                                                             ")")))]],
-         $Plot.aes))]);
-         var s = A2($Statistics$Continuous.dec,
-         2,
-         bin.sigma);
-         var ndtitle = _L.fromArray([$Plot.title(_U.replace([["label"
-                                                             ,$Maybe.Just(A2($Basics._op["++"],
-                                                             "N(µ=",
-                                                             A2($Basics._op["++"],
-                                                             $Basics.toString(mu),
-                                                             A2($Basics._op["++"],
-                                                             ",&sigma;=",
-                                                             A2($Basics._op["++"],
-                                                             $Basics.toString(s),
-                                                             ")")))))]],
-         $Plot.aes))]);
-         var ndintegral = _L.fromArray([$Plot.annotate_integral(_U.replace([["translate"
-                                                                            ,$Maybe.Just({ctor: "_Tuple2"
-                                                                                         ,_0: 0.8
-                                                                                         ,_1: 0.5})]
-                                                                           ,["limits"
-                                                                            ,$Maybe.Just({ctor: "_Tuple2"
-                                                                                         ,_0: mu - s
-                                                                                         ,_1: mu + s})]],
-         $Plot.aes))]);
-         var po = $Statistics$Discrete.poisson(bin.mu);
-         var podist = A3($Plot.discrete,
-         function ($) {
-            return function (n) {
-               return n * 100;
-            }(po.pdf($));
+         iris$));
+         var d_setosa = A3($Plot.fromPairs,
+         setosa,
+         {ctor: "_Tuple2",_0: 0,_1: 7},
+         {ctor: "_Tuple2",_0: -2,_1: 5});
+         var versicolor = $List.map(function (_v19) {
+            return function () {
+               switch (_v19.ctor)
+               {case "_Tuple3":
+                  return {ctor: "_Tuple2"
+                         ,_0: _v19._0
+                         ,_1: _v19._1};}
+               _U.badCase($moduleName,
+               "on line 54, column 43 to 46");
+            }();
+         })(A2($List.filter,
+         function (_v14) {
+            return function () {
+               switch (_v14.ctor)
+               {case "_Tuple3":
+                  return _U.eq(_v14._2,
+                    "versicolor");}
+               _U.badCase($moduleName,
+               "on line 54, column 77 to 94");
+            }();
          },
-         {ctor: "_Tuple2",_0: 0,_1: 60},
-         ylim);
-         var nd = A2($Statistics$Continuous.normal,
-         bin.mu,
-         bin.sigma);
-         var nddist = A4($Plot.continuous,
-         function ($) {
-            return function (n) {
-               return n * 100;
-            }(nd.pdf($));
+         iris$));
+         var d_versicolor = A3($Plot.fromPairs,
+         versicolor,
+         {ctor: "_Tuple2",_0: 0,_1: 7},
+         {ctor: "_Tuple2",_0: -2,_1: 5});
+         var virginica = $List.map(function (_v29) {
+            return function () {
+               switch (_v29.ctor)
+               {case "_Tuple3":
+                  return {ctor: "_Tuple2"
+                         ,_0: _v29._0
+                         ,_1: _v29._1};}
+               _U.badCase($moduleName,
+               "on line 55, column 42 to 45");
+            }();
+         })(A2($List.filter,
+         function (_v24) {
+            return function () {
+               switch (_v24.ctor)
+               {case "_Tuple3":
+                  return _U.eq(_v24._2,
+                    "virginica");}
+               _U.badCase($moduleName,
+               "on line 55, column 76 to 92");
+            }();
          },
-         {ctor: "_Tuple2",_0: 0,_1: 60},
-         ylim,
-         200);
-         var bingeoms = A3(mkGeoms,
-         n,
-         bin,
-         true);
-         var bintitle = _L.fromArray([$Plot.title(_U.replace([["label"
-                                                              ,$Maybe.Just(A2($Basics._op["++"],
-                                                              "Bin(π=",
-                                                              A2($Basics._op["++"],
-                                                              $Basics.toString(p),
-                                                              A2($Basics._op["++"],
-                                                              ",n=",
-                                                              A2($Basics._op["++"],
-                                                              $Basics.toString(n),
-                                                              ")")))))]],
-         $Plot.aes))]);
-         var pogeoms = A3(mkGeoms,
-         n,
-         po,
-         false);
-         var ndgeoms = A3(mkGeoms,
-         n,
-         nd,
-         _U.cmp(n,20) > -1);
+         iris$));
+         var d_virginica = A3($Plot.fromPairs,
+         virginica,
+         {ctor: "_Tuple2",_0: 0,_1: 7},
+         {ctor: "_Tuple2",_0: -2,_1: 5});
+         var cars = A3($List.map2,
+         F2(function (v0,v1) {
+            return {ctor: "_Tuple2"
+                   ,_0: v0
+                   ,_1: v1};
+         }),
+         $Statistics$Data$Mtcars.hp,
+         $Statistics$Data$Mtcars.mpg);
+         var d_cars = A3($Plot.fromPairs,
+         cars,
+         {ctor: "_Tuple2",_0: 0,_1: 340},
+         {ctor: "_Tuple2",_0: 0,_1: 35});
+         var lm_cars = $Statistics$Continuous.linreg(cars);
+         var geoms_cars = _L.fromArray([$Plot.geom_hline(_U.replace([["y"
+                                                                     ,$Maybe.Just(0)]
+                                                                    ,["annotate"
+                                                                     ,$Maybe.Just(false)]
+                                                                    ,["colour"
+                                                                     ,$Maybe.Just($Color.darkGrey)]],
+                                       $Plot.aes))
+                                       ,$Plot.title(_U.replace([["label"
+                                                                ,$Maybe.Just("Linear regression of the Mtcars dataset: mpg ~ hp")]],
+                                       $Plot.aes))
+                                       ,$Plot.xAxis(_U.replace([["tickspacing"
+                                                                ,$Maybe.Just(50)]
+                                                               ,["translate"
+                                                                ,$Maybe.Just({ctor: "_Tuple2"
+                                                                             ,_0: 0
+                                                                             ,_1: -5})]
+                                                               ,["label"
+                                                                ,$Maybe.Just("Horse Power (hp)")]],
+                                       $Plot.aes))
+                                       ,$Plot.yAxis(_U.replace([["tickspacing"
+                                                                ,$Maybe.Just(10)]
+                                                               ,["revolve"
+                                                                ,$Maybe.Just(true)]
+                                                               ,["label"
+                                                                ,$Maybe.Just("Fuel consumption (mpg)")]],
+                                       $Plot.aes))
+                                       ,$Plot.geom_abline(_U.replace([["fun"
+                                                                      ,$Maybe.Just(lm_cars.f)]
+                                                                     ,["dynamic"
+                                                                      ,$Maybe.Just(false)]
+                                                                     ,["limits"
+                                                                      ,$Maybe.Just({ctor: "_Tuple2"
+                                                                                   ,_0: 0
+                                                                                   ,_1: 340})]],
+                                       $Plot.aes))
+                                       ,$Plot.geom_vlineranges(_U.replace([["fun"
+                                                                           ,$Maybe.Just(lm_cars.f)]
+                                                                          ,["colour"
+                                                                           ,$Maybe.Just($Color.green)]
+                                                                          ,["linetype"
+                                                                           ,$Maybe.Just($Graphics$Collage.dotted)]],
+                                       $Plot.aes))
+                                       ,$Plot.geom_points(_U.replace([["dynamic"
+                                                                      ,$Maybe.Just(false)]
+                                                                     ,["colour"
+                                                                      ,$Maybe.Just($Color.blue)]
+                                                                     ,["pointsize"
+                                                                      ,$Maybe.Just(4)]
+                                                                     ,["visibility"
+                                                                      ,$Maybe.Just(1)]],
+                                       $Plot.aes))
+                                       ,$Plot.legend(_U.replace([["translate"
+                                                                 ,$Maybe.Just({ctor: "_Tuple2"
+                                                                              ,_0: 50
+                                                                              ,_1: 10})]
+                                                                ,["label"
+                                                                 ,$Maybe.Just("residuals")]
+                                                                ,["colour"
+                                                                 ,$Maybe.Just($Color.green)]
+                                                                ,["linetype"
+                                                                 ,$Maybe.Just($Graphics$Collage.dotted)]],
+                                       $Plot.aes))]);
          return A2($Graphics$Element.flow,
          $Graphics$Element.down,
-         _L.fromArray([A2($Html.toElement,
-                      1000,
-                      50)(A2($Html.h1,
-                      _L.fromArray([$Html$Attributes.align("center")]),
-                      _L.fromArray([$Html.text("Binomialfördelningen och dess vänner")])))
-                      ,$Graphics$Element.flow($Graphics$Element.right)(_L.fromArray([A2($Html.toElement,
-                                                                                    600,
-                                                                                    250)($Html.text(bintext))
-                                                                                    ,A5($Plot.plot,
+         _L.fromArray([$Graphics$Element.flow($Graphics$Element.right)(_L.fromArray([A5($Plot.plot,
                                                                                     {ctor: "_Tuple2"
-                                                                                    ,_0: 600
-                                                                                    ,_1: 250},
-                                                                                    bindist,
-                                                                                    A2($Basics._op["++"],
-                                                                                    geomsD,
-                                                                                    A2($Basics._op["++"],
-                                                                                    bingeoms,
-                                                                                    bintitle)),
+                                                                                    ,_0: 1000
+                                                                                    ,_1: 300},
+                                                                                    d_cars,
+                                                                                    geoms_cars,
                                                                                     m,
-                                                                                    w)]))
-                      ,$Graphics$Element.flow($Graphics$Element.right)(_L.fromArray([A2($Html.toElement,
-                                                                                    600,
-                                                                                    250)($Html.text(ndtext))
-                                                                                    ,$Graphics$Element.flow($Graphics$Element.outward)(_L.fromArray([A5($Plot.plot,
-                                                                                                                                                    {ctor: "_Tuple2"
-                                                                                                                                                    ,_0: 600
-                                                                                                                                                    ,_1: 250},
-                                                                                                                                                    nddist,
-                                                                                                                                                    A2($Basics._op["++"],
-                                                                                                                                                    geomsC,
-                                                                                                                                                    A2($Basics._op["++"],
-                                                                                                                                                    ndgeoms,
-                                                                                                                                                    ndtitle)),
-                                                                                                                                                    m,
-                                                                                                                                                    w)
-                                                                                                                                                    ,A5($Plot.plot,
-                                                                                                                                                    {ctor: "_Tuple2"
-                                                                                                                                                    ,_0: 600
-                                                                                                                                                    ,_1: 250},
-                                                                                                                                                    nddist,
-                                                                                                                                                    ndintegral,
-                                                                                                                                                    m,
-                                                                                                                                                    w)]))]))
-                      ,$Graphics$Element.flow($Graphics$Element.right)(_L.fromArray([A2($Html.toElement,
-                                                                                    600,
-                                                                                    250)($Html.text(potext))
-                                                                                    ,A5($Plot.plot,
-                                                                                    {ctor: "_Tuple2"
-                                                                                    ,_0: 600
-                                                                                    ,_1: 250},
-                                                                                    podist,
-                                                                                    A2($Basics._op["++"],
-                                                                                    geomsD,
-                                                                                    A2($Basics._op["++"],
-                                                                                    pogeoms,
-                                                                                    potitle)),
-                                                                                    m,
-                                                                                    w)]))]));
+                                                                                    w)
+                                                                                    ,A2($Html.toElement,
+                                                                                    300,
+                                                                                    300)($Html.text(A2($Basics._op["++"],
+                                                                                    "linear model: ",
+                                                                                    $Basics.toString(lm_cars))))]))
+                      ,$Graphics$Element.flow($Graphics$Element.right)(_L.fromArray([A2($Graphics$Element.flow,
+                                                                                    $Graphics$Element.outward,
+                                                                                    _L.fromArray([A5($Plot.plot,
+                                                                                                 {ctor: "_Tuple2"
+                                                                                                 ,_0: 1000
+                                                                                                 ,_1: 300},
+                                                                                                 d_iris,
+                                                                                                 geoms_iris,
+                                                                                                 m,
+                                                                                                 w)
+                                                                                                 ,A5($Plot.plot,
+                                                                                                 {ctor: "_Tuple2"
+                                                                                                 ,_0: 1000
+                                                                                                 ,_1: 300},
+                                                                                                 d_setosa,
+                                                                                                 geoms_setosa,
+                                                                                                 m,
+                                                                                                 w)
+                                                                                                 ,A5($Plot.plot,
+                                                                                                 {ctor: "_Tuple2"
+                                                                                                 ,_0: 1000
+                                                                                                 ,_1: 300},
+                                                                                                 d_versicolor,
+                                                                                                 geoms_versicolor,
+                                                                                                 m,
+                                                                                                 w)
+                                                                                                 ,A5($Plot.plot,
+                                                                                                 {ctor: "_Tuple2"
+                                                                                                 ,_0: 1000
+                                                                                                 ,_1: 300},
+                                                                                                 d_virginica,
+                                                                                                 geoms_virginica,
+                                                                                                 m,
+                                                                                                 w)]))
+                                                                                    ,A2($Html.toElement,
+                                                                                    300,
+                                                                                    300)($Html.text(A2($Basics._op["++"],
+                                                                                    "linear model: ",
+                                                                                    $Basics.toString(lm_iris))))]))]));
       }();
    });
    var main = A3($Signal.map2,
    render,
    $Mouse.position,
    $Window.dimensions);
+   var customAes = _U.replace([["radius"
+                               ,$Maybe.Just(2)]
+                              ,["pointsize",$Maybe.Just(9)]
+                              ,["colour"
+                               ,$Maybe.Just($Color.darkBlue)]
+                              ,["visibility",$Maybe.Just(0.6)]
+                              ,["annotate"
+                               ,$Maybe.Just(true)]],
+   $Plot.aes);
    _elm.Main.values = {_op: _op
+                      ,customAes: customAes
                       ,render: render
-                      ,main: main
-                      ,geomsD: geomsD
-                      ,geomsC: geomsC
-                      ,mkGeoms: mkGeoms
-                      ,bintext: bintext
-                      ,potext: potext
-                      ,ndtext: ndtext};
+                      ,main: main};
    return _elm.Main.values;
 };Elm.Maybe = Elm.Maybe || {};
 Elm.Maybe.make = function (_elm) {
@@ -14963,6 +14372,1160 @@ Elm.Statistics.Continuous.make = function (_elm) {
                                        ,correlate: correlate
                                        ,linreg: linreg};
    return _elm.Statistics.Continuous.values;
+};Elm.Statistics = Elm.Statistics || {};
+Elm.Statistics.Data = Elm.Statistics.Data || {};
+Elm.Statistics.Data.Iris = Elm.Statistics.Data.Iris || {};
+Elm.Statistics.Data.Iris.make = function (_elm) {
+   "use strict";
+   _elm.Statistics = _elm.Statistics || {};
+   _elm.Statistics.Data = _elm.Statistics.Data || {};
+   _elm.Statistics.Data.Iris = _elm.Statistics.Data.Iris || {};
+   if (_elm.Statistics.Data.Iris.values)
+   return _elm.Statistics.Data.Iris.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   _P = _N.Ports.make(_elm),
+   $moduleName = "Statistics.Data.Iris";
+   var species = _L.fromArray(["setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"setosa"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"versicolor"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"
+                              ,"virginica"]);
+   var petalWidth = _L.fromArray([0.2
+                                 ,0.2
+                                 ,0.2
+                                 ,0.2
+                                 ,0.2
+                                 ,0.4
+                                 ,0.3
+                                 ,0.2
+                                 ,0.2
+                                 ,0.1
+                                 ,0.2
+                                 ,0.2
+                                 ,0.1
+                                 ,0.1
+                                 ,0.2
+                                 ,0.4
+                                 ,0.4
+                                 ,0.3
+                                 ,0.3
+                                 ,0.3
+                                 ,0.2
+                                 ,0.4
+                                 ,0.2
+                                 ,0.5
+                                 ,0.2
+                                 ,0.2
+                                 ,0.4
+                                 ,0.2
+                                 ,0.2
+                                 ,0.2
+                                 ,0.2
+                                 ,0.4
+                                 ,0.1
+                                 ,0.2
+                                 ,0.2
+                                 ,0.2
+                                 ,0.2
+                                 ,0.1
+                                 ,0.2
+                                 ,0.2
+                                 ,0.3
+                                 ,0.3
+                                 ,0.2
+                                 ,0.6
+                                 ,0.4
+                                 ,0.3
+                                 ,0.2
+                                 ,0.2
+                                 ,0.2
+                                 ,0.2
+                                 ,1.4
+                                 ,1.5
+                                 ,1.5
+                                 ,1.3
+                                 ,1.5
+                                 ,1.3
+                                 ,1.6
+                                 ,1
+                                 ,1.3
+                                 ,1.4
+                                 ,1
+                                 ,1.5
+                                 ,1
+                                 ,1.4
+                                 ,1.3
+                                 ,1.4
+                                 ,1.5
+                                 ,1
+                                 ,1.5
+                                 ,1.1
+                                 ,1.8
+                                 ,1.3
+                                 ,1.5
+                                 ,1.2
+                                 ,1.3
+                                 ,1.4
+                                 ,1.4
+                                 ,1.7
+                                 ,1.5
+                                 ,1
+                                 ,1.1
+                                 ,1
+                                 ,1.2
+                                 ,1.6
+                                 ,1.5
+                                 ,1.6
+                                 ,1.5
+                                 ,1.3
+                                 ,1.3
+                                 ,1.3
+                                 ,1.2
+                                 ,1.4
+                                 ,1.2
+                                 ,1
+                                 ,1.3
+                                 ,1.2
+                                 ,1.3
+                                 ,1.3
+                                 ,1.1
+                                 ,1.3
+                                 ,2.5
+                                 ,1.9
+                                 ,2.1
+                                 ,1.8
+                                 ,2.2
+                                 ,2.1
+                                 ,1.7
+                                 ,1.8
+                                 ,1.8
+                                 ,2.5
+                                 ,2
+                                 ,1.9
+                                 ,2.1
+                                 ,2
+                                 ,2.4
+                                 ,2.3
+                                 ,1.8
+                                 ,2.2
+                                 ,2.3
+                                 ,1.5
+                                 ,2.3
+                                 ,2
+                                 ,2
+                                 ,1.8
+                                 ,2.1
+                                 ,1.8
+                                 ,1.8
+                                 ,1.8
+                                 ,2.1
+                                 ,1.6
+                                 ,1.9
+                                 ,2
+                                 ,2.2
+                                 ,1.5
+                                 ,1.4
+                                 ,2.3
+                                 ,2.4
+                                 ,1.8
+                                 ,1.8
+                                 ,2.1
+                                 ,2.4
+                                 ,2.3
+                                 ,1.9
+                                 ,2.3
+                                 ,2.5
+                                 ,2.3
+                                 ,1.9
+                                 ,2
+                                 ,2.3
+                                 ,1.8]);
+   var petalLength = _L.fromArray([1.4
+                                  ,1.4
+                                  ,1.3
+                                  ,1.5
+                                  ,1.4
+                                  ,1.7
+                                  ,1.4
+                                  ,1.5
+                                  ,1.4
+                                  ,1.5
+                                  ,1.5
+                                  ,1.6
+                                  ,1.4
+                                  ,1.1
+                                  ,1.2
+                                  ,1.5
+                                  ,1.3
+                                  ,1.4
+                                  ,1.7
+                                  ,1.5
+                                  ,1.7
+                                  ,1.5
+                                  ,1
+                                  ,1.7
+                                  ,1.9
+                                  ,1.6
+                                  ,1.6
+                                  ,1.5
+                                  ,1.4
+                                  ,1.6
+                                  ,1.6
+                                  ,1.5
+                                  ,1.5
+                                  ,1.4
+                                  ,1.5
+                                  ,1.2
+                                  ,1.3
+                                  ,1.4
+                                  ,1.3
+                                  ,1.5
+                                  ,1.3
+                                  ,1.3
+                                  ,1.3
+                                  ,1.6
+                                  ,1.9
+                                  ,1.4
+                                  ,1.6
+                                  ,1.4
+                                  ,1.5
+                                  ,1.4
+                                  ,4.7
+                                  ,4.5
+                                  ,4.9
+                                  ,4
+                                  ,4.6
+                                  ,4.5
+                                  ,4.7
+                                  ,3.3
+                                  ,4.6
+                                  ,3.9
+                                  ,3.5
+                                  ,4.2
+                                  ,4
+                                  ,4.7
+                                  ,3.6
+                                  ,4.4
+                                  ,4.5
+                                  ,4.1
+                                  ,4.5
+                                  ,3.9
+                                  ,4.8
+                                  ,4
+                                  ,4.9
+                                  ,4.7
+                                  ,4.3
+                                  ,4.4
+                                  ,4.8
+                                  ,5
+                                  ,4.5
+                                  ,3.5
+                                  ,3.8
+                                  ,3.7
+                                  ,3.9
+                                  ,5.1
+                                  ,4.5
+                                  ,4.5
+                                  ,4.7
+                                  ,4.4
+                                  ,4.1
+                                  ,4
+                                  ,4.4
+                                  ,4.6
+                                  ,4
+                                  ,3.3
+                                  ,4.2
+                                  ,4.2
+                                  ,4.2
+                                  ,4.3
+                                  ,3
+                                  ,4.1
+                                  ,6
+                                  ,5.1
+                                  ,5.9
+                                  ,5.6
+                                  ,5.8
+                                  ,6.6
+                                  ,4.5
+                                  ,6.3
+                                  ,5.8
+                                  ,6.1
+                                  ,5.1
+                                  ,5.3
+                                  ,5.5
+                                  ,5
+                                  ,5.1
+                                  ,5.3
+                                  ,5.5
+                                  ,6.7
+                                  ,6.9
+                                  ,5
+                                  ,5.7
+                                  ,4.9
+                                  ,6.7
+                                  ,4.9
+                                  ,5.7
+                                  ,6
+                                  ,4.8
+                                  ,4.9
+                                  ,5.6
+                                  ,5.8
+                                  ,6.1
+                                  ,6.4
+                                  ,5.6
+                                  ,5.1
+                                  ,5.6
+                                  ,6.1
+                                  ,5.6
+                                  ,5.5
+                                  ,4.8
+                                  ,5.4
+                                  ,5.6
+                                  ,5.1
+                                  ,5.1
+                                  ,5.9
+                                  ,5.7
+                                  ,5.2
+                                  ,5
+                                  ,5.2
+                                  ,5.4
+                                  ,5.1]);
+   var sepalWidth = _L.fromArray([3.5
+                                 ,3
+                                 ,3.2
+                                 ,3.1
+                                 ,3.6
+                                 ,3.9
+                                 ,3.4
+                                 ,3.4
+                                 ,2.9
+                                 ,3.1
+                                 ,3.7
+                                 ,3.4
+                                 ,3
+                                 ,3
+                                 ,4
+                                 ,4.4
+                                 ,3.9
+                                 ,3.5
+                                 ,3.8
+                                 ,3.8
+                                 ,3.4
+                                 ,3.7
+                                 ,3.6
+                                 ,3.3
+                                 ,3.4
+                                 ,3
+                                 ,3.4
+                                 ,3.5
+                                 ,3.4
+                                 ,3.2
+                                 ,3.1
+                                 ,3.4
+                                 ,4.1
+                                 ,4.2
+                                 ,3.1
+                                 ,3.2
+                                 ,3.5
+                                 ,3.6
+                                 ,3
+                                 ,3.4
+                                 ,3.5
+                                 ,2.3
+                                 ,3.2
+                                 ,3.5
+                                 ,3.8
+                                 ,3
+                                 ,3.8
+                                 ,3.2
+                                 ,3.7
+                                 ,3.3
+                                 ,3.2
+                                 ,3.2
+                                 ,3.1
+                                 ,2.3
+                                 ,2.8
+                                 ,2.8
+                                 ,3.3
+                                 ,2.4
+                                 ,2.9
+                                 ,2.7
+                                 ,2
+                                 ,3
+                                 ,2.2
+                                 ,2.9
+                                 ,2.9
+                                 ,3.1
+                                 ,3
+                                 ,2.7
+                                 ,2.2
+                                 ,2.5
+                                 ,3.2
+                                 ,2.8
+                                 ,2.5
+                                 ,2.8
+                                 ,2.9
+                                 ,3
+                                 ,2.8
+                                 ,3
+                                 ,2.9
+                                 ,2.6
+                                 ,2.4
+                                 ,2.4
+                                 ,2.7
+                                 ,2.7
+                                 ,3
+                                 ,3.4
+                                 ,3.1
+                                 ,2.3
+                                 ,3
+                                 ,2.5
+                                 ,2.6
+                                 ,3
+                                 ,2.6
+                                 ,2.3
+                                 ,2.7
+                                 ,3
+                                 ,2.9
+                                 ,2.9
+                                 ,2.5
+                                 ,2.8
+                                 ,3.3
+                                 ,2.7
+                                 ,3
+                                 ,2.9
+                                 ,3
+                                 ,3
+                                 ,2.5
+                                 ,2.9
+                                 ,2.5
+                                 ,3.6
+                                 ,3.2
+                                 ,2.7
+                                 ,3
+                                 ,2.5
+                                 ,2.8
+                                 ,3.2
+                                 ,3
+                                 ,3.8
+                                 ,2.6
+                                 ,2.2
+                                 ,3.2
+                                 ,2.8
+                                 ,2.8
+                                 ,2.7
+                                 ,3.3
+                                 ,3.2
+                                 ,2.8
+                                 ,3
+                                 ,2.8
+                                 ,3
+                                 ,2.8
+                                 ,3.8
+                                 ,2.8
+                                 ,2.8
+                                 ,2.6
+                                 ,3
+                                 ,3.4
+                                 ,3.1
+                                 ,3
+                                 ,3.1
+                                 ,3.1
+                                 ,3.1
+                                 ,2.7
+                                 ,3.2
+                                 ,3.3
+                                 ,3
+                                 ,2.5
+                                 ,3
+                                 ,3.4
+                                 ,3]);
+   var sepalLength = _L.fromArray([5.1
+                                  ,4.9
+                                  ,4.7
+                                  ,4.6
+                                  ,5
+                                  ,5.4
+                                  ,4.6
+                                  ,5
+                                  ,4.4
+                                  ,4.9
+                                  ,5.4
+                                  ,4.8
+                                  ,4.8
+                                  ,4.3
+                                  ,5.8
+                                  ,5.7
+                                  ,5.4
+                                  ,5.1
+                                  ,5.7
+                                  ,5.1
+                                  ,5.4
+                                  ,5.1
+                                  ,4.6
+                                  ,5.1
+                                  ,4.8
+                                  ,5
+                                  ,5
+                                  ,5.2
+                                  ,5.2
+                                  ,4.7
+                                  ,4.8
+                                  ,5.4
+                                  ,5.2
+                                  ,5.5
+                                  ,4.9
+                                  ,5
+                                  ,5.5
+                                  ,4.9
+                                  ,4.4
+                                  ,5.1
+                                  ,5
+                                  ,4.5
+                                  ,4.4
+                                  ,5
+                                  ,5.1
+                                  ,4.8
+                                  ,5.1
+                                  ,4.6
+                                  ,5.3
+                                  ,5
+                                  ,7
+                                  ,6.4
+                                  ,6.9
+                                  ,5.5
+                                  ,6.5
+                                  ,5.7
+                                  ,6.3
+                                  ,4.9
+                                  ,6.6
+                                  ,5.2
+                                  ,5
+                                  ,5.9
+                                  ,6
+                                  ,6.1
+                                  ,5.6
+                                  ,6.7
+                                  ,5.6
+                                  ,5.8
+                                  ,6.2
+                                  ,5.6
+                                  ,5.9
+                                  ,6.1
+                                  ,6.3
+                                  ,6.1
+                                  ,6.4
+                                  ,6.6
+                                  ,6.8
+                                  ,6.7
+                                  ,6
+                                  ,5.7
+                                  ,5.5
+                                  ,5.5
+                                  ,5.8
+                                  ,6
+                                  ,5.4
+                                  ,6
+                                  ,6.7
+                                  ,6.3
+                                  ,5.6
+                                  ,5.5
+                                  ,5.5
+                                  ,6.1
+                                  ,5.8
+                                  ,5
+                                  ,5.6
+                                  ,5.7
+                                  ,5.7
+                                  ,6.2
+                                  ,5.1
+                                  ,5.7
+                                  ,6.3
+                                  ,5.8
+                                  ,7.1
+                                  ,6.3
+                                  ,6.5
+                                  ,7.6
+                                  ,4.9
+                                  ,7.3
+                                  ,6.7
+                                  ,7.2
+                                  ,6.5
+                                  ,6.4
+                                  ,6.8
+                                  ,5.7
+                                  ,5.8
+                                  ,6.4
+                                  ,6.5
+                                  ,7.7
+                                  ,7.7
+                                  ,6
+                                  ,6.9
+                                  ,5.6
+                                  ,7.7
+                                  ,6.3
+                                  ,6.7
+                                  ,7.2
+                                  ,6.2
+                                  ,6.1
+                                  ,6.4
+                                  ,7.2
+                                  ,7.4
+                                  ,7.9
+                                  ,6.4
+                                  ,6.3
+                                  ,6.1
+                                  ,7.7
+                                  ,6.3
+                                  ,6.4
+                                  ,6
+                                  ,6.9
+                                  ,6.7
+                                  ,6.9
+                                  ,5.8
+                                  ,6.8
+                                  ,6.7
+                                  ,6.7
+                                  ,6.3
+                                  ,6.5
+                                  ,6.2
+                                  ,5.9]);
+   _elm.Statistics.Data.Iris.values = {_op: _op
+                                      ,sepalLength: sepalLength
+                                      ,sepalWidth: sepalWidth
+                                      ,petalLength: petalLength
+                                      ,petalWidth: petalWidth
+                                      ,species: species};
+   return _elm.Statistics.Data.Iris.values;
+};Elm.Statistics = Elm.Statistics || {};
+Elm.Statistics.Data = Elm.Statistics.Data || {};
+Elm.Statistics.Data.Mtcars = Elm.Statistics.Data.Mtcars || {};
+Elm.Statistics.Data.Mtcars.make = function (_elm) {
+   "use strict";
+   _elm.Statistics = _elm.Statistics || {};
+   _elm.Statistics.Data = _elm.Statistics.Data || {};
+   _elm.Statistics.Data.Mtcars = _elm.Statistics.Data.Mtcars || {};
+   if (_elm.Statistics.Data.Mtcars.values)
+   return _elm.Statistics.Data.Mtcars.values;
+   var _op = {},
+   _N = Elm.Native,
+   _U = _N.Utils.make(_elm),
+   _L = _N.List.make(_elm),
+   _P = _N.Ports.make(_elm),
+   $moduleName = "Statistics.Data.Mtcars";
+   var carb = _L.fromArray([4
+                           ,4
+                           ,1
+                           ,1
+                           ,2
+                           ,1
+                           ,4
+                           ,2
+                           ,2
+                           ,4
+                           ,4
+                           ,3
+                           ,3
+                           ,3
+                           ,4
+                           ,4
+                           ,4
+                           ,1
+                           ,2
+                           ,1
+                           ,1
+                           ,2
+                           ,2
+                           ,4
+                           ,2
+                           ,1
+                           ,2
+                           ,2
+                           ,4
+                           ,6
+                           ,8
+                           ,2]);
+   var gear = _L.fromArray([4
+                           ,4
+                           ,4
+                           ,3
+                           ,3
+                           ,3
+                           ,3
+                           ,4
+                           ,4
+                           ,4
+                           ,4
+                           ,3
+                           ,3
+                           ,3
+                           ,3
+                           ,3
+                           ,3
+                           ,4
+                           ,4
+                           ,4
+                           ,3
+                           ,3
+                           ,3
+                           ,3
+                           ,3
+                           ,4
+                           ,5
+                           ,5
+                           ,5
+                           ,5
+                           ,5
+                           ,4]);
+   var am = _L.fromArray([1
+                         ,1
+                         ,1
+                         ,0
+                         ,0
+                         ,0
+                         ,0
+                         ,0
+                         ,0
+                         ,0
+                         ,0
+                         ,0
+                         ,0
+                         ,0
+                         ,0
+                         ,0
+                         ,0
+                         ,1
+                         ,1
+                         ,1
+                         ,0
+                         ,0
+                         ,0
+                         ,0
+                         ,0
+                         ,1
+                         ,1
+                         ,1
+                         ,1
+                         ,1
+                         ,1
+                         ,1]);
+   var vs = _L.fromArray([0
+                         ,0
+                         ,1
+                         ,1
+                         ,0
+                         ,1
+                         ,0
+                         ,1
+                         ,1
+                         ,1
+                         ,1
+                         ,0
+                         ,0
+                         ,0
+                         ,0
+                         ,0
+                         ,0
+                         ,1
+                         ,1
+                         ,1
+                         ,1
+                         ,0
+                         ,0
+                         ,0
+                         ,0
+                         ,1
+                         ,0
+                         ,1
+                         ,0
+                         ,0
+                         ,0
+                         ,1]);
+   var qsec = _L.fromArray([16.46
+                           ,17.02
+                           ,18.61
+                           ,19.44
+                           ,17.02
+                           ,20.22
+                           ,15.84
+                           ,20
+                           ,22.9
+                           ,18.3
+                           ,18.9
+                           ,17.4
+                           ,17.6
+                           ,18
+                           ,17.98
+                           ,17.82
+                           ,17.42
+                           ,19.47
+                           ,18.52
+                           ,19.9
+                           ,20.01
+                           ,16.87
+                           ,17.3
+                           ,15.41
+                           ,17.05
+                           ,18.9
+                           ,16.7
+                           ,16.9
+                           ,14.5
+                           ,15.5
+                           ,14.6
+                           ,18.6]);
+   var wt = _L.fromArray([2.62
+                         ,2.875
+                         ,2.32
+                         ,3.215
+                         ,3.44
+                         ,3.46
+                         ,3.57
+                         ,3.19
+                         ,3.15
+                         ,3.44
+                         ,3.44
+                         ,4.07
+                         ,3.73
+                         ,3.78
+                         ,5.25
+                         ,5.424
+                         ,5.345
+                         ,2.2
+                         ,1.615
+                         ,1.835
+                         ,2.465
+                         ,3.52
+                         ,3.435
+                         ,3.84
+                         ,3.845
+                         ,1.935
+                         ,2.14
+                         ,1.513
+                         ,3.17
+                         ,2.77
+                         ,3.57
+                         ,2.78]);
+   var drat = _L.fromArray([3.9
+                           ,3.9
+                           ,3.85
+                           ,3.08
+                           ,3.15
+                           ,2.76
+                           ,3.21
+                           ,3.69
+                           ,3.92
+                           ,3.92
+                           ,3.92
+                           ,3.07
+                           ,3.07
+                           ,3.07
+                           ,2.93
+                           ,3
+                           ,3.23
+                           ,4.08
+                           ,4.93
+                           ,4.22
+                           ,3.7
+                           ,2.76
+                           ,3.15
+                           ,3.73
+                           ,3.08
+                           ,4.08
+                           ,4.43
+                           ,3.77
+                           ,4.22
+                           ,3.62
+                           ,3.54
+                           ,4.11]);
+   var hp = _L.fromArray([110
+                         ,110
+                         ,93
+                         ,110
+                         ,175
+                         ,105
+                         ,245
+                         ,62
+                         ,95
+                         ,123
+                         ,123
+                         ,180
+                         ,180
+                         ,180
+                         ,205
+                         ,215
+                         ,230
+                         ,66
+                         ,52
+                         ,65
+                         ,97
+                         ,150
+                         ,150
+                         ,245
+                         ,175
+                         ,66
+                         ,91
+                         ,113
+                         ,264
+                         ,175
+                         ,335
+                         ,109]);
+   var disp = _L.fromArray([160
+                           ,160
+                           ,108
+                           ,258
+                           ,360
+                           ,225
+                           ,360
+                           ,146.7
+                           ,140.8
+                           ,167.6
+                           ,167.6
+                           ,275.8
+                           ,275.8
+                           ,275.8
+                           ,472
+                           ,460
+                           ,440
+                           ,78.7
+                           ,75.7
+                           ,71.1
+                           ,120.1
+                           ,318
+                           ,304
+                           ,350
+                           ,400
+                           ,79
+                           ,120.3
+                           ,95.1
+                           ,351
+                           ,145
+                           ,301
+                           ,121]);
+   var cyl = _L.fromArray([6
+                          ,6
+                          ,4
+                          ,6
+                          ,8
+                          ,6
+                          ,8
+                          ,4
+                          ,4
+                          ,6
+                          ,6
+                          ,8
+                          ,8
+                          ,8
+                          ,8
+                          ,8
+                          ,8
+                          ,4
+                          ,4
+                          ,4
+                          ,4
+                          ,8
+                          ,8
+                          ,8
+                          ,8
+                          ,4
+                          ,4
+                          ,4
+                          ,8
+                          ,6
+                          ,8
+                          ,4]);
+   var mpg = _L.fromArray([21
+                          ,21
+                          ,22.8
+                          ,21.4
+                          ,18.7
+                          ,18.1
+                          ,14.3
+                          ,24.4
+                          ,22.8
+                          ,19.2
+                          ,17.8
+                          ,16.4
+                          ,17.3
+                          ,15.2
+                          ,10.4
+                          ,10.4
+                          ,14.7
+                          ,32.4
+                          ,30.4
+                          ,33.9
+                          ,21.5
+                          ,15.5
+                          ,15.2
+                          ,13.3
+                          ,19.2
+                          ,27.3
+                          ,26
+                          ,30.4
+                          ,15.8
+                          ,19.7
+                          ,15
+                          ,21.4]);
+   _elm.Statistics.Data.Mtcars.values = {_op: _op
+                                        ,mpg: mpg
+                                        ,cyl: cyl
+                                        ,disp: disp
+                                        ,hp: hp
+                                        ,drat: drat
+                                        ,wt: wt
+                                        ,qsec: qsec
+                                        ,vs: vs
+                                        ,am: am
+                                        ,gear: gear
+                                        ,carb: carb};
+   return _elm.Statistics.Data.Mtcars.values;
 };Elm.Statistics = Elm.Statistics || {};
 Elm.Statistics.Discrete = Elm.Statistics.Discrete || {};
 Elm.Statistics.Discrete.make = function (_elm) {
