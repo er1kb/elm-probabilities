@@ -93,10 +93,13 @@ continuous f (xmin,xmax) (ymin,ymax) steps =
        --ymax = maximum ys
        rmax = if (abs ymax) > (abs ymin) then (abs ymax) else (abs ymin)
        --yLimits = (-rmax, rmax)
-       yLimits = (ymin, ymax)
-       xLimits = yLimits
-       yScale = C.normalize yLimits
+       --yLimits = (ymin, ymax)
+       yLimits = (minimum ys, maximum ys)
+       --xLimits = yLimits
+       xLimits = xDomain
+       --yScale = C.normalize yLimits
        yDomain = (ymin, ymax)
+       yScale = C.normalize yDomain
        yExtent = ymax - ymin
        xyRatio = rmax / (xExtent / 2)
        sign = (xmin / xmin) * (xmax / xmax)
@@ -147,10 +150,13 @@ discrete f (xmin',xmax') (ymin,ymax) =
        --ymax = maximum ys
        rmax = if (abs ymax) > (abs ymin) then (abs ymax) else (abs ymin)
        --yLimits = (-rmax, rmax)
-       yLimits = (ymin, ymax)
-       xLimits = yLimits
-       yScale = C.normalize yLimits
+       --yLimits = (ymin, ymax)
+       yLimits = (minimum ys, maximum ys)
+       --xLimits = yLimits
+       xLimits = (xmin', xmax')
+       --yScale = C.normalize yLimits
        yDomain = (ymin, ymax)
+       yScale = C.normalize yDomain
        yExtent = ymax - ymin
        xyRatio = rmax / (snd xDomain)
        skew = (xmax - xmin)
@@ -199,10 +205,13 @@ fromPairs tuples (xmin,xmax) (ymin,ymax) =
        --ymax = maximum ys
        rmax = if (abs ymax) > (abs ymin) then (abs ymax) else (abs ymin)
        --yLimits = (-rmax, rmax)
-       yLimits = (ymin, ymax)
-       xLimits = yLimits
-       yScale = C.normalize yLimits
+       --yLimits = (ymin, ymax)
+       yLimits = (minimum ys, maximum ys)
+       --xLimits = yLimits
+       xLimits = xDomain
+       --yScale = C.normalize yLimits
        yDomain = (ymin, ymax)
+       yScale = C.normalize yDomain
        yExtent = ymax - ymin
        xyRatio = rmax / (xExtent / 2)
        sign = (xmin / xmin) * (xmax / xmax)
@@ -378,7 +387,8 @@ geom_bar aes' defaults d dims =
       colour = lookup .colour aes' defaults
       visibility = lookup .visibility aes' defaults
       limits' = lookup .limits aes' defaults
-      limits = if d.discrete then d.xDomain else limits'
+      --limits = if d.discrete then d.xDomain else limits'
+      limits = if d.discrete then d.xLimits else limits'
       dynamic = lookup .dynamic aes' defaults
       nsteps' = lookup .nsteps aes' defaults
       nsteps = if dynamic then (toFloat nsteps') else (toFloat d.steps) 
@@ -553,13 +563,17 @@ geom_hline aes' defaults d dims =
       label = lookup .label aes' defaults
       precision = lookup .precision aes' defaults
       translate = lookup .translate aes' defaults
-      txt' = move (xm * d.xScale (xmax + fst translate), ym * d.yScale (y + snd translate)) <| toForm <| plainText <| label ++ (toString (C.dec precision <| d.toY y)) 
+      --txt' = move (xm * d.xScale (xmax + fst translate), ym * d.yScale (y + snd translate)) <| toForm <| plainText <| label ++ (toString (C.dec precision <| d.toY y)) 
+      txt' = move (xm * d.xScale (xmax + fst translate), ym * d.yScale (y + snd translate)) <| toForm <| rightAligned <| color colour <| fromString <| label ++ (toString (C.dec precision <| d.toY y)) 
       txt = if annotate then txt' else (toForm empty)
       line = alpha visibility <| traced (linetype colour)  
       <| path [(0,ym * (d.yScale y)), (xm, ym * (d.yScale y))] 
    in
       group [txt,line]
 
+       --label' = move annotationPosition <| toForm <| rightAligned <| color colour 
+       --        <| fromString <| "&theta; &asymp; " ++ (toString <| C.dec 2 x)  
+       --        ++ "\nr = " ++ (toString <| C.dec 2 (d.f x))
 
 
 geom_vline : Aes -> Aes -> Graph -> Dimensions -> Geom
@@ -577,7 +591,8 @@ geom_vline aes' defaults d dims =
       label = lookup .label aes' defaults
       precision = lookup .precision aes' defaults
       translate = lookup .translate aes' defaults
-      txt' = move (xm * d.xScale (x + fst translate), ym * d.yScale (ymax + snd translate)) <| toForm <| plainText <| label ++ (toString (C.dec precision <| d.toX x)) 
+      --txt' = move (xm * d.xScale (x + fst translate), ym * d.yScale (ymax + snd translate)) <| toForm <| plainText <| label ++ (toString (C.dec precision <| d.toX x)) 
+      txt' = move (xm * d.xScale (x + fst translate), ym * d.yScale (ymax + snd translate)) <| toForm <| rightAligned <| color colour <| fromString <| label ++ (toString (C.dec precision <| d.toX x)) 
       txt = if annotate then txt' else (toForm empty)
       line = alpha visibility <| traced (linetype colour)  
       <| path [(xm * (d.xScale x),0), (xm * (d.xScale x), ym)] 
@@ -978,7 +993,8 @@ yAxis aes' defaults d dims =
        tickspacing = lookup .tickspacing aes' defaults
        xmargin = fst dims.margins
        xmin = fst d.xDomain
-       (ymin,ymax) = d.yLimits
+       --(ymin,ymax) = d.yLimits
+       (ymin,ymax) = d.yDomain
        pos = (xm * (d.xScale xmin) - (xmargin / 4),0)
        tickPositions = mkTicks (ymin,ymax) tickspacing
        --tickPositions = filter (\n -> (round n) % tickspacing == 0) 
@@ -1009,7 +1025,8 @@ xAxis aes' defaults d dims =
        (xoffset,yoffset) = lookup .translate aes' defaults
        tickspacing = lookup .tickspacing aes' defaults
        ymargin = snd dims.margins
-       ymin = fst d.yLimits
+       --ymin = fst d.yLimits
+       ymin = fst d.yDomain
        xscale = if d.discrete then C.normalize (fst d.xDomain + 0.5, snd d.xDomain - 0.5) else d.xScale
        (xmin,xmax) = d.xDomain
        pos = (0,ym * (d.yScale ymin) - (ymargin / 8))
@@ -1037,7 +1054,8 @@ title aes' defaults d dims =
        ymargin = fst dims.margins
        xm = dims.xm
        ym = dims.ym
-       ymax = snd d.yLimits
+       --ymax = snd d.yLimits
+       ymax = snd d.yDomain
        midx = ((fst d.xDomain) + (snd d.xDomain)) / 2
        pos = (xm * (d.xScale midx),ym * (d.yScale ymax) + (ymargin / 4))
        ttl = toForm <| centered <| height 22 <| fromString <| label
@@ -1056,7 +1074,7 @@ legend aes' defaults d dims =
        label' = lookup .label aes' defaults
        colour = lookup .colour aes' defaults
        translate = lookup .translate aes' defaults
-       annotationPosition = (xm * d.xScale (fst translate),  
+       annotationPosition = (xm * d.xScale (fst translate),
                              ym * d.yScale (snd translate))
        symbol = move (w * -2,0) <| filled colour <| rect w h
        label = toForm <| leftAligned <| fromString label'
@@ -1168,19 +1186,16 @@ annotate_integral aes' defaults d dims =
 
 {-- 
 TODO: 
-Make y limits optional (Maybe) for graph constructor, to allow for variable axis limits
 Add documentation to Plot module
 Consistent naming of single and multiple geoms, eg point/points
 Rename xscale/yscale --> fromX/fromY
 Colouring positive and negative integrals independently?
 How to annotate lineranges? 
-Implement grid?
+Background grid?
 Some kind of theme object for background colours, fonts, etc.?
 Decrease right margin or make better use of the empty space?
 Linestyles and textstyles?! 
-Improve axes: number of ticks etc.
 Factor out x and y labels from axes, to be able to move/rotate them independently?
-Geom_abline_polar?
 "Translate" given in the scale of x,y or percent of plot height,width or both?
 --}
 
