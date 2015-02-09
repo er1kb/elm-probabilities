@@ -22,7 +22,7 @@ import List (map, map2, concatMap, filter, head, tail, reverse, minimum, maximum
 
 # Geoms
 Visual mappings.
-@docs geom_step, geom_text, geom_point, geom_points, geom_bar, geom_trapezoid, geom_area, geom_curve, geom_hlinerange, geom_vlinerange, geom_vlineranges, geom_hline, geom_vline, geom_hline_polar, geom_vline_polar, geom_circle, geom_angle, geom_curve_polar, geom_area_polar, geom_position_polar, geom_trace_polar, geom_trace, geom_abline, geom_image  
+@docs Geom
 
 # Layers
 More problem specific features that may include different kinds of visual mappings.
@@ -38,7 +38,46 @@ More problem specific features that may include different kinds of visual mappin
 
 
 
+{-| Geoms are visual representations of data. 
 
+The Geom type is a synonym for the Form type in Graphics.Collage. All geom constructors have the same type signature, e.g. 
+geom_point : Aes -> Aes -> Graph -> Dimensions -> Geom
+
+All of these arguments except the first are invoked through the main plotting function, meaning you do not interface with a geom directly this way. Instead, the syntax for calling one is:
+geom_point aes
+...where aes is a record constructor for an aesthetic object (Aes type). Aesthetics handle all customization of the visual mapping, with respect to position, colour, labelling and so on. See separate documentation. 
+
+For now these geoms are available, but the list is subject to change. Some of them have counterparts for polar plotting. Depending on which features that turn out to be practically useful, geoms may be merged, split, improved, added or removed. There is no point in writing help sections for each geom individually but I will get around to summarizing which geom uses which aesthetic attributes. 
+
+Cartesian - (x,y) coordinates
+geom_abline 
+geom_area 
+geom_bar 
+geom_circle 
+geom_curve 
+geom_hline 
+geom_hlinerange 
+geom_image   
+geom_point 
+geom_points 
+geom_step 
+geom_text 
+geom_trace
+geom_trapezoid 
+geom_vline 
+geom_vlinerange 
+geom_vlineranges 
+
+Polar - (r,theta) coordinates
+geom_angle 
+geom_area_polar 
+geom_curve_polar 
+geom_hline_polar 
+geom_position_polar 
+geom_trace_polar 
+geom_vline_polar 
+
+-}
 type alias Geom = Form
 
 --geom_none : Aes -> Aes -> Graph -> Dimensions -> Geom
@@ -48,6 +87,10 @@ type alias Geom = Form
 --   in
 --      toForm <| plainText <| toString x
 
+{-| The identity function. Input and output are identical. -}
+id : a -> a
+id = (\x -> x)
+
 roundf = toFloat << round
 
 mkPolar xs ys = map fromPolar <| map2 (,) ys xs
@@ -55,6 +98,35 @@ mkPolar xs ys = map fromPolar <| map2 (,) ys xs
 spin points x = map (\(px,py) -> (((0.5 * py * cos x) - (0.5 * px * sin x)) + x, ((py * sin x) + (px * cos x)))) points
 
 
+
+{-| A graph is the abstract representation of a function applied over a certain interval of x values. It contains the x and y limits of the function as well as functions for normalizing input. The graph is one of a couple of things you feed into the plotting function.  
+
+type alias Graph = {
+         discrete: Bool,            -- discrete or continuous distribution?
+         f: (Float -> Float),       -- the mathematical function
+         xs: List Float,            -- x values
+         ys: List Float,            -- y values 
+         polar: List (Float,Float), -- (x,y) values for polar plotting
+         pairs: List (Float,Float), -- (x,y) pairs (data points supplied by the used)
+         xDomain: (Float,Float),    -- minimum and maximum on the x axis 
+         yDomain: (Float,Float),    -- minimum and maximum on the y axis 
+         xExtent: Float,            -- size of the domain (x)
+         rmax:Float,                -- maximum radius (either positive or negative y)
+         steps:Int,                 -- number of steps to evaluate the function
+         dx:Float,                  -- distance in x between evaluation points
+         xScale:(Float -> Float),   -- function for normalizing x values
+         yScale:(Float -> Float),   -- function for normalizing y values
+         yExtent:Float,             -- size of the range/co-domain (y) 
+         xLimits:(Float,Float),     -- manual x limits for plot
+         yLimits:(Float,Float),     -- manual y limits for plot
+         xyRatio:Float,             -- hack for mixing polar and cartesian coordinates
+         pOffset:Float,             -- for polar plots that are not symmetric at x=0
+         toX:(Float -> Float),      -- xScale reversed: normalized values into x
+         toY:(Float -> Float)       -- yScale reversed: normalized values into y
+      }
+
+
+-}
 type alias Graph = {
          discrete: Bool,
          f: (Float -> Float),
@@ -79,6 +151,12 @@ type alias Graph = {
          toY:(Float -> Float)
       }
 
+
+{-| Constructs a continuous distribution. Suitable for trigonometric functions, continuous probability functions (e.g. normal, exponential), logaritms and exponentials, linear functions, and so on. You need to tell it which function to evaluate (f), the x and y limits, and the number of steps to evaluate the function.  
+
+Let's dwell on the last argument (steps). Even though the function (f) is continuous, the representations and computations of it must be discrete. If you want to plot a sin function for 0 ≤ x ≤ 2pi, then 100 steps will draw a smooth curve. For plotting over a larger domain and especially for squiggly lines (such as y = sin16x) you should at least double that number, but also consider the performance penalty of adding computations. This should to be tweaked by the user as it's also affected by the plot size. 
+
+-}
 continuous : (Float -> Float) -> (Float, Float) -> (Float, Float) -> Int -> Graph
 continuous f (xmin,xmax) (ymin,ymax) steps = 
    let
@@ -134,6 +212,9 @@ continuous f (xmin,xmax) (ymin,ymax) steps =
                         }
 
 
+{-| Constructs a discrete graph. Use this for discrete probability distributions such as the binomial, Poisson and hypergeometric distributions. There are other discrete distributions such as the Fibonacci series, which may or may not lend themselves to plotting. 
+
+-}
 discrete : (Float -> Float) -> (Float, Float) -> (Float, Float) -> Graph
 discrete f (xmin',xmax') (ymin,ymax) = 
    let
@@ -189,16 +270,25 @@ discrete f (xmin',xmax') (ymin,ymax) =
                            toX = toX,
                            toY = toY
                         }
-id = (\x -> x)
+
+{-| For when you have (x,y) data points. Suitable for doing linear regression. 
 
 fromPairs : List (Float, Float) -> (Float, Float) -> (Float, Float) -> Graph
-fromPairs tuples (xmin,xmax) (ymin,ymax) = 
+fromPairs pairs (xmin,xmax) (ymin,ymax)
+
+In case you're unfamiliar with Elm lists, pairs can be constructed by:
+List.map2 (,) xs ys
+...where xs and ys are lists containing the x and y variables respectively.
+
+-}
+fromPairs : List (Float, Float) -> (Float, Float) -> (Float, Float) -> Graph
+fromPairs pairs (xmin,xmax) (ymin,ymax) = 
    let
        xDomain = (xmin, xmax)
        xExtent = (xmax - xmin)
-       steps = length tuples
-       xs = map fst tuples
-       ys = map snd tuples
+       steps = length pairs
+       xs = map fst pairs
+       ys = map snd pairs
        dx = 1
        xScale = C.normalize xDomain
        --ymin = minimum ys
@@ -227,7 +317,7 @@ fromPairs tuples (xmin,xmax) (ymin,ymax) =
                            xs = xs,
                            ys = ys,
                            polar = polar,
-                           pairs = tuples,
+                           pairs = pairs,
                            xDomain = xDomain, 
                            yDomain = yDomain,
                            xExtent = xExtent,
@@ -867,9 +957,13 @@ geom_trace aes' defaults d dims =
       linetype = lookup .linetype aes' defaults
       colour = lookup .colour aes' defaults
       visibility = lookup .visibility aes' defaults
-      --linethickness = lookup .linethickness aes' defaults -- not actually used yet
+      dynamic = lookup .dynamic aes' defaults
+      negate = lookup .negate aes' defaults
       x = lookup .x aes' defaults
-      (dx,steps) = C.interpolate (fst d.xDomain,x) (toFloat d.steps)
+      limits = lookup .limits aes' defaults
+      limits' = if negate then (x, snd limits) else (fst limits, x)
+      --(dx,steps) = C.interpolate (fst d.xDomain,x) (toFloat d.steps)
+      (dx,steps) = C.interpolate (if dynamic then limits' else limits) (toFloat d.steps)
       ys = map (\(x,y) -> (xm * (d.xScale x), ym * (d.yScale y)))  
                      <| map2 (,) steps (map d.f steps)
    in
@@ -1099,6 +1193,7 @@ geom_image aes' defaults d dims =
 
 
 
+{-| ... -}
 plot (plotWidth,plotHeight) d geoms m w =  
    let
       input = { x = (fst m), y = (snd m), width = (fst w), height = (snd w) }
@@ -1172,9 +1267,9 @@ annotate_integral aes' defaults d dims =
        (xmin,xmax) = limits
        integral = C.integrate limits (toFloat d.steps) d.f
    in
-       move (dims.xm * fst translate, 
-                dims.ym * snd translate)
-       --move (dims.xm * (d.xScale (fst translate)),  
+       move (dims.xm * fst translate,
+                dims.ym * snd translate) -- plot scale
+       --move (dims.xm * (d.xScale (fst translate)),  -- graph scale
        --         dims.ym * (d.yScale (snd translate)))
               <| toForm <| rightAligned <| fromString  
               -- <| "number of bins: " ++ (toString dims.nbins) 
@@ -1186,13 +1281,13 @@ annotate_integral aes' defaults d dims =
 
 {-- 
 TODO: 
+Negate geom_trace_polar?
 Add documentation to Plot module
 Consistent naming of single and multiple geoms, eg point/points
 Rename xscale/yscale --> fromX/fromY
+(xm * d.xScale x) etc is a recurring pattern. Factor this out completely into a function?
 Colouring positive and negative integrals independently?
-How to annotate lineranges? 
 Background grid?
-Some kind of theme object for background colours, fonts, etc.?
 Decrease right margin or make better use of the empty space?
 Linestyles and textstyles?! 
 Factor out x and y labels from axes, to be able to move/rotate them independently?
@@ -1219,6 +1314,8 @@ type alias Dimensions = {
          xm : Float
 }
             
+
+{-| ... -}
 type alias Aes = { visibility:Maybe Float, 
                    linetype:Maybe (Color -> LineStyle),
                    linethickness:Maybe Float,
@@ -1245,6 +1342,7 @@ type alias Aes = { visibility:Maybe Float,
                    nsteps: Maybe Int
                 }
 
+{-| ... -}
 aes : Aes
 aes = { visibility = Nothing, 
         linetype = Nothing,  
@@ -1273,6 +1371,7 @@ aes = { visibility = Nothing,
      }
 
 
+{-| ... -}
 aesDefault : Aes
 aesDefault = { visibility = Just 1, 
                linetype = Just solid,  
