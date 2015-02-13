@@ -1,4 +1,4 @@
-module Plot (Graph, continuous, discrete, fromPairs, geom_vlineranges, geom_step, geom_text, geom_point, geom_points, geom_bar, geom_trapezoid, geom_area, geom_curve, geom_hlinerange, geom_vlinerange, geom_hline, geom_vline, geom_hline_polar, geom_vline_polar, geom_circle, geom_angle, geom_curve_polar, geom_abline_polar, geom_area_polar, geom_position_polar, geom_trace_polar, geom_trace, geom_abline, derivative, yAxis, xAxis, title, legend, geom_image, plot, background, annotate_integral, Aes, aes, aesDefault, point, bar, trapezoid, lookup, Dimensions, Geom) where
+module Plot (Graph, continuous, discrete, fromPairs, geom_vlineranges, geom_step, geom_text, geom_point, geom_points, geom_bar, geom_trapezoid, geom_area, geom_curve, geom_hlinerange, geom_vlinerange, geom_hline, geom_vline, geom_hline_polar, geom_vline_polar, geom_circle, geom_angle, geom_curve_polar, geom_abline_polar, geom_area_polar, geom_position_polar, geom_trace_polar, geom_trace, geom_abline, derivative, yAxis, xAxis, title, legend, geom_image, plot, background, annotate_integral, annotate_text, Aes, aes, aesDefault, point, bar, trapezoid, lookup, Dimensions, Geom) where
 
 
 import Statistics.Discrete as D
@@ -226,7 +226,8 @@ discrete f (xmin',xmax') (ymin,ymax) =
        ys = map f xs
        steps = length xs
        dx = 1
-       xScale = C.normalize xDomain
+       xScale = C.normalize xLimits
+       --xScale = C.normalize xDomain
        --ymin = minimum ys
        --ymax = maximum ys
        rmax = if (abs ymax) > (abs ymin) then (abs ymax) else (abs ymin)
@@ -496,31 +497,6 @@ geom_bar aes' defaults d dims =
 
 
 
--- integral approximation by bars/rectangles
---geom_bar : Aes -> Aes -> Graph -> Dimensions -> Geom
---geom_bar aes' defaults d dims = 
---   let
---      --(dx',steps) = C.interpolate d.xDomain (toFloat dims.nbins)
---      xm = dims.xm
---      ym = dims.ym
---      linetype = lookup .linetype aes' defaults
---      colour = lookup .colour aes' defaults
---      visibility = lookup .visibility aes' defaults
---      limits = lookup .limits aes' defaults
---      (dx',steps) = C.interpolate limits (toFloat dims.nbins)
---      xscale = d.xScale
---      yscale = d.yScale
---      dx = dx' / 2
---      --xs = C.bins <| map (\x -> x - dx) steps
---      lowerbar = [((fst limits) - dx')]
---      upperbar = [((snd limits) + dx')]
---      --xs = C.bins <| map (\x -> x - dx) (lowerbar ++ steps ++ upperbar)
---      xs = C.bins <| map (\x -> x - dx) (steps ++ upperbar)
---      --points = map (bar (xm,ym) (xscale,yscale) d.f) xs 
---      points = map (bar (xm,ym) (xscale,yscale) limits d.f) xs 
---   in
---      alpha visibility <| group <| map (\x -> outlined (linetype colour) <| polygon x) points
-
 
 {-| Calculating trapezium points for plotting them as polygons. -}
 trapezoid (xm,ym) (xscale, yscale) f baseline (x1,x2) =  
@@ -555,13 +531,14 @@ geom_area aes' defaults d dims =
       baseline = lookup .fun aes' defaults
       dynamic = lookup .dynamic aes' defaults
       negate = lookup .negate aes' defaults
+      nsteps = lookup .nsteps aes' defaults
 
       limits = lookup .limits aes' defaults
       x = lookup .x aes' defaults
       limits' = if negate then (x, snd limits) else (fst limits, x)
 
-      (dx,steps) = C.interpolate (if dynamic then limits' else limits) (toFloat d.steps)
-      --(dx,steps) = C.interpolate (snd limits,x) (toFloat d.steps)
+      (dx,steps) = C.interpolate (if dynamic then limits' else limits) (toFloat nsteps)
+      --(dx,steps) = C.interpolate (if dynamic then limits' else limits) (toFloat d.steps)
       xm = dims.xm
       ym = dims.ym
       --xs = C.bins steps
@@ -1089,18 +1066,18 @@ yAxis aes' defaults d dims =
        xmin = fst d.xDomain
        --(ymin,ymax) = d.yLimits
        (ymin,ymax) = d.yDomain
-       pos = (xm * (d.xScale xmin) - (xmargin / 4),0)
+       pos = (xm * (d.xScale xmin) - (xmargin / 8),0)
        tickPositions = mkTicks (ymin,ymax) tickspacing
        --tickPositions = filter (\n -> (round n) % tickspacing == 0) 
        --   <| map toFloat [ceiling ymin .. floor ymax]
-       tickLabels = group <| map (\y -> move (xoffset + (-xmargin / 5), yoffset + ym * d.yScale y)  
+       tickLabels = group <| map (\y -> move (xoffset + (-xmargin / 3), yoffset + ym * d.yScale y)  
          <| toForm <| rightAligned <| fromString <| 
          labelfun (toString <| C.dec precision y)) tickPositions
        ticks = group <| map (\y -> move (0,ym * d.yScale y)  
-         <| traced (solid colour) <| path [(0,0),(10,0)]) tickPositions
-       yBar = traced (solid colour) <| path [(10,0),(10,ym)]
+         <| traced (solid colour) <| path [(0,0),(-10,0)]) tickPositions
+       yBar = traced (solid colour) <| path [(0,0),(0,ym)]
        yLabel = rotate angle <|
-          move (xoffset + (-xmargin / 2), yoffset + (ym * 0.5)) <|  
+          move (xoffset + (-xmargin * 0.6), yoffset + (ym * 0.5)) <|  
          toForm <| leftAligned <| fromString label
    in
       move pos <| group  
@@ -1151,7 +1128,7 @@ title aes' defaults d dims =
        --ymax = snd d.yLimits
        ymax = snd d.yDomain
        midx = ((fst d.xDomain) + (snd d.xDomain)) / 2
-       pos = (xm * (d.xScale midx),ym * (d.yScale ymax) + (ymargin / 4))
+       pos = (xm * (d.xScale midx),ym * (d.yScale ymax) + (ymargin / 2))
        ttl = toForm <| centered <| height 22 <| fromString <| label
    in
       move pos <| ttl
@@ -1193,8 +1170,15 @@ geom_image aes' defaults d dims =
 
 
 
-{-| ... -}
-plot (plotWidth,plotHeight) d geoms m w =  
+{-| Main plotting function. 
+
+plot : (Int,Int) -> Graph -> List (Aes -> Graph -> Dimensions -> Form) -> (Int,Int) -> (Int,Int) -> Element
+plot (plotWidth,plotHeight) d geoms m w  
+...where d is the data (Graph), geoms is a list of partially applied functions of the form [Geom Aes], m is mouse input (x,y) and w is window input (width, height).  
+
+-}
+plot : (Int,Int) -> (Float,Float) -> Graph -> List (Aes -> Graph -> Dimensions -> Form) -> (Int,Int) -> (Int,Int) -> Element
+plot (plotWidth,plotHeight) (xmargin',ymargin') d geoms m w =  
    let
       input = { x = (fst m), y = (snd m), width = (fst w), height = (snd w) }
 
@@ -1212,8 +1196,10 @@ plot (plotWidth,plotHeight) d geoms m w =
       wpos = (windowScaleX (toFloat input.x), windowScaleY (toFloat input.y))   --- 
       xpos = (fst d.xDomain) + d.xExtent * (fst wpos)
       ypos = if d.discrete then (d.f << (toFloat << round)) xpos else d.f xpos
-      xmargin = (toFloat plotWidth) * 0.1
-      ymargin = (toFloat plotHeight) * 0.2
+      maxXmargin = (toFloat plotWidth) * 0.2
+      maxYmargin = (toFloat plotHeight) * 0.2
+      xmargin = if xmargin' < maxXmargin then xmargin' else maxXmargin
+      ymargin = if ymargin' < maxYmargin then ymargin' else maxYmargin
       xoffset = (toFloat plotWidth)/2 - xmargin
       yoffset = (toFloat plotHeight)/2 - ymargin
       ymultiplier = (toFloat plotHeight) - (2 * ymargin)
@@ -1279,11 +1265,35 @@ annotate_integral aes' defaults d dims =
                      ++ " &#8776; " ++ (toString <| C.dec precision <| integral)
 
 
+annotate_text : Aes -> Aes -> Graph -> Dimensions -> Geom
+annotate_text aes' defaults d dims = 
+   let
+      xm = dims.xm
+      ym = dims.ym
+      colour = lookup .colour aes' defaults
+      label' = lookup .label aes' defaults
+      translate = lookup .translate aes' defaults
+      precision = lookup .precision aes' defaults
+      pointsize = lookup .pointsize aes' defaults
+      visibility = lookup .visibility aes' defaults
+      x = fst translate
+      y = snd translate
+      pos = (xm * d.xScale x, ym * d.yScale y)
+      label = move pos <| toForm <| rightAligned <| color colour 
+              <| fromString <| label'
+   in
+      label
+
+
 {-- 
 TODO: 
+Polar axis
+Fix axis tick/label positioning (make absolute)
 Negate geom_trace_polar?
 Add documentation to Plot module
 Consistent naming of single and multiple geoms, eg point/points
+Geom_texts?
+Geom_rug_x, geom_rug_y?
 Rename xscale/yscale --> fromX/fromY
 (xm * d.xScale x) etc is a recurring pattern. Factor this out completely into a function?
 Colouring positive and negative integrals independently?
