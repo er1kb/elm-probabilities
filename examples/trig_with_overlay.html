@@ -3258,378 +3258,40 @@ Elm.Main.make = function (_elm) {
    $moduleName = "Main",
    $Basics = Elm.Basics.make(_elm),
    $Color = Elm.Color.make(_elm),
-   $Graphics$Collage = Elm.Graphics.Collage.make(_elm),
    $Graphics$Element = Elm.Graphics.Element.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Mouse = Elm.Mouse.make(_elm),
    $Plot = Elm.Plot.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Statistics$Continuous = Elm.Statistics.Continuous.make(_elm),
-   $Statistics$Data$Iris = Elm.Statistics.Data.Iris.make(_elm),
-   $Statistics$Data$Mtcars = Elm.Statistics.Data.Mtcars.make(_elm),
    $Window = Elm.Window.make(_elm);
-   var render = F2(function (m,w) {
-      return function () {
-         var ps = 4;
-         var vis = 0.6;
-         var geoms_setosa = _L.fromArray([$Plot.geom_points(_U.replace([["dynamic"
-                                                                        ,$Maybe.Just(false)]
-                                                                       ,["colour"
-                                                                        ,$Maybe.Just($Color.blue)]
-                                                                       ,["pointsize"
-                                                                        ,$Maybe.Just(ps)]
-                                                                       ,["visibility"
-                                                                        ,$Maybe.Just(vis)]],
-                                         $Plot.aes))
-                                         ,$Plot.legend(_U.replace([["translate"
-                                                                   ,$Maybe.Just({ctor: "_Tuple2"
-                                                                                ,_0: 1
-                                                                                ,_1: 4})]
-                                                                  ,["label"
-                                                                   ,$Maybe.Just("Setosa")]
-                                                                  ,["colour"
-                                                                   ,$Maybe.Just($Color.blue)]],
-                                         $Plot.aes))
-                                         ,$Plot.geom_vline(_U.replace([["x"
-                                                                       ,$Maybe.Just(1.462)]
-                                                                      ,["colour"
-                                                                       ,$Maybe.Just($Color.blue)]
-                                                                      ,["label"
-                                                                       ,$Maybe.Just("mean = ")]
-                                                                      ,["linetype"
-                                                                       ,$Maybe.Just($Graphics$Collage.dotted)]],
-                                         $Plot.aes))]);
-         var geoms_versicolor = _L.fromArray([$Plot.geom_points(_U.replace([["dynamic"
-                                                                            ,$Maybe.Just(false)]
-                                                                           ,["colour"
-                                                                            ,$Maybe.Just($Color.orange)]
-                                                                           ,["pointsize"
-                                                                            ,$Maybe.Just(ps)]
-                                                                           ,["visibility"
-                                                                            ,$Maybe.Just(vis)]],
-                                             $Plot.aes))
-                                             ,$Plot.legend(_U.replace([["translate"
-                                                                       ,$Maybe.Just({ctor: "_Tuple2"
-                                                                                    ,_0: 1
-                                                                                    ,_1: 3.5})]
-                                                                      ,["label"
-                                                                       ,$Maybe.Just("Versicolor")]
-                                                                      ,["colour"
-                                                                       ,$Maybe.Just($Color.orange)]],
-                                             $Plot.aes))
-                                             ,$Plot.geom_vline(_U.replace([["x"
-                                                                           ,$Maybe.Just(4.26)]
-                                                                          ,["colour"
-                                                                           ,$Maybe.Just($Color.orange)]
-                                                                          ,["label"
-                                                                           ,$Maybe.Just("mean = ")]
-                                                                          ,["linetype"
-                                                                           ,$Maybe.Just($Graphics$Collage.dotted)]],
-                                             $Plot.aes))]);
-         var geoms_virginica = _L.fromArray([$Plot.geom_points(_U.replace([["dynamic"
-                                                                           ,$Maybe.Just(false)]
-                                                                          ,["colour"
-                                                                           ,$Maybe.Just($Color.red)]
-                                                                          ,["pointsize"
-                                                                           ,$Maybe.Just(ps)]
-                                                                          ,["visibility"
-                                                                           ,$Maybe.Just(vis)]],
-                                            $Plot.aes))
-                                            ,$Plot.legend(_U.replace([["translate"
-                                                                      ,$Maybe.Just({ctor: "_Tuple2"
-                                                                                   ,_0: 1
-                                                                                   ,_1: 3})]
-                                                                     ,["label"
-                                                                      ,$Maybe.Just("Virginica")]
-                                                                     ,["colour"
-                                                                      ,$Maybe.Just($Color.red)]],
-                                            $Plot.aes))
-                                            ,$Plot.geom_vline(_U.replace([["x"
-                                                                          ,$Maybe.Just(5.552)]
-                                                                         ,["colour"
-                                                                          ,$Maybe.Just($Color.red)]
-                                                                         ,["label"
-                                                                          ,$Maybe.Just("mean = ")]
-                                                                         ,["linetype"
-                                                                          ,$Maybe.Just($Graphics$Collage.dotted)]],
-                                            $Plot.aes))]);
-         var iris = A3($List.map2,
-         F2(function (v0,v1) {
-            return {ctor: "_Tuple2"
-                   ,_0: v0
-                   ,_1: v1};
-         }),
-         $Statistics$Data$Iris.petalLength,
-         $Statistics$Data$Iris.petalWidth);
-         var d_iris = A3($Plot.fromPairs,
-         iris,
-         {ctor: "_Tuple2",_0: 0,_1: 7},
-         {ctor: "_Tuple2",_0: -2,_1: 5});
-         var lm_iris = $Statistics$Continuous.linreg(iris);
-         var geoms_iris = _L.fromArray([$Plot.geom_hline(_U.replace([["y"
-                                                                     ,$Maybe.Just(0)]
-                                                                    ,["annotate"
-                                                                     ,$Maybe.Just(false)]
-                                                                    ,["colour"
-                                                                     ,$Maybe.Just($Color.darkGrey)]],
-                                       $Plot.aes))
-                                       ,$Plot.title(_U.replace([["label"
-                                                                ,$Maybe.Just("Linear regression of the Iris dataset: petalWidth ~ petalLength")]],
-                                       $Plot.aes))
-                                       ,$Plot.xAxis(_U.replace([["tickspacing"
-                                                                ,$Maybe.Just(2)]
-                                                               ,["translate"
-                                                                ,$Maybe.Just({ctor: "_Tuple2"
-                                                                             ,_0: 0
-                                                                             ,_1: -5})]
-                                                               ,["label"
-                                                                ,$Maybe.Just("Petal Length")]],
-                                       $Plot.aes))
-                                       ,$Plot.yAxis(_U.replace([["tickspacing"
-                                                                ,$Maybe.Just(2)]
-                                                               ,["revolve"
-                                                                ,$Maybe.Just(true)]
-                                                               ,["label"
-                                                                ,$Maybe.Just("Petal Width")]],
-                                       $Plot.aes))
-                                       ,$Plot.geom_abline(_U.replace([["fun"
-                                                                      ,$Maybe.Just(lm_iris.f)]
-                                                                     ,["dynamic"
-                                                                      ,$Maybe.Just(false)]
-                                                                     ,["limits"
-                                                                      ,$Maybe.Just({ctor: "_Tuple2"
-                                                                                   ,_0: 0
-                                                                                   ,_1: 7})]],
-                                       $Plot.aes))]);
-         var iris$ = A3($List.map2,
-         F2(function (_v0,s) {
-            return function () {
-               switch (_v0.ctor)
-               {case "_Tuple2":
-                  return {ctor: "_Tuple3"
-                         ,_0: _v0._0
-                         ,_1: _v0._1
-                         ,_2: s};}
-               _U.badCase($moduleName,
-               "on line 52, column 39 to 44");
-            }();
-         }),
-         iris,
-         $Statistics$Data$Iris.species);
-         var setosa = $List.map(function (_v9) {
-            return function () {
-               switch (_v9.ctor)
-               {case "_Tuple3":
-                  return {ctor: "_Tuple2"
-                         ,_0: _v9._0
-                         ,_1: _v9._1};}
-               _U.badCase($moduleName,
-               "on line 53, column 39 to 42");
-            }();
-         })(A2($List.filter,
-         function (_v4) {
-            return function () {
-               switch (_v4.ctor)
-               {case "_Tuple3":
-                  return _U.eq(_v4._2,"setosa");}
-               _U.badCase($moduleName,
-               "on line 53, column 73 to 86");
-            }();
-         },
-         iris$));
-         var d_setosa = A3($Plot.fromPairs,
-         setosa,
-         {ctor: "_Tuple2",_0: 0,_1: 7},
-         {ctor: "_Tuple2",_0: -2,_1: 5});
-         var versicolor = $List.map(function (_v19) {
-            return function () {
-               switch (_v19.ctor)
-               {case "_Tuple3":
-                  return {ctor: "_Tuple2"
-                         ,_0: _v19._0
-                         ,_1: _v19._1};}
-               _U.badCase($moduleName,
-               "on line 54, column 43 to 46");
-            }();
-         })(A2($List.filter,
-         function (_v14) {
-            return function () {
-               switch (_v14.ctor)
-               {case "_Tuple3":
-                  return _U.eq(_v14._2,
-                    "versicolor");}
-               _U.badCase($moduleName,
-               "on line 54, column 77 to 94");
-            }();
-         },
-         iris$));
-         var d_versicolor = A3($Plot.fromPairs,
-         versicolor,
-         {ctor: "_Tuple2",_0: 0,_1: 7},
-         {ctor: "_Tuple2",_0: -2,_1: 5});
-         var virginica = $List.map(function (_v29) {
-            return function () {
-               switch (_v29.ctor)
-               {case "_Tuple3":
-                  return {ctor: "_Tuple2"
-                         ,_0: _v29._0
-                         ,_1: _v29._1};}
-               _U.badCase($moduleName,
-               "on line 55, column 42 to 45");
-            }();
-         })(A2($List.filter,
-         function (_v24) {
-            return function () {
-               switch (_v24.ctor)
-               {case "_Tuple3":
-                  return _U.eq(_v24._2,
-                    "virginica");}
-               _U.badCase($moduleName,
-               "on line 55, column 76 to 92");
-            }();
-         },
-         iris$));
-         var d_virginica = A3($Plot.fromPairs,
-         virginica,
-         {ctor: "_Tuple2",_0: 0,_1: 7},
-         {ctor: "_Tuple2",_0: -2,_1: 5});
-         var cars = A3($List.map2,
-         F2(function (v0,v1) {
-            return {ctor: "_Tuple2"
-                   ,_0: v0
-                   ,_1: v1};
-         }),
-         $Statistics$Data$Mtcars.hp,
-         $Statistics$Data$Mtcars.mpg);
-         var d_cars = A3($Plot.fromPairs,
-         cars,
-         {ctor: "_Tuple2",_0: 0,_1: 340},
-         {ctor: "_Tuple2",_0: 0,_1: 35});
-         var lm_cars = $Statistics$Continuous.linreg(cars);
-         var geoms_cars = _L.fromArray([$Plot.geom_hline(_U.replace([["y"
-                                                                     ,$Maybe.Just(0)]
-                                                                    ,["annotate"
-                                                                     ,$Maybe.Just(false)]
-                                                                    ,["colour"
-                                                                     ,$Maybe.Just($Color.darkGrey)]],
-                                       $Plot.aes))
-                                       ,$Plot.title(_U.replace([["label"
-                                                                ,$Maybe.Just("Linear regression of the Mtcars dataset: mpg ~ hp")]],
-                                       $Plot.aes))
-                                       ,$Plot.xAxis(_U.replace([["tickspacing"
-                                                                ,$Maybe.Just(50)]
-                                                               ,["translate"
-                                                                ,$Maybe.Just({ctor: "_Tuple2"
-                                                                             ,_0: 0
-                                                                             ,_1: -5})]
-                                                               ,["label"
-                                                                ,$Maybe.Just("Horse Power (hp)")]],
-                                       $Plot.aes))
-                                       ,$Plot.yAxis(_U.replace([["tickspacing"
-                                                                ,$Maybe.Just(10)]
-                                                               ,["revolve"
-                                                                ,$Maybe.Just(true)]
-                                                               ,["label"
-                                                                ,$Maybe.Just("Fuel consumption (mpg)")]],
-                                       $Plot.aes))
-                                       ,$Plot.geom_abline(_U.replace([["fun"
-                                                                      ,$Maybe.Just(lm_cars.f)]
-                                                                     ,["dynamic"
-                                                                      ,$Maybe.Just(false)]
-                                                                     ,["limits"
-                                                                      ,$Maybe.Just({ctor: "_Tuple2"
-                                                                                   ,_0: 0
-                                                                                   ,_1: 340})]],
-                                       $Plot.aes))
-                                       ,$Plot.geom_vlineranges(_U.replace([["fun"
-                                                                           ,$Maybe.Just(lm_cars.f)]
-                                                                          ,["colour"
-                                                                           ,$Maybe.Just($Color.green)]
-                                                                          ,["linetype"
-                                                                           ,$Maybe.Just($Graphics$Collage.dotted)]],
-                                       $Plot.aes))
-                                       ,$Plot.geom_points(_U.replace([["dynamic"
-                                                                      ,$Maybe.Just(false)]
-                                                                     ,["colour"
-                                                                      ,$Maybe.Just($Color.blue)]
-                                                                     ,["pointsize"
-                                                                      ,$Maybe.Just(4)]
-                                                                     ,["visibility"
-                                                                      ,$Maybe.Just(1)]],
-                                       $Plot.aes))
-                                       ,$Plot.legend(_U.replace([["translate"
-                                                                 ,$Maybe.Just({ctor: "_Tuple2"
-                                                                              ,_0: 50
-                                                                              ,_1: 10})]
-                                                                ,["label"
-                                                                 ,$Maybe.Just("residuals")]
-                                                                ,["colour"
-                                                                 ,$Maybe.Just($Color.green)]
-                                                                ,["linetype"
-                                                                 ,$Maybe.Just($Graphics$Collage.dotted)]],
-                                       $Plot.aes))]);
-         return A2($Graphics$Element.flow,
-         $Graphics$Element.down,
-         _L.fromArray([$Graphics$Element.flow($Graphics$Element.right)(_L.fromArray([A5($Plot.plot,
-                                                                                    {ctor: "_Tuple2"
-                                                                                    ,_0: 1000
-                                                                                    ,_1: 300},
-                                                                                    d_cars,
-                                                                                    geoms_cars,
-                                                                                    m,
-                                                                                    w)
-                                                                                    ,A2($Html.toElement,
-                                                                                    300,
-                                                                                    300)($Html.text(A2($Basics._op["++"],
-                                                                                    "linear model: ",
-                                                                                    $Basics.toString(lm_cars))))]))
-                      ,$Graphics$Element.flow($Graphics$Element.right)(_L.fromArray([A2($Graphics$Element.flow,
-                                                                                    $Graphics$Element.outward,
-                                                                                    _L.fromArray([A5($Plot.plot,
-                                                                                                 {ctor: "_Tuple2"
-                                                                                                 ,_0: 1000
-                                                                                                 ,_1: 300},
-                                                                                                 d_iris,
-                                                                                                 geoms_iris,
-                                                                                                 m,
-                                                                                                 w)
-                                                                                                 ,A5($Plot.plot,
-                                                                                                 {ctor: "_Tuple2"
-                                                                                                 ,_0: 1000
-                                                                                                 ,_1: 300},
-                                                                                                 d_setosa,
-                                                                                                 geoms_setosa,
-                                                                                                 m,
-                                                                                                 w)
-                                                                                                 ,A5($Plot.plot,
-                                                                                                 {ctor: "_Tuple2"
-                                                                                                 ,_0: 1000
-                                                                                                 ,_1: 300},
-                                                                                                 d_versicolor,
-                                                                                                 geoms_versicolor,
-                                                                                                 m,
-                                                                                                 w)
-                                                                                                 ,A5($Plot.plot,
-                                                                                                 {ctor: "_Tuple2"
-                                                                                                 ,_0: 1000
-                                                                                                 ,_1: 300},
-                                                                                                 d_virginica,
-                                                                                                 geoms_virginica,
-                                                                                                 m,
-                                                                                                 w)]))
-                                                                                    ,A2($Html.toElement,
-                                                                                    300,
-                                                                                    300)($Html.text(A2($Basics._op["++"],
-                                                                                    "linear model: ",
-                                                                                    $Basics.toString(lm_iris))))]))]));
-      }();
-   });
-   var main = A3($Signal.map2,
-   render,
-   $Mouse.position,
-   $Window.dimensions);
+   var geoms4 = _L.fromArray([$Plot.geom_hline(_U.replace([["y"
+                                                           ,$Maybe.Just(0)]
+                                                          ,["annotate"
+                                                           ,$Maybe.Just(false)]
+                                                          ,["colour"
+                                                           ,$Maybe.Just($Color.darkGrey)]],
+                             $Plot.aes))
+                             ,$Plot.geom_hline(_U.replace([["y"
+                                                           ,$Maybe.Just(-1.26)]
+                                                          ,["annotate"
+                                                           ,$Maybe.Just(false)]
+                                                          ,["colour"
+                                                           ,$Maybe.Just($Color.darkGrey)]],
+                             $Plot.aes))
+                             ,$Plot.title(_U.replace([["label"
+                                                      ,$Maybe.Just("Linear regression: mpg ~ hp")]],
+                             $Plot.aes))
+                             ,$Plot.xAxis(_U.replace([["tickspacing"
+                                                      ,$Maybe.Just(50)]
+                                                     ,["translate"
+                                                      ,$Maybe.Just({ctor: "_Tuple2"
+                                                                   ,_0: 0
+                                                                   ,_1: -5})]],
+                             $Plot.aes))
+                             ,$Plot.yAxis(_U.replace([["tickspacing"
+                                                      ,$Maybe.Just(10)]],
+                             $Plot.aes))]);
    var customAes = _U.replace([["radius"
                                ,$Maybe.Just(2)]
                               ,["pointsize",$Maybe.Just(9)]
@@ -3639,10 +3301,220 @@ Elm.Main.make = function (_elm) {
                               ,["annotate"
                                ,$Maybe.Just(true)]],
    $Plot.aes);
+   var geoms3 = _L.fromArray([$Plot.geom_trace_polar(_U.replace([["colour"
+                                                                 ,$Maybe.Just($Color.purple)]
+                                                                ,["dynamic"
+                                                                 ,$Maybe.Just(true)]
+                                                                ,["negate"
+                                                                 ,$Maybe.Just(true)]],
+                             $Plot.aes))
+                             ,$Plot.geom_position_polar(customAes)
+                             ,$Plot.geom_angle(_U.replace([["colour"
+                                                           ,$Maybe.Just($Color.red)]
+                                                          ,["pointsize"
+                                                           ,$Maybe.Just(6)]
+                                                          ,["translate"
+                                                           ,$Maybe.Just({ctor: "_Tuple2"
+                                                                        ,_0: -0.5 * $Basics.pi
+                                                                        ,_1: 0.5})]],
+                             $Plot.aes))
+                             ,$Plot.geom_circle(customAes)
+                             ,$Plot.geom_vline_polar(customAes)
+                             ,$Plot.geom_hline(_U.replace([["y"
+                                                           ,$Maybe.Just(0)]
+                                                          ,["annotate"
+                                                           ,$Maybe.Just(false)]
+                                                          ,["colour"
+                                                           ,$Maybe.Just($Color.darkGrey)]],
+                             $Plot.aes))
+                             ,$Plot.geom_vline(_U.replace([["x"
+                                                           ,$Maybe.Just($Basics.pi)]
+                                                          ,["annotate"
+                                                           ,$Maybe.Just(false)]
+                                                          ,["colour"
+                                                           ,$Maybe.Just($Color.darkGrey)]],
+                             $Plot.aes))]);
+   var geoms1 = _L.fromArray([$Plot.geom_curve(customAes)
+                             ,$Plot.annotate_integral(_U.replace([["translate"
+                                                                  ,$Maybe.Just({ctor: "_Tuple2"
+                                                                               ,_0: 0.1
+                                                                               ,_1: 0.7})]],
+                             customAes))
+                             ,$Plot.geom_point(customAes)
+                             ,$Plot.geom_point(_U.replace([["y"
+                                                           ,$Maybe.Just(1)]
+                                                          ,["colour"
+                                                           ,$Maybe.Just($Color.red)]
+                                                          ,["pointsize"
+                                                           ,$Maybe.Just(6)]],
+                             $Plot.aes))
+                             ,$Plot.geom_trace_polar(_U.replace([["colour"
+                                                                 ,$Maybe.Just($Color.purple)]
+                                                                ,["dynamic"
+                                                                 ,$Maybe.Just(true)]
+                                                                ,["revolve"
+                                                                 ,$Maybe.Just(true)]
+                                                                ,["negate"
+                                                                 ,$Maybe.Just(true)]],
+                             $Plot.aes))
+                             ,$Plot.geom_trace(_U.replace([["colour"
+                                                           ,$Maybe.Just($Color.orange)]],
+                             $Plot.aes))
+                             ,$Plot.geom_vline(_U.replace([["label"
+                                                           ,$Maybe.Just("x = ")]
+                                                          ,["translate"
+                                                           ,$Maybe.Just({ctor: "_Tuple2"
+                                                                        ,_0: 0.5
+                                                                        ,_1: 0})]],
+                             customAes))
+                             ,$Plot.geom_hline(_U.replace([["annotate"
+                                                           ,$Maybe.Just(false)]
+                                                          ,["colour"
+                                                           ,$Maybe.Just($Color.darkGrey)]
+                                                          ,["y"
+                                                           ,$Maybe.Just(0)]],
+                             $Plot.aes))
+                             ,$Plot.geom_hline(_U.replace([["annotate"
+                                                           ,$Maybe.Just(false)]
+                                                          ,["colour"
+                                                           ,$Maybe.Just($Color.darkGrey)]
+                                                          ,["y"
+                                                           ,$Maybe.Just(1)]],
+                             $Plot.aes))
+                             ,$Plot.geom_hline(_U.replace([["annotate"
+                                                           ,$Maybe.Just(false)]
+                                                          ,["colour"
+                                                           ,$Maybe.Just($Color.darkGrey)]
+                                                          ,["y"
+                                                           ,$Maybe.Just(-1)]],
+                             $Plot.aes))
+                             ,$Plot.xAxis(_U.replace([["label"
+                                                      ,$Maybe.Just("X")]
+                                                     ,["tickspacing"
+                                                      ,$Maybe.Just(2)]],
+                             $Plot.aes))
+                             ,$Plot.yAxis(_U.replace([["label"
+                                                      ,$Maybe.Just("Y")]
+                                                     ,["tickspacing"
+                                                      ,$Maybe.Just(0.5)]],
+                             $Plot.aes))]);
+   var render = F2(function (m,w) {
+      return function () {
+         var mouseX = $Basics.toFloat($Basics.fst(m));
+         var xpos = A2($Statistics$Continuous.normalize,
+         {ctor: "_Tuple2"
+         ,_0: 0
+         ,_1: $Basics.toFloat($Basics.snd(w))},
+         mouseX);
+         var mouseY = $Basics.toFloat($Basics.snd(m));
+         var ypos = A2($Statistics$Continuous.normalize,
+         {ctor: "_Tuple2"
+         ,_0: 0.9 * function ($) {
+            return $Basics.toFloat($Basics.snd($));
+         }(w)
+         ,_1: 0.2 * function ($) {
+            return $Basics.toFloat($Basics.snd($));
+         }(w)},
+         mouseY);
+         var n$ = function ($) {
+            return $Basics.toFloat($Basics.floor($));
+         }(400 * A2($Statistics$Continuous.dec,
+         2,
+         ypos));
+         var n = _U.cmp(n$,
+         0) < 0 ? 0 : _U.cmp(n$,
+         400) > 0 ? 400 : n$;
+         var $const = $Statistics$Continuous.dec(2)(n * 1.0e-2);
+         var d1 = A4($Plot.continuous,
+         function (x) {
+            return $Basics.cos($const * x);
+         },
+         {ctor: "_Tuple2"
+         ,_0: 0
+         ,_1: 2 * $Basics.pi},
+         {ctor: "_Tuple2",_0: -1,_1: 1},
+         200);
+         var d2 = A4($Plot.continuous,
+         function (x) {
+            return $Basics.sin($const * x);
+         },
+         {ctor: "_Tuple2"
+         ,_0: 0
+         ,_1: 2 * $Basics.pi},
+         {ctor: "_Tuple2",_0: -1,_1: 1},
+         200);
+         var plotTitle1 = _L.fromArray([$Plot.title(_U.replace([["label"
+                                                                ,$Maybe.Just(A2($Basics._op["++"],
+                                                                "y = cos",
+                                                                A2($Basics._op["++"],
+                                                                $Basics.toString($const),
+                                                                "x")))]],
+         $Plot.aes))]);
+         var plotTitle2 = _L.fromArray([$Plot.title(_U.replace([["label"
+                                                                ,$Maybe.Just(A2($Basics._op["++"],
+                                                                "y = sin",
+                                                                A2($Basics._op["++"],
+                                                                $Basics.toString($const),
+                                                                "x")))]],
+         $Plot.aes))]);
+         var margins = {ctor: "_Tuple2"
+                       ,_0: 70
+                       ,_1: 70};
+         return A2($Graphics$Element.flow,
+         $Graphics$Element.down,
+         _L.fromArray([$Graphics$Element.flow($Graphics$Element.right)(_L.fromArray([A6($Plot.plot,
+                                                                                    {ctor: "_Tuple2"
+                                                                                    ,_0: 1000
+                                                                                    ,_1: 300},
+                                                                                    margins,
+                                                                                    d1,
+                                                                                    A2($Basics._op["++"],
+                                                                                    geoms1,
+                                                                                    plotTitle1),
+                                                                                    m,
+                                                                                    w)
+                                                                                    ,A6($Plot.plot,
+                                                                                    {ctor: "_Tuple2"
+                                                                                    ,_0: 300
+                                                                                    ,_1: 300},
+                                                                                    margins,
+                                                                                    d1,
+                                                                                    geoms3,
+                                                                                    m,
+                                                                                    w)]))
+                      ,$Graphics$Element.flow($Graphics$Element.right)(_L.fromArray([A6($Plot.plot,
+                                                                                    {ctor: "_Tuple2"
+                                                                                    ,_0: 1000
+                                                                                    ,_1: 300},
+                                                                                    margins,
+                                                                                    d2,
+                                                                                    A2($Basics._op["++"],
+                                                                                    geoms1,
+                                                                                    plotTitle2),
+                                                                                    m,
+                                                                                    w)
+                                                                                    ,A6($Plot.plot,
+                                                                                    {ctor: "_Tuple2"
+                                                                                    ,_0: 300
+                                                                                    ,_1: 300},
+                                                                                    margins,
+                                                                                    d2,
+                                                                                    geoms3,
+                                                                                    m,
+                                                                                    w)]))]));
+      }();
+   });
+   var main = A3($Signal.map2,
+   render,
+   $Mouse.position,
+   $Window.dimensions);
    _elm.Main.values = {_op: _op
+                      ,geoms1: geoms1
                       ,customAes: customAes
                       ,render: render
-                      ,main: main};
+                      ,main: main
+                      ,geoms3: geoms3
+                      ,geoms4: geoms4};
    return _elm.Main.values;
 };Elm.Maybe = Elm.Maybe || {};
 Elm.Maybe.make = function (_elm) {
@@ -10546,8 +10418,60 @@ Elm.Plot.make = function (_elm) {
                       break;}
                  break;}
             _U.badCase($moduleName,
-            "between lines 1210 and 1212");
+            "between lines 1315 and 1317");
          }();
+      }();
+   });
+   var annotate_text = F4(function (aes$,
+   defaults,
+   d,
+   dims) {
+      return function () {
+         var visibility = A3(lookup,
+         function (_) {
+            return _.visibility;
+         },
+         aes$,
+         defaults);
+         var pointsize = A3(lookup,
+         function (_) {
+            return _.pointsize;
+         },
+         aes$,
+         defaults);
+         var precision = A3(lookup,
+         function (_) {
+            return _.precision;
+         },
+         aes$,
+         defaults);
+         var translate = A3(lookup,
+         function (_) {
+            return _.translate;
+         },
+         aes$,
+         defaults);
+         var x = $Basics.fst(translate);
+         var y = $Basics.snd(translate);
+         var label$ = A3(lookup,
+         function (_) {
+            return _.label;
+         },
+         aes$,
+         defaults);
+         var colour = A3(lookup,
+         function (_) {
+            return _.colour;
+         },
+         aes$,
+         defaults);
+         var ym = dims.ym;
+         var xm = dims.xm;
+         var pos = {ctor: "_Tuple2"
+                   ,_0: xm * d.xScale(x)
+                   ,_1: ym * d.yScale(y)};
+         var label = $Graphics$Collage.move(pos)($Graphics$Collage.toForm($Text.rightAligned($Text.color(colour)($Text.fromString(label$)))));
+         return label;
       }();
    });
    var annotate_integral = F4(function (aes$,
@@ -10646,71 +10570,82 @@ Elm.Plot.make = function (_elm) {
                                                                                                                                                            ,_1: 0}])))]));
       }();
    });
-   var plot = F5(function (_v5,
+   var plot = F6(function (_v5,
+   _v6,
    d,
    geoms,
    m,
    w) {
       return function () {
-         switch (_v5.ctor)
+         switch (_v6.ctor)
          {case "_Tuple2":
             return function () {
-                 var ymargin = $Basics.toFloat(_v5._1) * 0.2;
-                 var yoffset = $Basics.toFloat(_v5._1) / 2 - ymargin;
-                 var ymultiplier = $Basics.toFloat(_v5._1) - 2 * ymargin;
-                 var xmargin = $Basics.toFloat(_v5._0) * 0.1;
-                 var xoffset = $Basics.toFloat(_v5._0) / 2 - xmargin;
-                 var offsets = {ctor: "_Tuple2"
-                               ,_0: 0 - xoffset
-                               ,_1: 0 - yoffset};
-                 var xmultiplier = $Basics.toFloat(_v5._0) - 2 * xmargin;
-                 var dims = {_: {}
-                            ,margins: {ctor: "_Tuple2"
-                                      ,_0: xmargin
-                                      ,_1: ymargin}
-                            ,plotHeight: $Basics.toFloat(_v5._1)
-                            ,plotWidth: $Basics.toFloat(_v5._0)
-                            ,xm: xmultiplier
-                            ,ym: ymultiplier};
-                 var input = {_: {}
-                             ,height: $Basics.snd(w)
-                             ,width: $Basics.fst(w)
-                             ,x: $Basics.fst(m)
-                             ,y: $Basics.snd(m)};
-                 var windowScaleX = $Statistics$Continuous.normalize({ctor: "_Tuple2"
-                                                                     ,_0: 0
-                                                                     ,_1: $Basics.toFloat(input.width)});
-                 var windowScaleY = $Statistics$Continuous.normalize({ctor: "_Tuple2"
-                                                                     ,_0: 0
-                                                                     ,_1: $Basics.toFloat(input.height)});
-                 var nsteps = $Basics.round($Basics.toFloat(input.x) / 4);
-                 var wpos = {ctor: "_Tuple2"
-                            ,_0: windowScaleX($Basics.toFloat(input.x))
-                            ,_1: windowScaleY($Basics.toFloat(input.y))};
-                 var xpos = $Basics.fst(d.xDomain) + d.xExtent * $Basics.fst(wpos);
-                 var ypos = d.discrete ? function ($) {
-                    return d.f($Basics.toFloat($Basics.round($)));
-                 }(xpos) : d.f(xpos);
-                 var defaults = _U.replace([["delta"
-                                            ,$Maybe.Just(d.dx)]
-                                           ,["limits"
-                                            ,$Maybe.Just(d.xDomain)]
-                                           ,["x",$Maybe.Just(xpos)]
-                                           ,["y",$Maybe.Just(ypos)]
-                                           ,["nsteps"
-                                            ,$Maybe.Just(nsteps)]],
-                 aesDefault);
-                 return A3($Graphics$Collage.collage,
-                 _v5._0,
-                 _v5._1,
-                 _L.fromArray([$Graphics$Collage.move(offsets)($Graphics$Collage.group(A2($List.map,
-                 function (g) {
-                    return A3(g,defaults,d,dims);
-                 },
-                 geoms)))]));
+                 switch (_v5.ctor)
+                 {case "_Tuple2":
+                    return function () {
+                         var maxYmargin = $Basics.toFloat(_v5._1) * 0.2;
+                         var ymargin = _U.cmp(_v6._1,
+                         maxYmargin) < 0 ? _v6._1 : maxYmargin;
+                         var yoffset = $Basics.toFloat(_v5._1) / 2 - ymargin;
+                         var ymultiplier = $Basics.toFloat(_v5._1) - 2 * ymargin;
+                         var maxXmargin = $Basics.toFloat(_v5._0) * 0.2;
+                         var xmargin = _U.cmp(_v6._0,
+                         maxXmargin) < 0 ? _v6._0 : maxXmargin;
+                         var xoffset = $Basics.toFloat(_v5._0) / 2 - xmargin;
+                         var offsets = {ctor: "_Tuple2"
+                                       ,_0: 0 - xoffset
+                                       ,_1: 0 - yoffset};
+                         var xmultiplier = $Basics.toFloat(_v5._0) - 2 * xmargin;
+                         var dims = {_: {}
+                                    ,margins: {ctor: "_Tuple2"
+                                              ,_0: xmargin
+                                              ,_1: ymargin}
+                                    ,plotHeight: $Basics.toFloat(_v5._1)
+                                    ,plotWidth: $Basics.toFloat(_v5._0)
+                                    ,xm: xmultiplier
+                                    ,ym: ymultiplier};
+                         var input = {_: {}
+                                     ,height: $Basics.snd(w)
+                                     ,width: $Basics.fst(w)
+                                     ,x: $Basics.fst(m)
+                                     ,y: $Basics.snd(m)};
+                         var windowScaleX = $Statistics$Continuous.normalize({ctor: "_Tuple2"
+                                                                             ,_0: 0
+                                                                             ,_1: $Basics.toFloat(input.width)});
+                         var windowScaleY = $Statistics$Continuous.normalize({ctor: "_Tuple2"
+                                                                             ,_0: 0
+                                                                             ,_1: $Basics.toFloat(input.height)});
+                         var nsteps = $Basics.round($Basics.toFloat(input.x) / 4);
+                         var wpos = {ctor: "_Tuple2"
+                                    ,_0: windowScaleX($Basics.toFloat(input.x))
+                                    ,_1: windowScaleY($Basics.toFloat(input.y))};
+                         var xpos = $Basics.fst(d.xDomain) + d.xExtent * $Basics.fst(wpos);
+                         var ypos = d.discrete ? function ($) {
+                            return d.f($Basics.toFloat($Basics.round($)));
+                         }(xpos) : d.f(xpos);
+                         var defaults = _U.replace([["delta"
+                                                    ,$Maybe.Just(d.dx)]
+                                                   ,["limits"
+                                                    ,$Maybe.Just(d.xDomain)]
+                                                   ,["x",$Maybe.Just(xpos)]
+                                                   ,["y",$Maybe.Just(ypos)]
+                                                   ,["nsteps"
+                                                    ,$Maybe.Just(nsteps)]],
+                         aesDefault);
+                         return A3($Graphics$Collage.collage,
+                         _v5._0,
+                         _v5._1,
+                         _L.fromArray([$Graphics$Collage.move(offsets)($Graphics$Collage.group(A2($List.map,
+                         function (g) {
+                            return A3(g,defaults,d,dims);
+                         },
+                         geoms)))]));
+                      }();}
+                 _U.badCase($moduleName,
+                 "between lines 1182 and 1220");
               }();}
          _U.badCase($moduleName,
-         "between lines 1103 and 1139");
+         "between lines 1182 and 1220");
       }();
    });
    var geom_image = F4(function (aes$,
@@ -10832,7 +10767,7 @@ Elm.Plot.make = function (_elm) {
          var ymargin = $Basics.fst(dims.margins);
          var pos = {ctor: "_Tuple2"
                    ,_0: xm * d.xScale(midx)
-                   ,_1: ym * d.yScale(ymax) + ymargin / 4};
+                   ,_1: ym * d.yScale(ymax) + ymargin / 2};
          var label = A3(lookup,
          function (_) {
             return _.label;
@@ -10843,13 +10778,13 @@ Elm.Plot.make = function (_elm) {
          return $Graphics$Collage.move(pos)(ttl);
       }();
    });
-   var mkTicks = F2(function (_v9,
+   var mkTicks = F2(function (_v13,
    tickspacing$) {
       return function () {
-         switch (_v9.ctor)
+         switch (_v13.ctor)
          {case "_Tuple2":
             return function () {
-                 var r = _v9._1 - _v9._0;
+                 var r = _v13._1 - _v13._0;
                  var m = $List.head($List.reverse(A2($List.filter,
                  function (m) {
                     return _U.cmp(Math.pow(10,m),
@@ -10869,12 +10804,12 @@ Elm.Plot.make = function (_elm) {
                     tickspacing),
                     0) : true;
                  },
-                 _L.range($Basics.ceiling(_v9._0 / ten),
-                 $Basics.floor(_v9._1 / ten))));
+                 _L.range($Basics.ceiling(_v13._0 / ten),
+                 $Basics.floor(_v13._1 / ten))));
                  return ticks;
               }();}
          _U.badCase($moduleName,
-         "between lines 968 and 977");
+         "between lines 1039 and 1048");
       }();
    });
    var yAxis = F4(function (aes$,
@@ -10941,7 +10876,7 @@ Elm.Plot.make = function (_elm) {
          var tickLabels = $Graphics$Collage.group(A2($List.map,
          function (y) {
             return $Graphics$Collage.move({ctor: "_Tuple2"
-                                          ,_0: xoffset + (0 - xmargin) / 5
+                                          ,_0: xoffset + (0 - xmargin) / 3
                                           ,_1: yoffset + ym * d.yScale(y)})($Graphics$Collage.toForm($Text.rightAligned($Text.fromString(labelfun($Basics.toString(A2($Statistics$Continuous.dec,
             precision,
             y)))))));
@@ -10955,22 +10890,22 @@ Elm.Plot.make = function (_elm) {
                                                                                                                                                                  ,_0: 0
                                                                                                                                                                  ,_1: 0}
                                                                                                                                                                 ,{ctor: "_Tuple2"
-                                                                                                                                                                 ,_0: 10
+                                                                                                                                                                 ,_0: -10
                                                                                                                                                                  ,_1: 0}]))));
          },
          tickPositions));
          var yBar = $Graphics$Collage.traced($Graphics$Collage.solid(colour))($Graphics$Collage.path(_L.fromArray([{ctor: "_Tuple2"
-                                                                                                                   ,_0: 10
+                                                                                                                   ,_0: 0
                                                                                                                    ,_1: 0}
                                                                                                                   ,{ctor: "_Tuple2"
-                                                                                                                   ,_0: 10
+                                                                                                                   ,_0: 0
                                                                                                                    ,_1: ym}])));
          var yLabel = $Graphics$Collage.rotate(angle)($Graphics$Collage.move({ctor: "_Tuple2"
-                                                                             ,_0: xoffset + (0 - xmargin) / 2
+                                                                             ,_0: xoffset + (0 - xmargin) * 0.6
                                                                              ,_1: yoffset + ym * 0.5})($Graphics$Collage.toForm($Text.leftAligned($Text.fromString(label)))));
          var xm = dims.xm;
          var pos = {ctor: "_Tuple2"
-                   ,_0: xm * d.xScale(xmin) - xmargin / 4
+                   ,_0: xm * d.xScale(xmin) - xmargin / 8
                    ,_1: 0};
          return $Graphics$Collage.move(pos)($Graphics$Collage.group(_L.fromArray([tickLabels
                                                                                  ,ticks
@@ -11297,16 +11232,37 @@ Elm.Plot.make = function (_elm) {
    d,
    dims) {
       return function () {
+         var limits = A3(lookup,
+         function (_) {
+            return _.limits;
+         },
+         aes$,
+         defaults);
          var x = A3(lookup,
          function (_) {
             return _.x;
          },
          aes$,
          defaults);
+         var negate = A3(lookup,
+         function (_) {
+            return _.negate;
+         },
+         aes$,
+         defaults);
+         var limits$ = negate ? {ctor: "_Tuple2"
+                                ,_0: x
+                                ,_1: $Basics.snd(limits)} : {ctor: "_Tuple2"
+                                                            ,_0: $Basics.fst(limits)
+                                                            ,_1: x};
+         var dynamic = A3(lookup,
+         function (_) {
+            return _.dynamic;
+         },
+         aes$,
+         defaults);
          var $ = A2($Statistics$Continuous.interpolate,
-         {ctor: "_Tuple2"
-         ,_0: $Basics.fst(d.xDomain)
-         ,_1: x},
+         dynamic ? limits$ : limits,
          $Basics.toFloat(d.steps)),
          dx = $._0,
          steps = $._1;
@@ -11330,15 +11286,15 @@ Elm.Plot.make = function (_elm) {
          defaults);
          var ym = dims.ym;
          var xm = dims.xm;
-         var ys = $List.map(function (_v13) {
+         var ys = $List.map(function (_v17) {
             return function () {
-               switch (_v13.ctor)
+               switch (_v17.ctor)
                {case "_Tuple2":
                   return {ctor: "_Tuple2"
-                         ,_0: xm * d.xScale(_v13._0)
-                         ,_1: ym * d.yScale(_v13._1)};}
+                         ,_0: xm * d.xScale(_v17._0)
+                         ,_1: ym * d.yScale(_v17._1)};}
                _U.badCase($moduleName,
-               "on line 873, column 28 to 64");
+               "on line 944, column 28 to 64");
             }();
          })(A3($List.map2,
          F2(function (v0,v1) {
@@ -11398,15 +11354,15 @@ Elm.Plot.make = function (_elm) {
          defaults);
          var ym = dims.ym;
          var xm = dims.xm;
-         var pos = function (_v17) {
+         var pos = function (_v21) {
             return function () {
-               switch (_v17.ctor)
+               switch (_v21.ctor)
                {case "_Tuple2":
                   return {ctor: "_Tuple2"
-                         ,_0: xm * d.xScale(d.pOffset + _v17._0 / xyRatio)
-                         ,_1: ym * d.yScale(_v17._1)};}
+                         ,_0: xm * d.xScale(d.pOffset + _v21._0 / xyRatio)
+                         ,_1: ym * d.yScale(_v21._1)};}
                _U.badCase($moduleName,
-               "on line 852, column 26 to 84");
+               "on line 919, column 26 to 84");
             }();
          }($Basics.fromPolar({ctor: "_Tuple2"
                              ,_0: y$
@@ -11461,15 +11417,15 @@ Elm.Plot.make = function (_elm) {
          },
          d.ys));
          var hline = $Graphics$Collage.path(A2($List.map,
-         function (_v21) {
+         function (_v25) {
             return function () {
-               switch (_v21.ctor)
+               switch (_v25.ctor)
                {case "_Tuple2":
                   return {ctor: "_Tuple2"
-                         ,_0: xm * d.xScale(d.pOffset + _v21._0 / xyRatio)
-                         ,_1: ym * d.yScale(_v21._1)};}
+                         ,_0: xm * d.xScale(d.pOffset + _v25._0 / xyRatio)
+                         ,_1: ym * d.yScale(_v25._1)};}
                _U.badCase($moduleName,
-               "on line 642, column 29 to 87");
+               "on line 709, column 29 to 87");
             }();
          },
          points));
@@ -11528,15 +11484,15 @@ Elm.Plot.make = function (_elm) {
          },
          d.xs));
          var hline = $Graphics$Collage.path(A2($List.map,
-         function (_v25) {
+         function (_v29) {
             return function () {
-               switch (_v25.ctor)
+               switch (_v29.ctor)
                {case "_Tuple2":
                   return {ctor: "_Tuple2"
-                         ,_0: xm * d.xScale(d.pOffset + _v25._0 / xyRatio)
-                         ,_1: ym * d.yScale(_v25._1)};}
+                         ,_0: xm * d.xScale(d.pOffset + _v29._0 / xyRatio)
+                         ,_1: ym * d.yScale(_v29._1)};}
                _U.badCase($moduleName,
-               "on line 620, column 29 to 87");
+               "on line 687, column 29 to 87");
             }();
          },
          points));
@@ -11891,15 +11847,15 @@ Elm.Plot.make = function (_elm) {
          defaults);
          var ym = dims.ym;
          var xm = dims.xm;
-         var ys = $List.map(function (_v29) {
+         var ys = $List.map(function (_v33) {
             return function () {
-               switch (_v29.ctor)
+               switch (_v33.ctor)
                {case "_Tuple2":
                   return {ctor: "_Tuple2"
-                         ,_0: xm * d.xScale(_v29._0)
-                         ,_1: ym * d.yScale(_v29._1)};}
+                         ,_0: xm * d.xScale(_v33._0)
+                         ,_1: ym * d.yScale(_v33._1)};}
                _U.badCase($moduleName,
-               "on line 500, column 28 to 64");
+               "on line 567, column 28 to 64");
             }();
          })(A3($List.map2,
          F2(function (v0,v1) {
@@ -11912,52 +11868,52 @@ Elm.Plot.make = function (_elm) {
          return $Graphics$Collage.alpha(visibility)($Graphics$Collage.traced(linetype(colour))($Graphics$Collage.path(ys)));
       }();
    });
-   var trapezoid = F5(function (_v33,
-   _v34,
+   var trapezoid = F5(function (_v37,
+   _v38,
    f,
    baseline,
-   _v35) {
+   _v39) {
       return function () {
-         switch (_v35.ctor)
+         switch (_v39.ctor)
          {case "_Tuple2":
             return function () {
-                 switch (_v34.ctor)
+                 switch (_v38.ctor)
                  {case "_Tuple2":
                     return function () {
-                         switch (_v33.ctor)
+                         switch (_v37.ctor)
                          {case "_Tuple2":
                             return A2($List.map,
-                              function (_v45) {
+                              function (_v49) {
                                  return function () {
-                                    switch (_v45.ctor)
+                                    switch (_v49.ctor)
                                     {case "_Tuple2":
                                        return {ctor: "_Tuple2"
-                                              ,_0: _v33._0 * _v34._0(_v45._0)
-                                              ,_1: _v33._1 * _v34._1(_v45._1)};}
+                                              ,_0: _v37._0 * _v38._0(_v49._0)
+                                              ,_1: _v37._1 * _v38._1(_v49._1)};}
                                     _U.badCase($moduleName,
-                                    "on line 437, column 20 to 52");
+                                    "on line 503, column 20 to 52");
                                  }();
                               },
                               _L.fromArray([{ctor: "_Tuple2"
-                                            ,_0: _v35._0
-                                            ,_1: baseline(_v35._0)}
+                                            ,_0: _v39._0
+                                            ,_1: baseline(_v39._0)}
                                            ,{ctor: "_Tuple2"
-                                            ,_0: _v35._1
-                                            ,_1: baseline(_v35._1)}
+                                            ,_0: _v39._1
+                                            ,_1: baseline(_v39._1)}
                                            ,{ctor: "_Tuple2"
-                                            ,_0: _v35._1
-                                            ,_1: f(_v35._1)}
+                                            ,_0: _v39._1
+                                            ,_1: f(_v39._1)}
                                            ,{ctor: "_Tuple2"
-                                            ,_0: _v35._0
-                                            ,_1: f(_v35._0)}]));}
+                                            ,_0: _v39._0
+                                            ,_1: f(_v39._0)}]));}
                          _U.badCase($moduleName,
-                         "between lines 437 and 438");
+                         "between lines 503 and 504");
                       }();}
                  _U.badCase($moduleName,
-                 "between lines 437 and 438");
+                 "between lines 503 and 504");
               }();}
          _U.badCase($moduleName,
-         "between lines 437 and 438");
+         "between lines 503 and 504");
       }();
    });
    var geom_trapezoid = F4(function (aes$,
@@ -12025,39 +11981,39 @@ Elm.Plot.make = function (_elm) {
          points)));
       }();
    });
-   var bar = F5(function (_v49,
-   _v50,
+   var bar = F5(function (_v53,
+   _v54,
    limits,
    f,
-   _v51) {
+   _v55) {
       return function () {
-         switch (_v51.ctor)
+         switch (_v55.ctor)
          {case "_Tuple2":
             return function () {
-                 switch (_v50.ctor)
+                 switch (_v54.ctor)
                  {case "_Tuple2":
                     return function () {
-                         switch (_v49.ctor)
+                         switch (_v53.ctor)
                          {case "_Tuple2":
                             return function () {
-                                 var x3 = (_v51._0 + _v51._1) / 2;
+                                 var x3 = (_v55._0 + _v55._1) / 2;
                                  var midpoint = f(x3);
                                  var upper = $Basics.snd(limits);
-                                 var x2 = _U.cmp(_v51._1,
-                                 upper) > 0 ? upper : _v51._1;
+                                 var x2 = _U.cmp(_v55._1,
+                                 upper) > 0 ? upper : _v55._1;
                                  var lower = $Basics.fst(limits);
-                                 var x1 = _U.cmp(_v51._0,
-                                 lower) < 0 ? lower : _v51._0;
+                                 var x1 = _U.cmp(_v55._0,
+                                 lower) < 0 ? lower : _v55._0;
                                  return A2($List.map,
-                                 function (_v61) {
+                                 function (_v65) {
                                     return function () {
-                                       switch (_v61.ctor)
+                                       switch (_v65.ctor)
                                        {case "_Tuple2":
                                           return {ctor: "_Tuple2"
-                                                 ,_0: _v49._0 * _v50._0(_v61._0)
-                                                 ,_1: _v49._1 * _v50._1(_v61._1)};}
+                                                 ,_0: _v53._0 * _v54._0(_v65._0)
+                                                 ,_1: _v53._1 * _v54._1(_v65._1)};}
                                        _U.badCase($moduleName,
-                                       "on line 376, column 23 to 55");
+                                       "on line 467, column 23 to 55");
                                     }();
                                  },
                                  _L.fromArray([{ctor: "_Tuple2"
@@ -12072,13 +12028,13 @@ Elm.Plot.make = function (_elm) {
                                                ,_1: midpoint}]));
                               }();}
                          _U.badCase($moduleName,
-                         "between lines 368 and 377");
+                         "between lines 459 and 468");
                       }();}
                  _U.badCase($moduleName,
-                 "between lines 368 and 377");
+                 "between lines 459 and 468");
               }();}
          _U.badCase($moduleName,
-         "between lines 368 and 377");
+         "between lines 459 and 468");
       }();
    });
    var geom_bar = F4(function (aes$,
@@ -12159,24 +12115,24 @@ Elm.Plot.make = function (_elm) {
          points)));
       }();
    });
-   var point = F4(function (_v65,
-   _v66,
+   var point = F4(function (_v69,
+   _v70,
    f,
    x) {
       return function () {
-         switch (_v66.ctor)
+         switch (_v70.ctor)
          {case "_Tuple2":
             return function () {
-                 switch (_v65.ctor)
+                 switch (_v69.ctor)
                  {case "_Tuple2":
                     return {ctor: "_Tuple2"
-                           ,_0: _v65._0 * _v66._0(x)
-                           ,_1: _v65._1 * _v66._1(f(x))};}
+                           ,_0: _v69._0 * _v70._0(x)
+                           ,_1: _v69._1 * _v70._1(f(x))};}
                  _U.badCase($moduleName,
-                 "on line 345, column 8 to 45");
+                 "on line 436, column 8 to 45");
               }();}
          _U.badCase($moduleName,
-         "on line 345, column 8 to 45");
+         "on line 436, column 8 to 45");
       }();
    });
    var geom_points = F4(function (aes$,
@@ -12234,28 +12190,28 @@ Elm.Plot.make = function (_elm) {
          steps);
          var points = _U.cmp($List.length(d.pairs),
          0) > 0 ? A2($List.map,
-         function (_v73) {
-            return function () {
-               switch (_v73.ctor)
-               {case "_Tuple2":
-                  return {ctor: "_Tuple2"
-                         ,_0: xm * d.xScale(_v73._0)
-                         ,_1: ym * d.yScale(_v73._1)};}
-               _U.badCase($moduleName,
-               "on line 362, column 40 to 72");
-            }();
-         },
-         d.pairs) : points$;
-         return $Graphics$Collage.alpha(visibility)($Graphics$Collage.group(A2($List.map,
          function (_v77) {
             return function () {
                switch (_v77.ctor)
                {case "_Tuple2":
-                  return $Graphics$Collage.move({ctor: "_Tuple2"
-                                                ,_0: _v77._0
-                                                ,_1: _v77._1})($Graphics$Collage.filled(colour)($Graphics$Collage.circle(pointsize)));}
+                  return {ctor: "_Tuple2"
+                         ,_0: xm * d.xScale(_v77._0)
+                         ,_1: ym * d.yScale(_v77._1)};}
                _U.badCase($moduleName,
-               "on line 365, column 51 to 98");
+               "on line 453, column 40 to 72");
+            }();
+         },
+         d.pairs) : points$;
+         return $Graphics$Collage.alpha(visibility)($Graphics$Collage.group(A2($List.map,
+         function (_v81) {
+            return function () {
+               switch (_v81.ctor)
+               {case "_Tuple2":
+                  return $Graphics$Collage.move({ctor: "_Tuple2"
+                                                ,_0: _v81._0
+                                                ,_1: _v81._1})($Graphics$Collage.filled(colour)($Graphics$Collage.circle(pointsize)));}
+               _U.badCase($moduleName,
+               "on line 456, column 51 to 98");
             }();
          },
          points)));
@@ -12450,15 +12406,15 @@ Elm.Plot.make = function (_elm) {
          var ym = dims.ym;
          var xm = dims.xm;
          var ys = A2($List.map,
-         function (_v81) {
+         function (_v85) {
             return function () {
-               switch (_v81.ctor)
+               switch (_v85.ctor)
                {case "_Tuple2":
                   return {ctor: "_Tuple2"
-                         ,_0: xm * d.xScale(_v81._0)
-                         ,_1: ym * d.yScale(_v81._1)};}
+                         ,_0: xm * d.xScale(_v85._0)
+                         ,_1: ym * d.yScale(_v85._1)};}
                _U.badCase($moduleName,
-               "on line 291, column 28 to 64");
+               "on line 382, column 28 to 64");
             }();
          },
          points);
@@ -12500,27 +12456,24 @@ Elm.Plot.make = function (_elm) {
          var ym = dims.ym;
          var xm = dims.xm;
          var lineranges = A2($List.map,
-         function (_v85) {
+         function (_v89) {
             return function () {
-               switch (_v85.ctor)
+               switch (_v89.ctor)
                {case "_Tuple2":
                   return $Graphics$Collage.alpha(visibility)($Graphics$Collage.traced(linetype(colour))($Graphics$Collage.path(_L.fromArray([{ctor: "_Tuple2"
-                                                                                                                                             ,_0: xm * d.xScale(_v85._0)
-                                                                                                                                             ,_1: ym * d.yScale(_v85._1)}
+                                                                                                                                             ,_0: xm * d.xScale(_v89._0)
+                                                                                                                                             ,_1: ym * d.yScale(_v89._1)}
                                                                                                                                             ,{ctor: "_Tuple2"
-                                                                                                                                             ,_0: xm * d.xScale(_v85._0)
-                                                                                                                                             ,_1: ym * d.yScale(fun(_v85._0))}]))));}
+                                                                                                                                             ,_0: xm * d.xScale(_v89._0)
+                                                                                                                                             ,_1: ym * d.yScale(fun(_v89._0))}]))));}
                _U.badCase($moduleName,
-               "between lines 266 and 267");
+               "between lines 357 and 358");
             }();
          },
          d.pairs);
          return $Graphics$Collage.group(lineranges);
       }();
    });
-   var id = function (x) {
-      return x;
-   };
    var Graph = function (a) {
       return function (b) {
          return function (c) {
@@ -12588,15 +12541,15 @@ Elm.Plot.make = function (_elm) {
    var spin = F2(function (points,
    x) {
       return A2($List.map,
-      function (_v89) {
+      function (_v93) {
          return function () {
-            switch (_v89.ctor)
+            switch (_v93.ctor)
             {case "_Tuple2":
                return {ctor: "_Tuple2"
-                      ,_0: 0.5 * _v89._1 * $Basics.cos(x) - 0.5 * _v89._0 * $Basics.sin(x) + x
-                      ,_1: _v89._1 * $Basics.sin(x) + _v89._0 * $Basics.cos(x)};}
+                      ,_0: 0.5 * _v93._1 * $Basics.cos(x) - 0.5 * _v93._0 * $Basics.sin(x) + x
+                      ,_1: _v93._1 * $Basics.sin(x) + _v93._0 * $Basics.cos(x)};}
             _U.badCase($moduleName,
-            "on line 55, column 35 to 111");
+            "on line 98, column 35 to 111");
          }();
       },
       points);
@@ -12663,15 +12616,15 @@ Elm.Plot.make = function (_elm) {
          var ym = dims.ym;
          var xm = dims.xm;
          var points = A2($List.map,
-         function (_v93) {
+         function (_v97) {
             return function () {
-               switch (_v93.ctor)
+               switch (_v97.ctor)
                {case "_Tuple2":
                   return {ctor: "_Tuple2"
-                         ,_0: xm * d.xScale(offset + _v93._0 / xyRatio)
-                         ,_1: ym * d.yScale(_v93._1)};}
+                         ,_0: xm * d.xScale(offset + _v97._0 / xyRatio)
+                         ,_1: ym * d.yScale(_v97._1)};}
                _U.badCase($moduleName,
-               "on line 694, column 32 to 87");
+               "on line 761, column 32 to 87");
             }();
          },
          points$);
@@ -12826,15 +12779,15 @@ Elm.Plot.make = function (_elm) {
          var ym = dims.ym;
          var xm = dims.xm;
          var points = A2($List.map,
-         function (_v97) {
+         function (_v101) {
             return function () {
-               switch (_v97.ctor)
+               switch (_v101.ctor)
                {case "_Tuple2":
                   return {ctor: "_Tuple2"
-                         ,_0: xm * d.xScale(offset + _v97._0 / xyRatio)
-                         ,_1: ym * d.yScale(_v97._1)};}
+                         ,_0: xm * d.xScale(offset + _v101._0 / xyRatio)
+                         ,_1: ym * d.yScale(_v101._1)};}
                _U.badCase($moduleName,
-               "on line 752, column 33 to 88");
+               "on line 819, column 33 to 88");
             }();
          },
          points$);
@@ -12957,15 +12910,15 @@ Elm.Plot.make = function (_elm) {
          var ym = dims.ym;
          var xm = dims.xm;
          var area = A2($List.map,
-         function (_v101) {
+         function (_v105) {
             return function () {
-               switch (_v101.ctor)
+               switch (_v105.ctor)
                {case "_Tuple2":
                   return {ctor: "_Tuple2"
-                         ,_0: xm * d.xScale(offset + _v101._0 / xyRatio)
-                         ,_1: ym * d.yScale(_v101._1)};}
+                         ,_0: xm * d.xScale(offset + _v105._0 / xyRatio)
+                         ,_1: ym * d.yScale(_v105._1)};}
                _U.badCase($moduleName,
-               "on line 832, column 30 to 85");
+               "on line 899, column 30 to 85");
             }();
          },
          points);
@@ -12984,38 +12937,38 @@ Elm.Plot.make = function (_elm) {
       xs));
    });
    var continuous = F4(function (f,
-   _v105,
-   _v106,
+   _v109,
+   _v110,
    steps) {
       return function () {
-         switch (_v106.ctor)
+         switch (_v110.ctor)
          {case "_Tuple2":
             return function () {
-                 switch (_v105.ctor)
+                 switch (_v109.ctor)
                  {case "_Tuple2":
                     return function () {
-                         var pOffset = (_v105._1 + _v105._0) / 2;
-                         var sign = _v105._0 / _v105._0 * (_v105._1 / _v105._1);
-                         var yExtent = _v106._1 - _v106._0;
+                         var pOffset = (_v109._1 + _v109._0) / 2;
+                         var sign = _v109._0 / _v109._0 * (_v109._1 / _v109._1);
+                         var yExtent = _v110._1 - _v110._0;
                          var yDomain = {ctor: "_Tuple2"
-                                       ,_0: _v106._0
-                                       ,_1: _v106._1};
+                                       ,_0: _v110._0
+                                       ,_1: _v110._1};
                          var yScale = $Statistics$Continuous.normalize(yDomain);
                          var toY = function (y) {
                             return $Basics.fst(yDomain) + yExtent * yScale(y);
                          };
-                         var rmax = _U.cmp($Basics.abs(_v106._1),
-                         $Basics.abs(_v106._0)) > 0 ? $Basics.abs(_v106._1) : $Basics.abs(_v106._0);
+                         var rmax = _U.cmp($Basics.abs(_v110._1),
+                         $Basics.abs(_v110._0)) > 0 ? $Basics.abs(_v110._1) : $Basics.abs(_v110._0);
                          var interpolator = A2($List.map,
                          $Statistics$Continuous.normalize({ctor: "_Tuple2"
                                                           ,_0: 0
                                                           ,_1: $Basics.toFloat(steps)}),
                          _L.range(0,
                          $Basics.toFloat(steps)));
-                         var xExtent = _v105._1 - _v105._0;
+                         var xExtent = _v109._1 - _v109._0;
                          var xs = A2($List.map,
                          function (x) {
-                            return _v105._0 + xExtent * x;
+                            return _v109._0 + xExtent * x;
                          },
                          interpolator);
                          var ys = A2($List.map,f,xs);
@@ -13026,8 +12979,8 @@ Elm.Plot.make = function (_elm) {
                          var dx = xExtent / $Basics.toFloat(steps);
                          var xyRatio = rmax / (xExtent / 2);
                          var xDomain = {ctor: "_Tuple2"
-                                       ,_0: _v105._0
-                                       ,_1: _v105._1};
+                                       ,_0: _v109._0
+                                       ,_1: _v109._1};
                          var xScale = $Statistics$Continuous.normalize(xDomain);
                          var xLimits = xDomain;
                          var toX = function (x) {
@@ -13057,50 +13010,50 @@ Elm.Plot.make = function (_elm) {
                                 ,ys: ys};
                       }();}
                  _U.badCase($moduleName,
-                 "between lines 84 and 134");
+                 "between lines 162 and 212");
               }();}
          _U.badCase($moduleName,
-         "between lines 84 and 134");
+         "between lines 162 and 212");
       }();
    });
    var discrete = F3(function (f,
-   _v113,
-   _v114) {
+   _v117,
+   _v118) {
       return function () {
-         switch (_v114.ctor)
+         switch (_v118.ctor)
          {case "_Tuple2":
             return function () {
-                 switch (_v113.ctor)
+                 switch (_v117.ctor)
                  {case "_Tuple2":
                     return function () {
-                         var yExtent = _v114._1 - _v114._0;
+                         var yExtent = _v118._1 - _v118._0;
                          var yDomain = {ctor: "_Tuple2"
-                                       ,_0: _v114._0
-                                       ,_1: _v114._1};
+                                       ,_0: _v118._0
+                                       ,_1: _v118._1};
                          var yScale = $Statistics$Continuous.normalize(yDomain);
                          var toY = function (y) {
                             return $Basics.fst(yDomain) + yExtent * yScale(y);
                          };
                          var xLimits = {ctor: "_Tuple2"
-                                       ,_0: _v113._0
-                                       ,_1: _v113._1};
-                         var rmax = _U.cmp($Basics.abs(_v114._1),
-                         $Basics.abs(_v114._0)) > 0 ? $Basics.abs(_v114._1) : $Basics.abs(_v114._0);
+                                       ,_0: _v117._0
+                                       ,_1: _v117._1};
+                         var rmax = _U.cmp($Basics.abs(_v118._1),
+                         $Basics.abs(_v118._0)) > 0 ? $Basics.abs(_v118._1) : $Basics.abs(_v118._0);
+                         var xScale = $Statistics$Continuous.normalize(xLimits);
                          var dx = 1;
-                         var xs = _L.range(_v113._0,
-                         _v113._1);
+                         var xs = _L.range(_v117._0,
+                         _v117._1);
                          var ys = A2($List.map,f,xs);
                          var yLimits = {ctor: "_Tuple2"
                                        ,_0: $List.minimum(ys)
                                        ,_1: $List.maximum(ys)};
                          var steps = $List.length(xs);
                          var polar = A2(mkPolar,xs,ys);
-                         var xmax = _v113._1 + 0.5;
-                         var xmin = _v113._0 - 0.5;
+                         var xmax = _v117._1 + 0.5;
+                         var xmin = _v117._0 - 0.5;
                          var xDomain = {ctor: "_Tuple2"
                                        ,_0: xmin
                                        ,_1: xmax};
-                         var xScale = $Statistics$Continuous.normalize(xDomain);
                          var xyRatio = rmax / $Basics.snd(xDomain);
                          var xExtent = xmax - xmin;
                          var toX = function (x) {
@@ -13132,84 +13085,10 @@ Elm.Plot.make = function (_elm) {
                                 ,ys: ys};
                       }();}
                  _U.badCase($moduleName,
-                 "between lines 139 and 191");
+                 "between lines 220 and 273");
               }();}
          _U.badCase($moduleName,
-         "between lines 139 and 191");
-      }();
-   });
-   var fromPairs = F3(function (tuples,
-   _v121,
-   _v122) {
-      return function () {
-         switch (_v122.ctor)
-         {case "_Tuple2":
-            return function () {
-                 switch (_v121.ctor)
-                 {case "_Tuple2":
-                    return function () {
-                         var pOffset = (_v121._1 + _v121._0) / 2;
-                         var sign = _v121._0 / _v121._0 * (_v121._1 / _v121._1);
-                         var yExtent = _v122._1 - _v122._0;
-                         var yDomain = {ctor: "_Tuple2"
-                                       ,_0: _v122._0
-                                       ,_1: _v122._1};
-                         var yScale = $Statistics$Continuous.normalize(yDomain);
-                         var toY = function (y) {
-                            return $Basics.fst(yDomain) + yExtent * yScale(y);
-                         };
-                         var rmax = _U.cmp($Basics.abs(_v122._1),
-                         $Basics.abs(_v122._0)) > 0 ? $Basics.abs(_v122._1) : $Basics.abs(_v122._0);
-                         var dx = 1;
-                         var ys = A2($List.map,
-                         $Basics.snd,
-                         tuples);
-                         var yLimits = {ctor: "_Tuple2"
-                                       ,_0: $List.minimum(ys)
-                                       ,_1: $List.maximum(ys)};
-                         var xs = A2($List.map,
-                         $Basics.fst,
-                         tuples);
-                         var polar = A2(mkPolar,xs,ys);
-                         var steps = $List.length(tuples);
-                         var xExtent = _v121._1 - _v121._0;
-                         var xyRatio = rmax / (xExtent / 2);
-                         var xDomain = {ctor: "_Tuple2"
-                                       ,_0: _v121._0
-                                       ,_1: _v121._1};
-                         var xScale = $Statistics$Continuous.normalize(xDomain);
-                         var xLimits = xDomain;
-                         var toX = function (x) {
-                            return $Basics.fst(xDomain) + xExtent * xScale(x);
-                         };
-                         return {_: {}
-                                ,discrete: false
-                                ,dx: dx
-                                ,f: id
-                                ,pOffset: pOffset
-                                ,pairs: tuples
-                                ,polar: polar
-                                ,rmax: rmax
-                                ,steps: steps
-                                ,toX: toX
-                                ,toY: toY
-                                ,xDomain: xDomain
-                                ,xExtent: xExtent
-                                ,xLimits: xLimits
-                                ,xScale: xScale
-                                ,xs: xs
-                                ,xyRatio: xyRatio
-                                ,yDomain: yDomain
-                                ,yExtent: yExtent
-                                ,yLimits: yLimits
-                                ,yScale: yScale
-                                ,ys: ys};
-                      }();}
-                 _U.badCase($moduleName,
-                 "between lines 196 and 246");
-              }();}
-         _U.badCase($moduleName,
-         "between lines 196 and 246");
+         "between lines 220 and 273");
       }();
    });
    var geom_trace_polar = F4(function (aes$,
@@ -13272,15 +13151,15 @@ Elm.Plot.make = function (_elm) {
          var ym = dims.ym;
          var xm = dims.xm;
          var points = A2($List.map,
-         function (_v129) {
+         function (_v125) {
             return function () {
-               switch (_v129.ctor)
+               switch (_v125.ctor)
                {case "_Tuple2":
                   return {ctor: "_Tuple2"
-                         ,_0: xm * d.xScale(offset + _v129._0 / xyRatio)
-                         ,_1: ym * d.yScale(_v129._1)};}
+                         ,_0: xm * d.xScale(offset + _v125._0 / xyRatio)
+                         ,_1: ym * d.yScale(_v125._1)};}
                _U.badCase($moduleName,
-               "on line 670, column 33 to 88");
+               "on line 737, column 33 to 88");
             }();
          },
          points$);
@@ -13387,15 +13266,15 @@ Elm.Plot.make = function (_elm) {
          var ym = dims.ym;
          var xm = dims.xm;
          var points = A2($List.map,
-         function (_v133) {
+         function (_v129) {
             return function () {
-               switch (_v133.ctor)
+               switch (_v129.ctor)
                {case "_Tuple2":
                   return {ctor: "_Tuple2"
-                         ,_0: xm * d.xScale(offset + _v133._0 / xyRatio)
-                         ,_1: ym * d.yScale(_v133._1)};}
+                         ,_0: xm * d.xScale(offset + _v129._0 / xyRatio)
+                         ,_1: ym * d.yScale(_v129._1)};}
                _U.badCase($moduleName,
-               "on line 788, column 33 to 88");
+               "on line 855, column 33 to 88");
             }();
          },
          points$);
@@ -13427,6 +13306,12 @@ Elm.Plot.make = function (_elm) {
          },
          aes$,
          defaults);
+         var nsteps = A3(lookup,
+         function (_) {
+            return _.nsteps;
+         },
+         aes$,
+         defaults);
          var negate = A3(lookup,
          function (_) {
             return _.negate;
@@ -13446,7 +13331,7 @@ Elm.Plot.make = function (_elm) {
          defaults);
          var $ = A2($Statistics$Continuous.interpolate,
          dynamic ? limits$ : limits,
-         $Basics.toFloat(d.steps)),
+         $Basics.toFloat(nsteps)),
          dx = $._0,
          steps = $._1;
          var rev_steps = $List.reverse(steps);
@@ -13477,15 +13362,15 @@ Elm.Plot.make = function (_elm) {
          rev_steps,
          ys));
          var area = A2($List.map,
-         function (_v137) {
+         function (_v133) {
             return function () {
-               switch (_v137.ctor)
+               switch (_v133.ctor)
                {case "_Tuple2":
                   return {ctor: "_Tuple2"
-                         ,_0: xm * d.xScale(_v137._0)
-                         ,_1: ym * d.yScale(_v137._1)};}
+                         ,_0: xm * d.xScale(_v133._0)
+                         ,_1: ym * d.yScale(_v133._1)};}
                _U.badCase($moduleName,
-               "on line 484, column 30 to 66");
+               "on line 551, column 30 to 66");
             }();
          },
          points);
@@ -13508,6 +13393,83 @@ Elm.Plot.make = function (_elm) {
          aes$,
          defaults);
          return $Graphics$Collage.alpha(visibility)($Graphics$Collage.filled(colour)($Graphics$Collage.polygon(area)));
+      }();
+   });
+   var id = function (x) {
+      return x;
+   };
+   var fromPairs = F3(function (pairs,
+   _v137,
+   _v138) {
+      return function () {
+         switch (_v138.ctor)
+         {case "_Tuple2":
+            return function () {
+                 switch (_v137.ctor)
+                 {case "_Tuple2":
+                    return function () {
+                         var pOffset = (_v137._1 + _v137._0) / 2;
+                         var sign = _v137._0 / _v137._0 * (_v137._1 / _v137._1);
+                         var yExtent = _v138._1 - _v138._0;
+                         var yDomain = {ctor: "_Tuple2"
+                                       ,_0: _v138._0
+                                       ,_1: _v138._1};
+                         var yScale = $Statistics$Continuous.normalize(yDomain);
+                         var toY = function (y) {
+                            return $Basics.fst(yDomain) + yExtent * yScale(y);
+                         };
+                         var rmax = _U.cmp($Basics.abs(_v138._1),
+                         $Basics.abs(_v138._0)) > 0 ? $Basics.abs(_v138._1) : $Basics.abs(_v138._0);
+                         var dx = 1;
+                         var ys = A2($List.map,
+                         $Basics.snd,
+                         pairs);
+                         var yLimits = {ctor: "_Tuple2"
+                                       ,_0: $List.minimum(ys)
+                                       ,_1: $List.maximum(ys)};
+                         var xs = A2($List.map,
+                         $Basics.fst,
+                         pairs);
+                         var polar = A2(mkPolar,xs,ys);
+                         var steps = $List.length(pairs);
+                         var xExtent = _v137._1 - _v137._0;
+                         var xyRatio = rmax / (xExtent / 2);
+                         var xDomain = {ctor: "_Tuple2"
+                                       ,_0: _v137._0
+                                       ,_1: _v137._1};
+                         var xScale = $Statistics$Continuous.normalize(xDomain);
+                         var xLimits = xDomain;
+                         var toX = function (x) {
+                            return $Basics.fst(xDomain) + xExtent * xScale(x);
+                         };
+                         return {_: {}
+                                ,discrete: false
+                                ,dx: dx
+                                ,f: id
+                                ,pOffset: pOffset
+                                ,pairs: pairs
+                                ,polar: polar
+                                ,rmax: rmax
+                                ,steps: steps
+                                ,toX: toX
+                                ,toY: toY
+                                ,xDomain: xDomain
+                                ,xExtent: xExtent
+                                ,xLimits: xLimits
+                                ,xScale: xScale
+                                ,xs: xs
+                                ,xyRatio: xyRatio
+                                ,yDomain: yDomain
+                                ,yExtent: yExtent
+                                ,yLimits: yLimits
+                                ,yScale: yScale
+                                ,ys: ys};
+                      }();}
+                 _U.badCase($moduleName,
+                 "between lines 287 and 337");
+              }();}
+         _U.badCase($moduleName,
+         "between lines 287 and 337");
       }();
    });
    _elm.Plot.values = {_op: _op
@@ -13547,6 +13509,7 @@ Elm.Plot.make = function (_elm) {
                       ,plot: plot
                       ,background: background
                       ,annotate_integral: annotate_integral
+                      ,annotate_text: annotate_text
                       ,aes: aes
                       ,aesDefault: aesDefault
                       ,point: point
@@ -13957,7 +13920,7 @@ Elm.Statistics.Continuous.make = function (_elm) {
             return _U.eq(_v0._0 - _v0._1,
               0) ? 0.5 : (x - _v0._0) / (_v0._1 - _v0._0);}
          _U.badCase($moduleName,
-         "on line 213, column 27 to 87");
+         "on line 210, column 27 to 87");
       }();
    });
    var dec = F2(function (m,n) {
@@ -13982,7 +13945,7 @@ Elm.Statistics.Continuous.make = function (_elm) {
                {case "_Tuple2":
                   return (_v4._0 - meanx) * (_v4._1 - meany);}
                _U.badCase($moduleName,
-               "on line 250, column 56 to 79");
+               "on line 247, column 56 to 79");
             }();
          },
          pairs));
@@ -14010,7 +13973,7 @@ Elm.Statistics.Continuous.make = function (_elm) {
                {case "_Tuple2":
                   return (_v8._0 - meanx) * (_v8._1 - meany);}
                _U.badCase($moduleName,
-               "on line 274, column 56 to 79");
+               "on line 271, column 56 to 79");
             }();
          },
          pairs));
@@ -14029,7 +13992,7 @@ Elm.Statistics.Continuous.make = function (_elm) {
                {case "_Tuple2":
                   return dec(2)(_v12._1 - f(_v12._0));}
                _U.badCase($moduleName,
-               "on line 280, column 40 to 57");
+               "on line 277, column 40 to 57");
             }();
          },
          pairs);
@@ -14090,7 +14053,7 @@ Elm.Statistics.Continuous.make = function (_elm) {
                         interpolator)};
               }();}
          _U.badCase($moduleName,
-         "between lines 159 and 164");
+         "between lines 156 and 161");
       }();
    });
    var bins = function (ys) {
@@ -14112,7 +14075,7 @@ Elm.Statistics.Continuous.make = function (_elm) {
          {case "_Tuple2":
             return dx * (_v20._0 + _v20._1) / 2;}
          _U.badCase($moduleName,
-         "on line 151, column 19 to 37");
+         "on line 148, column 19 to 37");
       }();
    });
    var integrate = F3(function (_v24,
@@ -14136,7 +14099,7 @@ Elm.Statistics.Continuous.make = function (_elm) {
                  trapezia));
               }();}
          _U.badCase($moduleName,
-         "between lines 169 and 178");
+         "between lines 166 and 175");
       }();
    });
    var cdfuniform = F2(function (_v28,
@@ -14175,7 +14138,7 @@ Elm.Statistics.Continuous.make = function (_elm) {
                  pdfexponential(lambda));
               }();}
          _U.badCase($moduleName,
-         "between lines 144 and 145");
+         "between lines 141 and 142");
       }();
    });
    var pdfnormal = F3(function (mu,
@@ -14195,18 +14158,6 @@ Elm.Statistics.Continuous.make = function (_elm) {
    var cdfnormal = F4(function (mu,
    sigma,
    nsteps,
-   x) {
-      return function () {
-         var from = mu - sigma * 4;
-         return A3(integrate,
-         {ctor: "_Tuple2"
-         ,_0: from
-         ,_1: x},
-         nsteps,
-         A2(pdfnormal,mu,sigma));
-      }();
-   });
-   var cdfstandardnormal = F2(function (nsteps,
    _v36) {
       return function () {
          switch (_v36.ctor)
@@ -14216,19 +14167,34 @@ Elm.Statistics.Continuous.make = function (_elm) {
               ,_0: _v36._0
               ,_1: _v36._1},
               nsteps,
-              A2(pdfnormal,0,1));}
+              A2(pdfnormal,mu,sigma));}
          _U.badCase($moduleName,
-         "on line 139, column 38 to 79");
+         "on line 127, column 4 to 50");
       }();
    });
-   var pdfuniform = F2(function (_v40,
-   x) {
+   var cdfstandardnormal = F2(function (nsteps,
+   _v40) {
       return function () {
          switch (_v40.ctor)
          {case "_Tuple2":
+            return A3(integrate,
+              {ctor: "_Tuple2"
+              ,_0: _v40._0
+              ,_1: _v40._1},
+              nsteps,
+              A2(pdfnormal,0,1));}
+         _U.badCase($moduleName,
+         "on line 136, column 38 to 79");
+      }();
+   });
+   var pdfuniform = F2(function (_v44,
+   x) {
+      return function () {
+         switch (_v44.ctor)
+         {case "_Tuple2":
             return function () {
-                 var b = _v40._1;
-                 var a = _v40._0;
+                 var b = _v44._1;
+                 var a = _v44._0;
                  var domain = b - a;
                  return _U.cmp(x,
                  0) > -1 && (_U.cmp(a,
@@ -14306,23 +14272,23 @@ Elm.Statistics.Continuous.make = function (_elm) {
              ,pdf: e
              ,sigma: d};
    });
-   var uniform = function (_v44) {
+   var uniform = function (_v48) {
       return function () {
-         switch (_v44.ctor)
+         switch (_v48.ctor)
          {case "_Tuple2": return {_: {}
                                  ,cdf: cdfuniform({ctor: "_Tuple2"
-                                                  ,_0: _v44._0
-                                                  ,_1: _v44._1})
+                                                  ,_0: _v48._0
+                                                  ,_1: _v48._1})
                                  ,discrete: false
                                  ,interval: {ctor: "_Tuple2"
-                                            ,_0: _v44._0
-                                            ,_1: _v44._1}
-                                 ,mu: (_v44._1 - _v44._0) / 2
+                                            ,_0: _v48._0
+                                            ,_1: _v48._1}
+                                 ,mu: (_v48._1 - _v48._0) / 2
                                  ,name: "uniform"
                                  ,pdf: pdfuniform({ctor: "_Tuple2"
-                                                  ,_0: _v44._0
-                                                  ,_1: _v44._1})
-                                 ,sigma: $Basics.sqrt(Math.pow(_v44._1 - _v44._0,
+                                                  ,_0: _v48._0
+                                                  ,_1: _v48._1})
+                                 ,sigma: $Basics.sqrt(Math.pow(_v48._1 - _v48._0,
                                  2) / 12)};}
          _U.badCase($moduleName,
          "between lines 29 and 35");
