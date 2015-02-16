@@ -3889,9 +3889,9 @@ Elm.Main.make = function (_elm) {
    $Statistics$Continuous = Elm.Statistics.Continuous.make(_elm),
    $Statistics$Discrete = Elm.Statistics.Discrete.make(_elm),
    $Window = Elm.Window.make(_elm);
-   var ndtext = "Normalfördelningen är en välkänd kontinuerlig fördelning som kan användas istället för binomialfördelningen om en av flera möjliga tumregler uppfylls, till exempel nπ≥5 och n(1-π)≥5. Här betyder det att n≥5/π = n≥20. Med andra ord kan vi byta ut binomialfördelningen mot en motsvarande normalfördelning då antalet försök är minst 20. Fördelningen N(µ,σ) konstrueras med väntevärdet och standardavvikelsen från den ursprungliga binomialfördelningen. Om det vi försöker mäta liknar en normalfördelning så kan vi räkna med att ungefär två tredjedelar (0.68) av utfallen sker inom ±1 standardavvikelse omkring väntevärdet.";
-   var potext = "Poissonfördelningen är en annan diskret sannolikhetsfördelning som kan användas för att efterlikna binomialfördelningen. Eftersom poissonfördelningen används för mer ovanliga/osannolika händelser så passar den bra för stora n och små π, dvs ett stort antal försök och liten sannolikhet för positivt utfall. En tumregel är n ≥ 10 och π ≤ 0,1. Med andra ord är den olämplig att använda här då π=0.25. Poängen med diagrammet är snarare att visa fördelningarna och hur de liknar varandra. Poissonfördelningen har en något plattare form och en större standardavvikelse, dvs att det totala utfallet förväntas variera inom ett större intervall. Standardavvikelsen för en poissonfördelning är för övrigt roten ur väntevärdet. ";
-   var bintext = "Binomialfördelningen beskriver sannolikheter för två ömsesidigt uteslutande utfall och ett känt antal försök. Det gäller till exempel olika typer av spel, där utfallen är vinst och förlust. Varje försök är oberoende: utfallet av ett tärningskast beror inte på det föregående kastet. För att konstruera denna fördelning behövs två komponenter: sannolikheten för att händelsen inträffar (π) och antal försök (n). I verkligheten sker en slumpmässig variation men i det långa loppet kommer antalet positiva utfall att närma sig väntevärdet (µ), som enkelt beräknas genom n * π. Binomialfördelningen är en diskret fördelning, eftersom x-värdena (0..n) utgörs av heltal. Allt eftersom antalet försök växer blir binomialfördelningen mer omständlig att beräkna, och det kan därför vara en god idé att \"approximera\" den med en liknande fördelning. Exemplet till höger illustrerar fördelningen för mellan 4 och 60 försök, då sannolikheten för positivt utfall är en fjärdedel.";
+   var potext = "The Poisson distribution is another discrete probability distribution, which sometimes can act as a substitute for the binomial one. Since the Poisson distribution is used for rare or unlikely events, it\'s good for large n and small π, i.e. it works well for a large number of trials and a small probability of success. One rule of thumb is n ≥ 10 and π ≤ 0,1. In other words we shouldn\'t use it when π=0.25. Even though it makes a poor approximation, you can still tell from looking at the charts that the two distributions are similar. The Poisson distribution is slightly flatter with a larger standard deviation, meaning that the outcome is expected to vary more. It uses a single parameter(µ) and the standard deviation is assumed to be the square root of this value. ";
+   var ndtext = "The normal distribution is a well-known continuous distribution which can be used to approximate binomial probabilities if one out of several criteria are met, for example nπ≥5 och n(1-π)≥5. In this case it means n≥5/π = n≥20. In other words we can swap a binomial distribution for the corresponding normal one when the number of trials is at least 20. The normal distribution, denoted N(µ,σ), is constructed with the expected value (µ) and standard deviation (σ) from the original binomial one. If what we are trying to measure resembles a normal distribution we can expect approximately two thirds (0.68) of all outcomes to be within ±1 standard deviation about the mean. ";
+   var bintext = "Binomial distributions can be used to model probabilities where you have two mutually excluding events and a known number of trials. For example, a game might result in either win or loss for a given number of rounds. Also, each trial is independent from the others: the outcome of rolling a die does not depend on the previous roll. To construct this probability distribution, two components are needed: the probability of an event (π) and the number of trials (n). In practice results will vary, but in the long run the total outcome will approach the expected value (µ), which is n * π. The binomial distribution is discrete, since the x values (0..n) are integers. As more trials are performed, calculations become increasingly demanding. For this reason, you sometimes \"approximate\" it by using a similar distribution. The example on the right illustrates a binomial distribution of between 4 and 60 trials, when the probability of success is 1/4 (=0.25).";
    var mkGeoms = F3(function (n,
    pdist,
    use) {
@@ -4003,12 +4003,12 @@ Elm.Main.make = function (_elm) {
                                                            ,$Maybe.Just($Color.grey)]],
                              $Plot.aes))
                              ,$Plot.xAxis(_U.replace([["label"
-                                                      ,$Maybe.Just("Antal försök")]
+                                                      ,$Maybe.Just("Number of trials")]
                                                      ,["tickspacing"
                                                       ,$Maybe.Just(10)]],
                              $Plot.aes))
                              ,$Plot.yAxis(_U.replace([["label"
-                                                      ,$Maybe.Just("Sannolikhet")]
+                                                      ,$Maybe.Just("Probability")]
                                                      ,["tickspacing"
                                                       ,$Maybe.Just(0.1)]
                                                      ,["revolve"
@@ -4031,12 +4031,12 @@ Elm.Main.make = function (_elm) {
                                                                         ,_1: 20})]],
                              $Plot.aes))
                              ,$Plot.xAxis(_U.replace([["label"
-                                                      ,$Maybe.Just("Antal försök")]
+                                                      ,$Maybe.Just("Number of trials")]
                                                      ,["tickspacing"
                                                       ,$Maybe.Just(10)]],
                              $Plot.aes))
                              ,$Plot.yAxis(_U.replace([["label"
-                                                      ,$Maybe.Just("Sannolikhet")]
+                                                      ,$Maybe.Just("Probability")]
                                                      ,["tickspacing"
                                                       ,$Maybe.Just(0.1)]
                                                      ,["revolve"
@@ -4222,15 +4222,19 @@ Elm.Main.make = function (_elm) {
    render,
    $Mouse.position,
    $Window.dimensions);
+   var id = function (n) {
+      return n;
+   };
    _elm.Main.values = {_op: _op
+                      ,id: id
                       ,render: render
                       ,main: main
                       ,geomsD: geomsD
                       ,geomsC: geomsC
                       ,mkGeoms: mkGeoms
                       ,bintext: bintext
-                      ,potext: potext
-                      ,ndtext: ndtext};
+                      ,ndtext: ndtext
+                      ,potext: potext};
    return _elm.Main.values;
 };Elm.Maybe = Elm.Maybe || {};
 Elm.Maybe.make = function (_elm) {
