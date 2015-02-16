@@ -44,6 +44,7 @@ customAes = { aes | radius <- Just 2, pointsize <- Just 9, colour <- Just darkBl
 
 render m w =  
    let
+      margins = (70,70)
       mouseY = toFloat <| snd m
       mouseX = toFloat <| fst m
       ypos = C.normalize (0.9 * (toFloat << snd) w,0.2 * (toFloat << snd) w) mouseY
@@ -74,12 +75,12 @@ render m w =
       flow down 
       [  
         flow right <|  
-         [plot (1000,300) d1 (geoms1 ++ plotTitle1) m w,
-              plot (300,300) d1 geoms3 m w 
+         [plot (1000,300) margins d1 (geoms1 ++ plotTitle1) m w,
+              plot (300,300) margins d1 geoms3 m w 
               ],
         flow right <|  
-         [plot (1000,300) d2 (geoms1 ++ plotTitle2) m w,
-              plot (300,300) d2 geoms3 m w 
+         [plot (1000,300) margins d2 (geoms1 ++ plotTitle2) m w,
+              plot (300,300) margins d2 geoms3 m w 
               ]
         --flow right <|  
         -- [plot (1000,200) d3 (geoms4 ++ regressionPoints ++ regressionLine) m w,
