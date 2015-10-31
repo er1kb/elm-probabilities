@@ -30,4 +30,4 @@ Examples:
 [Interactive linear regression](http://er1kb.github.io/elm-probabilities/examples/Interactive_regression.html)  
 [Static plot of linear regressions](http://er1kb.github.io/elm-probabilities/examples/linear_regression.html)  
 [Approximating a binomial distribution](http://er1kb.github.io/elm-probabilities/examples/binom_en.html)  
-[Dogenometry (silly)](http://er1kb.github.io/elm-probabilities/examples/Dogenometry.html)  
+[Dogenometry (silly)](http://er1kb.github.io/elm-probabilities/examples/Dogenometry1.html)  
